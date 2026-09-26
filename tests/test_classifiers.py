@@ -59,9 +59,9 @@ def test_mahalanobis_ignores_anomalous_fit_rows() -> None:
     assert roc_auc_score(yt, sc.anomaly_score(Xt)) > 0.95
 
 
-def test_make_scorer_rejects_unknown_name() -> None:
-    """An unimplemented classifier name (e.g. Thinking) raises KeyError."""
-    with pytest.raises(KeyError):
+def test_make_scorer_thinking_requires_cache_args() -> None:
+    """`tabpfn_thinking` without `cache_key`/`cache_dir` raises ValueError, not a bad Path op."""
+    with pytest.raises(ValueError, match="cache_key"):
         make_scorer("tabpfn_thinking", {}, seed=0, device="cpu")
 
 

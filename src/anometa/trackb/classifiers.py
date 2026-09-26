@@ -2,13 +2,15 @@
 
 `make_scorer` builds a `Scorer` for one `config.ClassifierName`: `logreg`
 and `knn` fit a scikit-learn pipeline on labelled shots; `tabpfn` and
-`tabpfn_fast` fit TabPFN-3.5 and 3.5-Fast the same way; `mahalanobis` and
-`tabpfn_outlier` are one-class controls (`config.ONE_CLASS`) that fit on
-normal rows only. Every scorer's `anomaly_score` is 1-D: P(anomalous) in
-`[0, 1]` when `probabilistic`, otherwise unbounded with higher meaning more
-anomalous. `tabpfn` and `tabpfn-extensions` are imported inside their
-factory functions, so a run that only uses the scikit-learn classifiers
-never pays for loading them.
+`tabpfn_fast` fit TabPFN-3.5 and 3.5-Fast the same way; `tabpfn_thinking`
+fits TabPFN-3.5-Thinking via the Prior Labs API, caching its prediction to
+disk so a rerun of the same (config, scenario, seed) never spends credits;
+`mahalanobis` and `tabpfn_outlier` are one-class controls (`config.ONE_CLASS`)
+that fit on normal rows only. Every scorer's `anomaly_score` is 1-D:
+P(anomalous) in `[0, 1]` when `probabilistic`, otherwise unbounded with
+higher meaning more anomalous. `tabpfn`, `tabpfn-extensions` and
+`tabpfn_client` are imported inside their factory functions, so a run that
+only uses the scikit-learn classifiers never pays for loading them.
 """
 
 from collections.abc import Callable, Mapping
@@ -393,6 +395,115 @@ def _build_tabpfn_outlier(
     return _TabPFNOutlierScorer(model, seed, n_permutations)
 
 
+@dataclass
+class ThinkingScorer:
+    """`Scorer` wrapping TabPFN-3.5-Thinking via the Prior Labs API, cached to disk.
+
+    `fit` only stores the fit rows; the API call is deferred to
+    `anomaly_score` and made at most once: when `cache_file` already holds a
+    prediction, it is returned unchanged and no API call happens, so a
+    rerun of the same (config, scenario, seed) never spends credits.
+    `tabpfn_client` is resolved as a module attribute at call time (`import
+    tabpfn_client` then `tabpfn_client.TabPFNClassifier`), so tests can
+    monkeypatch it.
+    """
+
+    seed: int
+    cache_file: Path
+    effort: str = "medium"
+    metric: str = "roc_auc"
+    timeout_s: int = 600
+    probabilistic: bool = field(default=True, init=False)
+    _x: NDArray[np.float32] | None = field(default=None, init=False, repr=False)
+    _y: NDArray[np.int64] | None = field(default=None, init=False, repr=False)
+
+    def fit(self, X: NDArray[np.float32], y: NDArray[np.int64]) -> Self:
+        """Store the fit rows; the API call happens lazily in `anomaly_score`."""
+        self._x = X
+        self._y = y
+        return self
+
+    def anomaly_score(self, X: NDArray[np.float32]) -> NDArray[np.float64]:
+        """Return P(y == 1) for `X`, from `cache_file` or one Prior Labs API call.
+
+        Args:
+            X: `(n, d)` feature rows to score.
+
+        Returns:
+            `(n,)` P(anomalous), cached at `cache_file` after a live call.
+
+        Raises:
+            ValueError: If a cached prediction's length doesn't match `len(X)`.
+            RuntimeError: If `fit` was never called and there is no cache to read.
+        """
+        if self.cache_file.exists():
+            p = np.asarray(np.load(self.cache_file)["p"], dtype=np.float64)
+            if len(p) != len(X):
+                raise ValueError(
+                    f"cached prediction at {self.cache_file} has {len(p)} rows, expected {len(X)}"
+                )
+            return p
+        if self._x is None or self._y is None:
+            raise RuntimeError("fit must be called before anomaly_score")
+
+        import tabpfn_client
+
+        clf = tabpfn_client.TabPFNClassifier.create_default_for_version(
+            "v3.5",
+            thinking_effort=self.effort,
+            thinking_metric=self.metric,
+            thinking_timeout_s=self.timeout_s,
+            random_state=self.seed,
+        )
+        clf.fit(self._x, self._y)
+        proba = np.asarray(clf.predict_proba(X))
+        p = proba[:, list(clf.classes_).index(1)].astype(np.float64)
+        self.cache_file.parent.mkdir(parents=True, exist_ok=True)
+        np.savez(self.cache_file, p=p)
+        return p
+
+
+def thinking_cost(X_fit: NDArray[np.float32], X_eval: NDArray[np.float32]) -> int:
+    """Estimate the Prior Labs token cost of one TabPFN-3.5-Thinking fit and predict.
+
+    Both estimates use `thinking_effort="medium"`, matching `ThinkingScorer`'s
+    default. Every operation costs at least 10,000 tokens against a 5M
+    token/day default budget: call this before a real Thinking run and check
+    the estimate against the remaining budget.
+
+    Args:
+        X_fit: `(n_fit, d)` feature rows a Thinking scorer would fit on.
+        X_eval: `(n_eval, d)` feature rows it would then score.
+
+    Returns:
+        The summed `estimated_cost` of one `"thinking_fit"` and one
+        `"thinking_predict"` operation.
+    """
+    import tabpfn_client
+
+    fit_cost = tabpfn_client.estimate_cost(
+        X_fit, X_eval, operation="thinking_fit", thinking_effort="medium"
+    ).estimated_cost
+    predict_cost = tabpfn_client.estimate_cost(
+        X_fit, X_eval, operation="thinking_predict", thinking_effort="medium"
+    ).estimated_cost
+    return fit_cost + predict_cost
+
+
+def _build_tabpfn_thinking(seed: int, cache_key: str, cache_dir: Path) -> Scorer:
+    """Build the `tabpfn_thinking` scorer: cached TabPFN-3.5-Thinking via the API.
+
+    Args:
+        seed: `random_state` for `ThinkingScorer`'s TabPFN classifier.
+        cache_key: Cache-file stem, e.g. `f"{config_hash(cfg)}/{scenario}-{seed}"`.
+        cache_dir: Directory `cache_key`'s `.npz` cache file lives under.
+
+    Returns:
+        The scorer, unfitted.
+    """
+    return ThinkingScorer(seed, cache_dir / f"{cache_key}.npz")
+
+
 _BUILDERS: dict[str, Callable[[Mapping[str, int | float | str], int, str], Scorer]] = {
     "logreg": _build_logreg,
     "knn": _build_knn,
@@ -401,10 +512,11 @@ _BUILDERS: dict[str, Callable[[Mapping[str, int | float | str], int, str], Score
     "mahalanobis": _build_mahalanobis,
     "tabpfn_outlier": _build_tabpfn_outlier,
 }
-"""Scorer builder per implemented `ClassifierName`.
+"""Scorer builder per `ClassifierName` that only needs `params`/`seed`/`device`.
 
-A name with no entry here (e.g. `tabpfn_thinking`, added in Task 21) makes
-`make_scorer` raise `KeyError`.
+`tabpfn_thinking` isn't here: it also needs `cache_key`/`cache_dir`, so
+`make_scorer` builds it directly instead. A name with no entry here and not
+`tabpfn_thinking` makes `make_scorer` raise `KeyError`.
 """
 
 
@@ -424,15 +536,23 @@ def make_scorer(
         params: Classifier-specific hyperparameters; see each `_build_*`.
         seed: Random seed for the classifier's own randomness.
         device: `"cpu"`, `"cuda"` or `"mps"` (see `config.resolve_device`).
-        cache_key: Unused here; reserved for the Thinking scorer (Task 21).
-        cache_dir: Unused here; reserved for the Thinking scorer (Task 21).
+        cache_key: Required for `"tabpfn_thinking"`: its cache file's stem,
+            e.g. `f"{config_hash(cfg)}/{scenario}-{seed}"`.
+        cache_dir: Required for `"tabpfn_thinking"`: the directory its
+            `.npz` cache file lives under.
 
     Returns:
         The scorer, unfitted.
 
     Raises:
         KeyError: If `name` has no scorer builder.
+        ValueError: If `name` is `"tabpfn_thinking"` and `cache_key` or
+            `cache_dir` is `None`.
     """
+    if name == "tabpfn_thinking":
+        if cache_key is None or cache_dir is None:
+            raise ValueError("tabpfn_thinking requires cache_key and cache_dir")
+        return _build_tabpfn_thinking(seed, cache_key, cache_dir)
     return _BUILDERS[name](params, seed, device)
 
 
