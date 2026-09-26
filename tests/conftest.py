@@ -10,8 +10,11 @@ import torch
 from numpy.typing import NDArray
 from PIL import Image
 
-from anometa.config import Paths
+from anometa.config import Paths, Scenario, TrackBConfig
+from anometa.data.ad2 import index_scenario
+from anometa.data.splits import make_split, write_split
 from anometa.features.encoders import Encoded
+from anometa.features.extract import extract_scenario
 
 _LIGHTINGS: tuple[str, ...] = ("regular", "overexposed", "shift_1")
 _SIZE: tuple[int, int] = (16, 24)  # (height, width)
@@ -112,6 +115,45 @@ def paths(tmp_path: Path, ad2_root: Path) -> Paths:
         splits=tmp_path / "splits",
         configs=tmp_path / "configs",
     )
+
+
+@pytest.fixture
+def prepared(ad2_root: Path, paths: Paths) -> Paths:
+    """Extract fake Vial features and write its dev/lock split.
+
+    Args:
+        ad2_root: The fake AD2 data root.
+        paths: Run paths scoped to `ad2_root`.
+
+    Returns:
+        `paths`, ready for a Track B run over the fake Vial scenario.
+    """
+    extract_scenario(FakeEncoder(), Scenario.VIAL, paths)
+    write_split(make_split(index_scenario(ad2_root, Scenario.VIAL)), paths.splits / "vial.csv")
+    return paths
+
+
+def cfg_b(paths: Paths, **kw: object) -> TrackBConfig:
+    """Build a Track B config over the fake Vial scenario, overriding any field.
+
+    Args:
+        paths: Run paths, as built by `prepared`.
+        **kw: Fields overriding the default logreg, k=2, dinov3_s config.
+
+    Returns:
+        The validated `TrackBConfig`.
+    """
+    base: dict[str, object] = dict(
+        encoder="dinov3_s",
+        features=("cls", "mean_patch", "novelty"),
+        pca_dim=4,
+        classifier="logreg",
+        k=2,
+        scenarios=(Scenario.VIAL,),
+        seeds=(0, 1),
+        paths=paths,
+    )
+    return TrackBConfig.model_validate(base | kw)
 
 
 @dataclass

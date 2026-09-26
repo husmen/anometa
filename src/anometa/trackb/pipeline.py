@@ -11,6 +11,7 @@ its PCA and feature-assembly building blocks.
 
 import json
 import time
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Literal
 
@@ -33,7 +34,7 @@ from anometa.data.splits import BudgetError, eval_rows, load_split, sample_few_s
 from anometa.features.extract import Features, load_features
 from anometa.metrics.aggregate import group_metrics, summarize
 from anometa.metrics.image import prior_correct
-from anometa.trackb.classifiers import make_scorer, tabpfn_revision
+from anometa.trackb.classifiers import Scorer, make_scorer, tabpfn_revision
 
 _EMBEDDING_BLOCKS: tuple[FeatureBlock, ...] = ("cls", "mean_patch")
 _TABPFN_VERSIONS: dict[str, Literal["v3.5", "v3.5-fast"]] = {
@@ -69,10 +70,13 @@ def fit_pca(embedding: NDArray[np.float32], dim: int) -> PCA:
     return PCA(n_components=dim, svd_solver="full").fit(embedding)
 
 
-def _embedding(
+def embedding(
     feats: Features, rows: NDArray[np.int64], blocks: tuple[FeatureBlock, ...]
 ) -> NDArray[np.float32] | None:
     """Concatenate the `cls`/`mean_patch` blocks requested in `blocks` for some rows.
+
+    Public: also used by callers that need to fit a PCA before `design_matrix`
+    can run, e.g. the GUI demo's `fit_and_score`.
 
     Args:
         feats: A scenario's cached features.
@@ -115,14 +119,83 @@ def design_matrix(
             `None`.
     """
     parts: list[NDArray[np.float32]] = []
-    embedding = _embedding(feats, rows, blocks)
-    if embedding is not None:
+    emb = embedding(feats, rows, blocks)
+    if emb is not None:
         if pca is None:
             raise ValueError("pca is required when blocks include cls or mean_patch")
-        parts.append(pca.transform(embedding).astype(np.float32))
+        parts.append(pca.transform(emb).astype(np.float32))
     if "novelty" in blocks:
         parts.append(feats.novelty[rows])
     return np.concatenate(parts, axis=1)
+
+
+def fit_and_score_shots(
+    feats: Features,
+    pca: PCA | None,
+    train_rows: NDArray[np.int64],
+    features: tuple[FeatureBlock, ...],
+    shots: Sequence[str],
+    split_df: pd.DataFrame,
+    split: Literal["dev", "lock"],
+    scorer: Scorer,
+    device: str,
+) -> tuple[pd.DataFrame, NDArray[np.float64], NDArray[np.float64], float, float]:
+    """Fit `scorer` on train normals plus `shots`, score `split`'s eval rows, balance the scores.
+
+    The per-seed fit/score/balance step shared by `run_track_b`'s scenario
+    loop and the GUI demo's `fit_and_score`, so the two paths can't silently
+    diverge. `train_rows` selection and the PCA fit happen once per scenario
+    in the caller, since `run_track_b` reuses both across seeds.
+
+    Args:
+        feats: A scenario's cached features.
+        pca: PCA fitted on the scenario's train-normal embedding, or `None`
+            when `features` is novelty-only.
+        train_rows: Row positions of the scenario's train-normal images.
+        features: Feature blocks to concatenate, e.g. `cfg.features`.
+        shots: Image ids labelled anomalous (the `y=1` fit rows).
+        split_df: The scenario's dev/lock split, as returned by `load_split`.
+        split: `"dev"` or `"lock"`: which rows `eval_rows` scores.
+        scorer: An unfitted `Scorer`.
+        device: Device `scorer` runs on; CUDA is synchronised around each
+            timed call so the latencies reflect the GPU work, not just launch.
+
+    Returns:
+        `(eval_df, score, score_balanced, fit_ms, predict_ms)`. `eval_df` is
+        `eval_rows(split_df, split=split, shots=shots)`; `score` and
+        `score_balanced` (NaN when not `scorer.probabilistic`) align to its
+        rows; `fit_ms` and `predict_ms` are wall-clock milliseconds.
+    """
+    shot_rows = feats.rows(shots)
+    fit_positions = np.concatenate([train_rows, shot_rows])
+    y_fit: NDArray[np.int64] = np.concatenate(
+        [np.zeros(len(train_rows), dtype=np.int64), np.ones(len(shot_rows), dtype=np.int64)]
+    )
+    x_fit = design_matrix(feats, fit_positions, features, pca)
+
+    start = time.perf_counter()
+    scorer.fit(x_fit, y_fit)
+    if device == "cuda":
+        torch.cuda.synchronize()
+    fit_ms = (time.perf_counter() - start) * 1000
+
+    eval_df = eval_rows(split_df, split=split, shots=shots)
+    eval_ids: list[str] = eval_df["image_id"].tolist()
+    eval_positions = feats.rows(eval_ids)
+    x_eval = design_matrix(feats, eval_positions, features, pca)
+
+    start = time.perf_counter()
+    score = scorer.anomaly_score(x_eval)
+    if device == "cuda":
+        torch.cuda.synchronize()
+    predict_ms = (time.perf_counter() - start) * 1000
+
+    if scorer.probabilistic:
+        score_balanced = prior_correct(score, len(shots) / (len(train_rows) + len(shots)))
+    else:
+        score_balanced = np.full(score.shape, np.nan)
+
+    return eval_df, score, score_balanced, fit_ms, predict_ms
 
 
 def _encoder_revision(feats: Features) -> str:
@@ -230,7 +303,7 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
         train_rows: NDArray[np.int64] = np.flatnonzero(
             np.char.startswith(feats.image_id, "train/good/")
         ).astype(np.int64)
-        train_embedding = _embedding(feats, train_rows, cfg.features)
+        train_embedding = embedding(feats, train_rows, cfg.features)
         pca: PCA | None = None
         if train_embedding is not None:
             assert cfg.pca_dim is not None  # guaranteed by TrackBConfig validation
@@ -238,16 +311,6 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
 
         for seed in cfg.seeds:
             shots = seed_shots[str(seed)]
-            shot_rows = feats.rows(shots)
-            fit_positions = np.concatenate([train_rows, shot_rows])
-            y_fit: NDArray[np.int64] = np.concatenate(
-                [
-                    np.zeros(len(train_rows), dtype=np.int64),
-                    np.ones(len(shot_rows), dtype=np.int64),
-                ]
-            )
-            x_fit = design_matrix(feats, fit_positions, cfg.features, pca)
-
             if cfg.classifier == "tabpfn_thinking":
                 scorer = make_scorer(
                     cfg.classifier,
@@ -262,27 +325,11 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
                     cfg.classifier, cfg.classifier_params, seed=seed, device=device
                 )
 
-            start = time.perf_counter()
-            scorer.fit(x_fit, y_fit)
-            if device == "cuda":
-                torch.cuda.synchronize()
-            fit_latencies_ms.append((time.perf_counter() - start) * 1000)
-
-            eval_df = eval_rows(split_df, split=cfg.split, shots=shots)
-            eval_ids: list[str] = eval_df["image_id"].tolist()
-            eval_positions = feats.rows(eval_ids)
-            x_eval = design_matrix(feats, eval_positions, cfg.features, pca)
-
-            start = time.perf_counter()
-            score = scorer.anomaly_score(x_eval)
-            if device == "cuda":
-                torch.cuda.synchronize()
-            predict_latencies_ms.append((time.perf_counter() - start) * 1000)
-
-            if probabilistic:
-                score_balanced = prior_correct(score, cfg.k / (len(train_rows) + cfg.k))
-            else:
-                score_balanced = np.full(score.shape, np.nan)
+            eval_df, score, score_balanced, fit_ms, predict_ms = fit_and_score_shots(
+                feats, pca, train_rows, cfg.features, shots, split_df, cfg.split, scorer, device
+            )
+            fit_latencies_ms.append(fit_ms)
+            predict_latencies_ms.append(predict_ms)
 
             part = eval_df[["image_id", "scene_id", "label", "lighting"]].copy()
             part["scenario"] = str(scenario)
