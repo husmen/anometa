@@ -84,6 +84,13 @@ def test_name_rejects_path_traversal() -> None:
         dict(features=("cls",), pca_dim=16, classifier="logreg", k=0),  # few-shot means k>0
         dict(features=("cls",), pca_dim=16, classifier="logreg", k=10, shot_lighting="all"),  # dev
         dict(
+            features=("cls",),
+            pca_dim=16,
+            classifier="tabpfn_thinking",
+            k=1,
+            classifier_params={"n_estimators": 4},
+        ),  # tabpfn_thinking takes no params
+        dict(
             encoder="siglip2",
             features=("cls",),
             pca_dim=16,

@@ -34,7 +34,7 @@ from anometa.data.splits import BudgetError, eval_rows, load_split, sample_few_s
 from anometa.features.extract import Features, load_features
 from anometa.metrics.aggregate import group_metrics, summarize
 from anometa.metrics.image import prior_correct
-from anometa.trackb.classifiers import Scorer, make_scorer, tabpfn_revision
+from anometa.trackb.classifiers import Scorer, ThinkingScorer, make_scorer, tabpfn_revision
 
 _EMBEDDING_BLOCKS: tuple[FeatureBlock, ...] = ("cls", "mean_patch")
 _TABPFN_VERSIONS: dict[str, Literal["v3.5", "v3.5-fast"]] = {
@@ -43,6 +43,14 @@ _TABPFN_VERSIONS: dict[str, Literal["v3.5", "v3.5-fast"]] = {
     "tabpfn_outlier": "v3.5",
 }
 """TabPFN checkpoint version per classifier whose scorer loads `tabpfn` (so its licence applies)."""
+
+_THINKING_KEY_EXCLUDE: tuple[str, ...] = ("seeds", "scenarios", "device", "classifier_params")
+"""Fields (besides `name`/`paths`) left out of the `tabpfn_thinking` cache key.
+
+One cached prediction per (scenario, seed), whichever other seeds and
+scenarios a run spans and whatever device it names; `classifier_params` is
+always empty for `tabpfn_thinking`.
+"""
 
 _PRED_COLUMNS: list[str] = [
     "scenario",
@@ -223,10 +231,13 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
     on train normals (y=0) plus that seed's shots (y=1, empty for one-class
     classifiers), times the fit and the timed `anomaly_score` call on the
     split's evaluation rows (CUDA synchronised), and prior-corrects
-    probabilistic scores to a balanced 50/50 prior. `tabpfn_thinking` is
-    keyed by `f"{config_hash(cfg)}/{scenario}-{seed}"` under
-    `cfg.paths.cache / "thinking"`, so its predictions are cached across
-    reruns of the same config.
+    probabilistic scores to a balanced 50/50 prior. `tabpfn_thinking`
+    caches each prediction at
+    `cfg.paths.cache / "thinking" / <key> / f"{scenario}-{seed}.npz"`,
+    where `<key>` is `config_hash` without `_THINKING_KEY_EXCLUDE`, so a
+    rerun, or another run sharing that (scenario, seed), never calls the API
+    again. Its fit/predict latencies are recorded as NaN: they time the
+    network, not the model.
 
     Args:
         cfg: The Track B experiment configuration.
@@ -237,8 +248,9 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
         Predictions for every (scenario, seed)'s evaluation rows, summary
         metrics (`summarize(group_metrics(...))` plus `fit_latency_ms`,
         `predict_latency_ms` and, on CUDA, `peak_vram_mb`), the model
-        revisions and licences this run depended on, and the sampled shots
-        per (scenario, seed) as `shots.json`.
+        revisions and licences this run depended on (`tabpfn_thinking`
+        records the Prior Labs API terms, not the local weights licence),
+        and the sampled shots per (scenario, seed) as `shots.json`.
 
     Raises:
         BudgetError: If a seed's few-shot sample exceeds the shot pool, or
@@ -250,7 +262,7 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
     """
     device = resolve_device(cfg.device)
     probabilistic = cfg.classifier not in ONE_CLASS
-    cfg_hash = config_hash(cfg)
+    thinking_key = config_hash(cfg, exclude=_THINKING_KEY_EXCLUDE)
 
     if device == "cuda":
         torch.cuda.reset_peak_memory_stats()
@@ -260,8 +272,10 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
     predict_latencies_ms: list[float] = []
     model_revisions: dict[str, str] = {}
     licences: dict[str, str] = {"ad2": LICENCES["ad2"]}
-    if cfg.classifier in _TABPFN_VERSIONS or cfg.classifier == "tabpfn_thinking":
+    if cfg.classifier in _TABPFN_VERSIONS:
         licences["tabpfn"] = LICENCES["tabpfn"]
+    elif cfg.classifier == "tabpfn_thinking":
+        licences["tabpfn_api"] = LICENCES["tabpfn_api"]
 
     # Sample every (scenario, seed)'s shots first, so a BudgetError fires before any fit.
     splits: dict[Scenario, pd.DataFrame] = {}
@@ -317,7 +331,7 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
                     cfg.classifier_params,
                     seed=seed,
                     device=device,
-                    cache_key=f"{cfg_hash}/{scenario}-{seed}",
+                    cache_key=f"{thinking_key}/{scenario}-{seed}",
                     cache_dir=cfg.paths.cache / "thinking",
                 )
             else:
@@ -344,11 +358,18 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
         model_revisions["tabpfn"] = (
             f"{rev['tabpfn_version']}@{rev['checkpoint']}#{rev['sha256'][:12]}"
         )
+    elif cfg.classifier == "tabpfn_thinking":
+        model_revisions["tabpfn_thinking"] = (
+            f"api:v3.5 effort={ThinkingScorer.effort} metric={ThinkingScorer.metric}"
+        )
 
     predictions = pd.concat(pred_parts, ignore_index=True)[_PRED_COLUMNS]
     metrics = summarize(group_metrics(predictions, probabilistic))
-    metrics["fit_latency_ms"] = float(np.median(fit_latencies_ms))
-    metrics["predict_latency_ms"] = float(np.median(predict_latencies_ms))
+    timed = cfg.classifier != "tabpfn_thinking"  # API round trips aren't model latency
+    metrics["fit_latency_ms"] = float(np.median(fit_latencies_ms)) if timed else float("nan")
+    metrics["predict_latency_ms"] = (
+        float(np.median(predict_latencies_ms)) if timed else float("nan")
+    )
     if device == "cuda":
         metrics["peak_vram_mb"] = torch.cuda.max_memory_allocated() / 2**20
 
