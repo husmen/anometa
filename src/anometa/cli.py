@@ -230,6 +230,41 @@ _run_parser.add_argument(
 _run_parser.set_defaults(func=_cmd_run)
 
 
+def _cmd_reference_check(args: argparse.Namespace) -> int:
+    """Run the `reference-check` subcommand: compare `TabPFNWithImages` to Track B.
+
+    Prints one row per seed and each side's mean AUROC.
+
+    Args:
+        args: Parsed arguments; `scenario` and `k`.
+
+    Returns:
+        `0` on success.
+    """
+    from anometa.trackb.reference import reference_check
+
+    paths = Paths()
+    result = reference_check(args.scenario, paths, k=args.k)
+    print(result.to_string(index=False))
+    print(f"reference mean AUROC: {result['reference_auroc'].mean():.4f}")
+    print(f"ours mean AUROC: {result['ours_auroc'].mean():.4f}")
+    return 0
+
+
+_reference_check_parser = SUBPARSERS.add_parser(
+    "reference-check", help="Compare TabPFNWithImages to Track B on one scenario"
+)
+_reference_check_parser.add_argument(
+    "--scenario",
+    type=Scenario,
+    choices=list(Scenario),
+    default=Scenario.VIAL,
+    help="Scenario to check",
+)
+_reference_check_parser.add_argument("--k", type=int, default=5, help="Few-shot budget per seed")
+_reference_check_parser.set_defaults(func=_cmd_reference_check)
+
+
 def main(argv: list[str] | None = None) -> int:
     """Parse arguments and dispatch to the selected subcommand.
 
