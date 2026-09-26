@@ -21,6 +21,7 @@ from anometa.data.splits import make_split, write_split
 from anometa.experiment import run_experiment
 from anometa.features.encoders import load_encoder
 from anometa.features.extract import extract_scenario
+from anometa.search.grid import GridSpec, grid_configs, run_grid
 
 parser = argparse.ArgumentParser(prog="anometa")
 SUBPARSERS = parser.add_subparsers(dest="command")
@@ -263,6 +264,171 @@ _reference_check_parser.add_argument(
 )
 _reference_check_parser.add_argument("--k", type=int, default=5, help="Few-shot budget per seed")
 _reference_check_parser.set_defaults(func=_cmd_reference_check)
+
+
+def _scenarios(args: argparse.Namespace) -> tuple[Scenario, ...] | None:
+    """Return a search subcommand's `--scenario` restriction.
+
+    Args:
+        args: Parsed arguments; `scenario` is `None` or a list of scenarios.
+
+    Returns:
+        The given scenarios, or `None` (every scenario) when none were given.
+    """
+    return tuple(args.scenario) if args.scenario else None
+
+
+def _cmd_grid(args: argparse.Namespace) -> int:
+    """Run the `grid` subcommand: run every config in a search grid.
+
+    With `--dry-run`, prints the expanded config count and exits without
+    running anything.
+
+    Args:
+        args: Parsed arguments; `spec` (path to a `GridSpec` YAML file),
+            `scenario` (repeatable, defaults to every scenario) and `dry_run`.
+
+    Returns:
+        `0` on success.
+    """
+    paths = Paths()
+    spec = GridSpec(**yaml.safe_load(Path(args.spec).read_text()))
+    configs = grid_configs(spec, paths, _scenarios(args))
+    if args.dry_run:
+        print(len(configs))
+        return 0
+    result = run_grid(configs)
+    print(result.to_string(index=False))
+    return 0
+
+
+_grid_parser = SUBPARSERS.add_parser("grid", help="Run a search grid of Track B configs")
+_grid_parser.add_argument("spec", help="Path to a GridSpec YAML file")
+_grid_parser.add_argument(
+    "--scenario",
+    action="append",
+    type=Scenario,
+    choices=list(Scenario),
+    help="Scenario to search on (repeatable); defaults to all scenarios",
+)
+_grid_parser.add_argument(
+    "--dry-run", action="store_true", help="Print the expanded config count and exit"
+)
+_grid_parser.set_defaults(func=_cmd_grid)
+
+
+def _cmd_optuna(args: argparse.Namespace) -> int:
+    """Run the `optuna` subcommand: run an NSGA-II or TPE search over dev configs.
+
+    `nsga2` prints one line per Pareto-optimal trial (`study.best_trials`).
+    `tpe` prints the single best trial (`study.best_trial`) and writes every
+    trial to a parquet file (see `run_tpe`). Optuna is imported here, so
+    other subcommands never load it.
+
+    Args:
+        args: Parsed arguments; `method` (`nsga2` or `tpe`), `trials`, `k`,
+            `seed`, `storage` (`None` for the default under
+            `paths.artifacts`) and `scenario` (repeatable, defaults to every
+            scenario).
+
+    Returns:
+        `0` on success.
+    """
+    from anometa.search.optuna_search import run_nsga2, run_tpe
+
+    paths = Paths()
+    scenarios = _scenarios(args)
+    if args.method == "nsga2":
+        study = run_nsga2(
+            args.trials,
+            k=args.k,
+            seed=args.seed,
+            storage=args.storage,
+            paths=paths,
+            scenarios=scenarios,
+        )
+        for trial in study.best_trials:
+            print(trial.number, trial.values, trial.params)
+    else:
+        study = run_tpe(
+            args.trials,
+            k=args.k,
+            seed=args.seed,
+            storage=args.storage,
+            paths=paths,
+            scenarios=scenarios,
+        )
+        print(study.best_trial.number, study.best_trial.value, study.best_trial.params)
+    return 0
+
+
+_optuna_parser = SUBPARSERS.add_parser("optuna", help="Run an Optuna NSGA-II or TPE search")
+_optuna_parser.add_argument("method", choices=["nsga2", "tpe"], help="Search method")
+_optuna_parser.add_argument("--trials", type=int, required=True, help="Number of trials to run")
+_optuna_parser.add_argument("--k", type=int, default=2, help="Few-shot budget per trial")
+_optuna_parser.add_argument("--seed", type=int, default=0, help="Sampler seed")
+_optuna_parser.add_argument(
+    "--storage",
+    default=None,
+    help="Optuna RDB storage URL; defaults to sqlite:///<artifacts>/optuna.db",
+)
+_optuna_parser.add_argument(
+    "--scenario",
+    action="append",
+    type=Scenario,
+    choices=list(Scenario),
+    help="Scenario to search on (repeatable); defaults to all scenarios",
+)
+_optuna_parser.set_defaults(func=_cmd_optuna)
+
+
+def _cmd_bo(args: argparse.Namespace) -> int:
+    """Run the `bo` subcommand: run a TabPFN-surrogate Bayesian optimization loop.
+
+    Prints the best trial found (highest `auroc`).
+
+    Args:
+        args: Parsed arguments; `trials`, `k`, `seed`, `device` (where the
+            TabPFN surrogate runs) and `scenario` (repeatable, defaults to
+            every scenario).
+
+    Returns:
+        `0` on success.
+    """
+    from anometa.search.tabpfn_bo import run_tabpfn_bo
+
+    paths = Paths()
+    df = run_tabpfn_bo(
+        args.trials,
+        k=args.k,
+        seed=args.seed,
+        device=args.device,
+        paths=paths,
+        scenarios=_scenarios(args),
+    )
+    best = df.loc[df["auroc"].idxmax()]
+    print(best["trial"], best["auroc"], best["run_id"])
+    return 0
+
+
+_bo_parser = SUBPARSERS.add_parser("bo", help="Run a TabPFN-surrogate Bayesian optimization loop")
+_bo_parser.add_argument("--trials", type=int, required=True, help="Number of trials to run")
+_bo_parser.add_argument("--k", type=int, default=2, help="Few-shot budget per trial")
+_bo_parser.add_argument("--seed", type=int, default=0, help="Sampler seed")
+_bo_parser.add_argument(
+    "--device",
+    default="auto",
+    choices=["auto", "cuda", "mps", "cpu"],
+    help="Device to run the TabPFN surrogate on",
+)
+_bo_parser.add_argument(
+    "--scenario",
+    action="append",
+    type=Scenario,
+    choices=list(Scenario),
+    help="Scenario to search on (repeatable); defaults to all scenarios",
+)
+_bo_parser.set_defaults(func=_cmd_bo)
 
 
 def main(argv: list[str] | None = None) -> int:

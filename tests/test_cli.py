@@ -2,11 +2,12 @@
 
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 import anometa.cli as cli
 from anometa.cli import main
-from anometa.config import ExperimentConfig, TrackBConfig
+from anometa.config import ExperimentConfig, Scenario, TrackBConfig
 from anometa.experiment import ExperimentResult
 
 _DEV_CONFIG = "track: B\nencoder: dinov3_s\nfeatures: [cls]\npca_dim: 4\nclassifier: logreg\nk: 1\n"
@@ -91,3 +92,18 @@ def test_cli_run_failure_prints_error_line(
     config.write_text(_DEV_CONFIG)
     assert main(["run", str(config)]) == 1
     assert capsys.readouterr().err == "BudgetError: vial: k=9 too many\n"
+
+
+def test_cli_grid_scenario_flag_restricts_configs(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`grid --scenario vial --scenario can` runs only configs on those two scenarios."""
+    seen: list[TrackBConfig] = []
+
+    def fake_grid(configs: list[TrackBConfig]) -> pd.DataFrame:
+        """Record the configs instead of running them."""
+        seen.extend(configs)
+        return pd.DataFrame()
+
+    monkeypatch.setattr(cli, "run_grid", fake_grid)
+    argv = ["grid", "configs/search/grid.yaml", "--scenario", "vial", "--scenario", "can"]
+    assert main(argv) == 0
+    assert {c.scenarios for c in seen} == {(Scenario.VIAL, Scenario.CAN)}
