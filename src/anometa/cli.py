@@ -7,13 +7,18 @@ via `SUBPARSERS.add_parser(...)` and `set_defaults(func=...)`.
 
 import argparse
 import sys
+import time
 from pathlib import Path
 
-from anometa.config import Paths, Scenario, load_config
+import torch
+
+from anometa.config import Paths, Scenario, load_config, resolve_device
 from anometa.data.ad2 import index_scenario, lighting_counts
 from anometa.data.download import fetch_scenario
 from anometa.data.splits import make_split, write_split
 from anometa.experiment import run_experiment
+from anometa.features.encoders import load_encoder
+from anometa.features.extract import extract_scenario
 
 parser = argparse.ArgumentParser(prog="anometa")
 SUBPARSERS = parser.add_subparsers(dest="command")
@@ -81,6 +86,69 @@ def _cmd_split(args: argparse.Namespace) -> int:
 
 _split_parser = SUBPARSERS.add_parser("split", help="Build dev/lock splits for AD2 scenarios")
 _split_parser.set_defaults(func=_cmd_split)
+
+
+def _cmd_extract(args: argparse.Namespace) -> int:
+    """Run the `extract` subcommand: encode and cache one encoder's scenario features.
+
+    Prints, per scenario, the backend, the cache path, the wall time and, on
+    CUDA, the peak allocated VRAM.
+
+    Args:
+        args: Parsed arguments; `encoder`, `scenario` (repeatable, defaults
+            to every scenario downloaded under `paths.data`), `device` and
+            `backend`.
+
+    Returns:
+        `0` on success.
+    """
+    paths = Paths()
+    device = resolve_device(args.device)
+    encoder = load_encoder(args.encoder, device, args.backend)
+    scenarios = args.scenario or [
+        scenario for scenario in Scenario if (paths.data / scenario / "train/good").is_dir()
+    ]
+    for scenario in scenarios:
+        if device == "cuda":
+            torch.cuda.reset_peak_memory_stats()
+        start = time.perf_counter()
+        out = extract_scenario(encoder, scenario, paths)
+        timing = f"{time.perf_counter() - start:.1f} s"
+        if device == "cuda":
+            timing += f", peak VRAM {torch.cuda.max_memory_allocated() / 2**20:.0f} MB"
+        print(f"{scenario}: backend={encoder.backend} -> {out} ({timing})")
+    return 0
+
+
+_extract_parser = SUBPARSERS.add_parser(
+    "extract", help="Extract and cache one encoder's per-scenario features"
+)
+_extract_parser.add_argument(
+    "--encoder",
+    required=True,
+    choices=["dinov3_s", "dinov3_l", "siglip2"],
+    help="Encoder to run",
+)
+_extract_parser.add_argument(
+    "--scenario",
+    action="append",
+    type=Scenario,
+    choices=list(Scenario),
+    help="Scenario to extract (repeatable); defaults to every downloaded scenario",
+)
+_extract_parser.add_argument(
+    "--device",
+    default="auto",
+    choices=["auto", "cuda", "mps", "cpu"],
+    help="Device to run the encoder on",
+)
+_extract_parser.add_argument(
+    "--backend",
+    default="auto",
+    choices=["auto", "transformers", "timm"],
+    help="Encoder loading backend",
+)
+_extract_parser.set_defaults(func=_cmd_extract)
 
 
 def _cmd_run(args: argparse.Namespace) -> int:

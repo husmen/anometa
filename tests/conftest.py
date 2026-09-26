@@ -1,18 +1,27 @@
-"""Shared pytest fixtures: a fake AD2 tree and the `Paths` pointing at it."""
+"""Shared pytest fixtures: a fake AD2 tree, `Paths` and `FakeEncoder`."""
 
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import pytest
+import torch
 from numpy.typing import NDArray
 from PIL import Image
 
 from anometa.config import Paths
+from anometa.features.encoders import Encoded
 
 _LIGHTINGS: tuple[str, ...] = ("regular", "overexposed", "shift_1")
 _SIZE: tuple[int, int] = (16, 24)  # (height, width)
 _MASK_ROWS = slice(6, 10)
 _MASK_COLS = slice(10, 14)
+_FAKE_PATCH = 4
+_FAKE_PROJECTION: NDArray[np.float32] = (
+    np.random.default_rng(0).standard_normal((3, 8)).astype(np.float32)
+)
+"""Fixed seeded 3->8 projection `FakeEncoder` applies to its block means."""
 
 
 def _random_grey(rng: np.random.Generator) -> NDArray[np.uint8]:
@@ -103,3 +112,41 @@ def paths(tmp_path: Path, ad2_root: Path) -> Paths:
         splits=tmp_path / "splits",
         configs=tmp_path / "configs",
     )
+
+
+@dataclass
+class FakeEncoder:
+    """Deterministic, CPU-only stand-in for `Encoder` (`anometa.features.encoders`).
+
+    `encode` projects 4x4 block means of the input image through a fixed
+    seeded 3->8 matrix, so results are reproducible without loading any
+    model weights. `calls` counts `encode` invocations.
+    """
+
+    name: str = "dinov3_s"
+    backend: Literal["transformers", "timm"] = "transformers"
+    dim: int = 8
+    resolution_tag: str = "r512"
+    revisions: dict[str, str] = field(default_factory=dict)
+    calls: int = 0
+
+    def encode(self, image: NDArray[np.uint8]) -> Encoded:
+        """Encode one HxWx3 uint8 image into 4x4-patch fake features.
+
+        Args:
+            image: HxWx3 uint8 array; each side is cropped down to a multiple
+                of the 4px patch size before pooling.
+
+        Returns:
+            `Encoded` with `patches` from block means projected to `dim` and
+            `cls` as their mean.
+        """
+        self.calls += 1
+        h, w, c = image.shape
+        ph, pw = h // _FAKE_PATCH, w // _FAKE_PATCH
+        cropped = image[: ph * _FAKE_PATCH, : pw * _FAKE_PATCH]
+        blocks = cropped.reshape(ph, _FAKE_PATCH, pw, _FAKE_PATCH, c).astype(np.float32)
+        means = blocks.mean(axis=(1, 3))
+        patches = means @ _FAKE_PROJECTION
+        cls = patches.mean(axis=(0, 1))
+        return Encoded(cls=torch.from_numpy(cls), patches=torch.from_numpy(patches))

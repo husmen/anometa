@@ -76,6 +76,9 @@ convention = "google"
 preset = "strict"
 python-version = "3.14"
 project-includes = ["src", "tests"]
+# tests/ has no __init__.py (pytest rootless import mode); this lets test
+# modules import shared helpers from conftest.py the same way pytest does.
+search-path = ["tests"]
 
 [[tool.pyrefly.sub-config]]
 matches = "tests/**"
