@@ -9,6 +9,7 @@ from conftest import FakeEncoder
 from numpy.typing import NDArray
 
 import anometa.trackb.pipeline as pipeline
+from anometa.artifacts import LICENCES
 from anometa.cli import apply_overrides
 from anometa.config import ClassifierName, Paths, Scenario, TrackBConfig
 from anometa.data.ad2 import index_scenario
@@ -79,9 +80,19 @@ def record_fits(monkeypatch: pytest.MonkeyPatch, build_as: ClassifierName) -> li
     real_make_scorer = pipeline.make_scorer
 
     def make_scorer(
-        name: ClassifierName, params: Mapping[str, int | float | str], *, seed: int, device: str
+        name: ClassifierName,
+        params: Mapping[str, int | float | str],
+        *,
+        seed: int,
+        device: str,
+        cache_key: str | None = None,
+        cache_dir: Path | None = None,
     ) -> Scorer:
-        """Build the `build_as` scorer and wrap its `fit` to log its inputs."""
+        """Build the `build_as` scorer and wrap its `fit` to log its inputs.
+
+        `cache_key`/`cache_dir` are accepted (and ignored) so this also
+        stands in for `tabpfn_thinking`'s wider call signature.
+        """
         scorer = real_make_scorer(build_as, params, seed=seed, device=device)
         real_fit = scorer.fit
 
@@ -133,6 +144,19 @@ def test_tabpfn_revision_read_after_fits(
     out = run_track_b(cfg_b(prepared, classifier=classifier, **overrides), tmp_path)
     assert fits_before_revision == [n_fits]
     assert out.model_revisions["tabpfn"] == "9.9@c.ckpt#abababababab"
+
+
+def test_tabpfn_thinking_records_licence(
+    prepared: Paths, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A `tabpfn_thinking` run records the TabPFN non-commercial licence.
+
+    It calls the same API-side TabPFN-3.5 checkpoint as `tabpfn`/`tabpfn_fast`,
+    so its manifest must carry the same licence entry.
+    """
+    record_fits(monkeypatch, "logreg")
+    out = run_track_b(cfg_b(prepared, classifier="tabpfn_thinking", seeds=(0,)), tmp_path)
+    assert out.licences["tabpfn"] == LICENCES["tabpfn"]
 
 
 def test_run_track_b_end_to_end(prepared: Paths, tmp_path: Path) -> None:

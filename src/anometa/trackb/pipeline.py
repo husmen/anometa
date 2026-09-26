@@ -21,7 +21,14 @@ from numpy.typing import NDArray
 from sklearn.decomposition import PCA
 
 from anometa.artifacts import LICENCES, TrackOutput
-from anometa.config import ONE_CLASS, FeatureBlock, Scenario, TrackBConfig, resolve_device
+from anometa.config import (
+    ONE_CLASS,
+    FeatureBlock,
+    Scenario,
+    TrackBConfig,
+    config_hash,
+    resolve_device,
+)
 from anometa.data.splits import BudgetError, eval_rows, load_split, sample_few_shot
 from anometa.features.extract import Features, load_features
 from anometa.metrics.aggregate import group_metrics, summarize
@@ -143,7 +150,10 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
     on train normals (y=0) plus that seed's shots (y=1, empty for one-class
     classifiers), times the fit and the timed `anomaly_score` call on the
     split's evaluation rows (CUDA synchronised), and prior-corrects
-    probabilistic scores to a balanced 50/50 prior.
+    probabilistic scores to a balanced 50/50 prior. `tabpfn_thinking` is
+    keyed by `f"{config_hash(cfg)}/{scenario}-{seed}"` under
+    `cfg.paths.cache / "thinking"`, so its predictions are cached across
+    reruns of the same config.
 
     Args:
         cfg: The Track B experiment configuration.
@@ -167,6 +177,7 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
     """
     device = resolve_device(cfg.device)
     probabilistic = cfg.classifier not in ONE_CLASS
+    cfg_hash = config_hash(cfg)
 
     if device == "cuda":
         torch.cuda.reset_peak_memory_stats()
@@ -176,7 +187,7 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
     predict_latencies_ms: list[float] = []
     model_revisions: dict[str, str] = {}
     licences: dict[str, str] = {"ad2": LICENCES["ad2"]}
-    if cfg.classifier in _TABPFN_VERSIONS:
+    if cfg.classifier in _TABPFN_VERSIONS or cfg.classifier == "tabpfn_thinking":
         licences["tabpfn"] = LICENCES["tabpfn"]
 
     # Sample every (scenario, seed)'s shots first, so a BudgetError fires before any fit.
@@ -237,7 +248,19 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
             )
             x_fit = design_matrix(feats, fit_positions, cfg.features, pca)
 
-            scorer = make_scorer(cfg.classifier, cfg.classifier_params, seed=seed, device=device)
+            if cfg.classifier == "tabpfn_thinking":
+                scorer = make_scorer(
+                    cfg.classifier,
+                    cfg.classifier_params,
+                    seed=seed,
+                    device=device,
+                    cache_key=f"{cfg_hash}/{scenario}-{seed}",
+                    cache_dir=cfg.paths.cache / "thinking",
+                )
+            else:
+                scorer = make_scorer(
+                    cfg.classifier, cfg.classifier_params, seed=seed, device=device
+                )
 
             start = time.perf_counter()
             scorer.fit(x_fit, y_fit)
