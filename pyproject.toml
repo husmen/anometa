@@ -68,6 +68,10 @@ select = ["E", "W", "F", "I", "UP", "B", "SIM", "ANN", "D", "RUF", "PT", "NPY"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
+[tool.ruff.lint.flake8-bugbear]
+# Paths is a frozen pydantic model with no mutable state, so a `Paths()` default is safe.
+extend-immutable-calls = ["anometa.config.Paths"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ANN", "D100", "D104"]
 "src/anometa/metrics/_pro_reference.py" = ["ANN", "D", "B", "SIM", "UP", "NPY"]
