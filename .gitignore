@@ -218,6 +218,6 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Anometa runtime data (never committed)
-data/
-cache/
-artifacts/
+/data/
+/cache/
+/artifacts/

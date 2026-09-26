@@ -1,0 +1,12 @@
+# MVTec AD 2 scenario archive URLs.
+# https://www.mvtec.com/research-teaching/datasets/mvtec-ad-2/downloads (checked 2026-09-26)
+base: https://www.mydrive.ch/shares/
+archives:
+  can: 121501/26456e2f3ef813930866f8f9b072593a/download/466651130-1743159807/can.tar.gz
+  fabric: 150999/2c2026421bcf68e37e9268885d355081/download/466651519-1743162446/fabric.tar.gz
+  fruit_jelly: 121503/951a46ce30a3af3787ce9671cfa8613a/download/466651800-1743164023/fruit_jelly.tar.gz
+  rice: 121504/0014676292c3c44931712a54fb3bdbe8/download/466653907-1743164943/rice.tar.gz
+  sheet_metal: 121505/2d8fcdc8e988456bdd18696746eda0a0/download/466654829-1743166795/sheet_metal.tar.gz
+  vial: 121506/739dc6459c939fe464c0d26acc6c2d55/download/466654885-1743167505/vial.tar.gz
+  wallplugs: 121507/66fe6e114b498e03be8d48c711794be7/download/466655287-1743168151/wallplugs.tar.gz
+  walnuts: 121508/9fcf67e49f0dc61a9608f57ba0482356/download/466656233-1743168988/walnuts.tar.gz
