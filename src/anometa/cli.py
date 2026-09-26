@@ -9,7 +9,9 @@ import argparse
 import sys
 
 from anometa.config import Paths, Scenario
+from anometa.data.ad2 import index_scenario, lighting_counts
 from anometa.data.download import fetch_scenario
+from anometa.data.splits import make_split, write_split
 
 parser = argparse.ArgumentParser(prog="anometa")
 SUBPARSERS = parser.add_subparsers(dest="command")
@@ -46,6 +48,37 @@ _download_parser.add_argument(
     help="Keep the downloaded archive after extraction",
 )
 _download_parser.set_defaults(func=_cmd_download)
+
+
+def _cmd_split(args: argparse.Namespace) -> int:
+    """Run the `split` subcommand: build each downloaded scenario's dev/lock split.
+
+    Indexes every scenario whose `train/good` folder exists under
+    `paths.data`, writes `splits/<scenario>.csv` only when it doesn't already
+    exist (an existing split is never overwritten), and prints its
+    `lighting_counts` table.
+
+    Args:
+        args: Parsed arguments; none beyond the subcommand itself.
+
+    Returns:
+        `0` on success.
+    """
+    paths = Paths()
+    for scenario in Scenario:
+        if not (paths.data / scenario / "train/good").is_dir():
+            continue
+        index = index_scenario(paths.data, scenario)
+        split_path = paths.splits / f"{scenario}.csv"
+        if not split_path.exists():
+            write_split(make_split(index), split_path)
+        print(scenario)
+        print(lighting_counts(index))
+    return 0
+
+
+_split_parser = SUBPARSERS.add_parser("split", help="Build dev/lock splits for AD2 scenarios")
+_split_parser.set_defaults(func=_cmd_split)
 
 
 def main(argv: list[str] | None = None) -> int:
