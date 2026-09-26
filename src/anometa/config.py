@@ -211,6 +211,41 @@ def config_hash(cfg: ExperimentConfig) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
+def resolve_device(device: str) -> Literal["cuda", "mps", "cpu"]:
+    """Resolve a configured device string to a concrete, available device.
+
+    Imports `torch` lazily so loading this module stays cheap.
+
+    Args:
+        device: `"auto"`, `"cuda"`, `"mps"` or `"cpu"`. `"auto"` picks CUDA,
+            else MPS, else CPU.
+
+    Returns:
+        The resolved device kind.
+
+    Raises:
+        ValueError: If an explicit `"cuda"` or `"mps"` device isn't
+            available on this host, or `device` isn't a known value.
+    """
+    import torch
+
+    cuda_available = torch.cuda.is_available()
+    mps_available = torch.backends.mps.is_available()
+    if device == "auto":
+        return "cuda" if cuda_available else "mps" if mps_available else "cpu"
+    if device == "cuda":
+        if not cuda_available:
+            raise ValueError("device='cuda' requested but no CUDA device is available")
+        return "cuda"
+    if device == "mps":
+        if not mps_available:
+            raise ValueError("device='mps' requested but MPS is not available")
+        return "mps"
+    if device == "cpu":
+        return "cpu"
+    raise ValueError(f"unknown device: {device!r}")
+
+
 def run_id(cfg: ExperimentConfig) -> str:
     """Build a short, content-addressed identifier for an experiment run.
 
