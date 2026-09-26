@@ -95,7 +95,7 @@ def dataset_hash(scenarios: Sequence[Scenario], paths: Paths) -> str:
     return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
 
-def _git_info() -> tuple[str | None, bool | None]:
+def git_info() -> tuple[str | None, bool | None]:
     """Read the current commit and dirty state of the enclosing git repo.
 
     Returns:
@@ -189,7 +189,7 @@ def capture_manifest(
         `licences`, `seeds`, `hardware`, `versions`, `started_at`,
         `duration_s`.
     """
-    git_commit, git_dirty = _git_info()
+    git_commit, git_dirty = git_info()
     return {
         "run_id": run_id(cfg),
         "config": cfg.model_dump(mode="json"),

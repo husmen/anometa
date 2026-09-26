@@ -104,9 +104,10 @@ def test_cli_split_writes_only_downloaded_scenarios_and_never_overwrites(
     monkeypatch.setattr(cli, "Paths", lambda: paths)
 
     assert main(["split"]) == 0
-    written = (paths.splits / "vial.csv").read_bytes()
+    assert (paths.splits / "vial.csv").is_file()
     assert not (paths.splits / "can.csv").exists()
     assert "vial" in capsys.readouterr().out
 
+    (paths.splits / "vial.csv").write_text("sentinel\n")
     assert main(["split"]) == 0
-    assert (paths.splits / "vial.csv").read_bytes() == written
+    assert (paths.splits / "vial.csv").read_text() == "sentinel\n"
