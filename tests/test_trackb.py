@@ -5,65 +5,18 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from conftest import FakeEncoder
+from conftest import cfg_b
 from numpy.typing import NDArray
 
 import anometa.trackb.pipeline as pipeline
 from anometa.artifacts import LICENCES
 from anometa.cli import apply_overrides
-from anometa.config import ClassifierName, Paths, Scenario, TrackBConfig
-from anometa.data.ad2 import index_scenario
-from anometa.data.splits import (
-    BudgetError,
-    eval_rows,
-    load_split,
-    make_split,
-    sample_few_shot,
-    write_split,
-)
-from anometa.features.extract import cache_path, extract_scenario
+from anometa.config import ClassifierName, Paths, Scenario
+from anometa.data.splits import BudgetError, eval_rows, load_split, sample_few_shot, write_split
+from anometa.features.extract import cache_path
 from anometa.metrics.image import prior_correct
 from anometa.trackb.classifiers import Scorer
 from anometa.trackb.pipeline import run_track_b
-
-
-@pytest.fixture
-def prepared(ad2_root: Path, paths: Paths) -> Paths:
-    """Extract fake Vial features and write its dev/lock split.
-
-    Args:
-        ad2_root: The fake AD2 data root.
-        paths: Run paths scoped to `ad2_root`.
-
-    Returns:
-        `paths`, ready for a Track B run over the fake Vial scenario.
-    """
-    extract_scenario(FakeEncoder(), Scenario.VIAL, paths)
-    write_split(make_split(index_scenario(ad2_root, Scenario.VIAL)), paths.splits / "vial.csv")
-    return paths
-
-
-def cfg_b(paths: Paths, **kw: object) -> TrackBConfig:
-    """Build a Track B config over the fake Vial scenario, overriding any field.
-
-    Args:
-        paths: Run paths, as built by `prepared`.
-        **kw: Fields overriding the default logreg, k=2, dinov3_s config.
-
-    Returns:
-        The validated `TrackBConfig`.
-    """
-    base: dict[str, object] = dict(
-        encoder="dinov3_s",
-        features=("cls", "mean_patch", "novelty"),
-        pca_dim=4,
-        classifier="logreg",
-        k=2,
-        scenarios=(Scenario.VIAL,),
-        seeds=(0, 1),
-        paths=paths,
-    )
-    return TrackBConfig.model_validate(base | kw)
 
 
 def record_fits(monkeypatch: pytest.MonkeyPatch, build_as: ClassifierName) -> list[tuple[int, int]]:

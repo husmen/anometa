@@ -198,6 +198,7 @@ gui = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "anometa", extra = ["gui"] },
     { name = "pandas-stubs" },
     { name = "pre-commit" },
     { name = "pyrefly" },
@@ -234,6 +235,7 @@ provides-extras = ["gui"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "anometa", extras = ["gui"] },
     { name = "pandas-stubs", specifier = "~=2.3.0" },
     { name = "pre-commit", specifier = ">=4.6.2" },
     { name = "pyrefly", specifier = ">=1.3.1" },

@@ -6,6 +6,7 @@ via `SUBPARSERS.add_parser(...)` and `set_defaults(func=...)`.
 """
 
 import argparse
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -429,6 +430,26 @@ _bo_parser.add_argument(
     help="Scenario to search on (repeatable); defaults to all scenarios",
 )
 _bo_parser.set_defaults(func=_cmd_bo)
+
+
+def _cmd_demo(args: argparse.Namespace) -> int:
+    """Run the `demo` subcommand: launch the Streamlit few-shot labelling demo.
+
+    Args:
+        args: Parsed arguments; none beyond the subcommand itself.
+
+    Returns:
+        The Streamlit subprocess's exit code.
+    """
+    app_path = Path(__file__).parent / "gui" / "app.py"
+    completed = subprocess.run(
+        [sys.executable, "-m", "streamlit", "run", str(app_path)], check=False
+    )
+    return completed.returncode
+
+
+_demo_parser = SUBPARSERS.add_parser("demo", help="Launch the Streamlit few-shot labelling demo")
+_demo_parser.set_defaults(func=_cmd_demo)
 
 
 def main(argv: list[str] | None = None) -> int:
