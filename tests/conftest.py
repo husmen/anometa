@@ -1,5 +1,10 @@
-"""Shared pytest fixtures: a fake AD2 tree, `Paths` and `FakeEncoder`."""
+"""Shared pytest fixtures: a fake AD2 tree, `Paths` and `FakeEncoder`.
 
+Also defaults `TABPFN_DISABLE_TELEMETRY` and `TABPFN_NO_BROWSER` to `"1"` at
+import, before any test module can import `tabpfn`.
+"""
+
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -15,6 +20,9 @@ from anometa.data.ad2 import index_scenario
 from anometa.data.splits import make_split, write_split
 from anometa.features.encoders import Encoded
 from anometa.features.extract import extract_scenario
+
+os.environ.setdefault("TABPFN_DISABLE_TELEMETRY", "1")
+os.environ.setdefault("TABPFN_NO_BROWSER", "1")
 
 _LIGHTINGS: tuple[str, ...] = ("regular", "overexposed", "shift_1")
 _SIZE: tuple[int, int] = (16, 24)  # (height, width)

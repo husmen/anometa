@@ -13,6 +13,7 @@ higher meaning more anomalous. `tabpfn`, `tabpfn-extensions` and
 only uses the scikit-learn classifiers never pays for loading them.
 """
 
+import os
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from functools import cache
@@ -430,14 +431,17 @@ class ThinkingScorer:
             X: `(n, d)` feature rows to score.
 
         Returns:
-            `(n,)` P(anomalous), cached at `cache_file` after a live call.
+            `(n,)` P(anomalous), cached at `cache_file` after a live call
+            (written to a temporary file first, then moved into place, so an
+            interrupted write never leaves a truncated cache).
 
         Raises:
             ValueError: If a cached prediction's length doesn't match `len(X)`.
             RuntimeError: If `fit` was never called and there is no cache to read.
         """
         if self.cache_file.exists():
-            p = np.asarray(np.load(self.cache_file)["p"], dtype=np.float64)
+            with np.load(self.cache_file) as cached:
+                p = np.asarray(cached["p"], dtype=np.float64)
             if len(p) != len(X):
                 raise ValueError(
                     f"cached prediction at {self.cache_file} has {len(p)} rows, expected {len(X)}"
@@ -459,7 +463,10 @@ class ThinkingScorer:
         proba = np.asarray(clf.predict_proba(X))
         p = proba[:, list(clf.classes_).index(1)].astype(np.float64)
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)
-        np.savez(self.cache_file, p=p)
+        tmp = self.cache_file.with_name(self.cache_file.name + ".tmp")
+        with tmp.open("wb") as f:
+            np.savez(f, p=p)
+        os.replace(tmp, self.cache_file)
         return p
 
 
@@ -495,7 +502,7 @@ def _build_tabpfn_thinking(seed: int, cache_key: str, cache_dir: Path) -> Scorer
 
     Args:
         seed: `random_state` for `ThinkingScorer`'s TabPFN classifier.
-        cache_key: Cache-file stem, e.g. `f"{config_hash(cfg)}/{scenario}-{seed}"`.
+        cache_key: Cache-file stem, e.g. `f"{key}/{scenario}-{seed}"` (see `run_track_b`).
         cache_dir: Directory `cache_key`'s `.npz` cache file lives under.
 
     Returns:
@@ -537,7 +544,7 @@ def make_scorer(
         seed: Random seed for the classifier's own randomness.
         device: `"cpu"`, `"cuda"` or `"mps"` (see `config.resolve_device`).
         cache_key: Required for `"tabpfn_thinking"`: its cache file's stem,
-            e.g. `f"{config_hash(cfg)}/{scenario}-{seed}"`.
+            e.g. `f"{key}/{scenario}-{seed}"` (see `run_track_b`).
         cache_dir: Required for `"tabpfn_thinking"`: the directory its
             `.npz` cache file lives under.
 

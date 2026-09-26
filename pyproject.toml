@@ -56,6 +56,10 @@ markers = [
     "api: calls the Prior Labs TabPFN API",
 ]
 addopts = "-m 'not data and not models and not gpu and not api'"
+filterwarnings = [
+    # backoff (imported by tabpfn_client, which tabpfn_extensions imports) uses an API Python 3.14 deprecates.
+    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning:backoff",
+]
 
 [tool.ruff]
 line-length = 100

@@ -99,17 +99,22 @@ def test_tabpfn_revision_read_after_fits(
     assert out.model_revisions["tabpfn"] == "9.9@c.ckpt#abababababab"
 
 
-def test_tabpfn_thinking_records_licence(
+def test_tabpfn_thinking_records_api_terms_and_no_latency(
     prepared: Paths, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """A `tabpfn_thinking` run records the TabPFN non-commercial licence.
+    """A `tabpfn_thinking` run records the Prior Labs API terms and NaN latencies.
 
-    It calls the same API-side TabPFN-3.5 checkpoint as `tabpfn`/`tabpfn_fast`,
-    so its manifest must carry the same licence entry.
+    It runs on the API, not on local weights, so its manifest carries the API
+    terms instead of the local weights licence, an `api:` model revision, and
+    no fit/predict latency (network time isn't comparable).
     """
     record_fits(monkeypatch, "logreg")
     out = run_track_b(cfg_b(prepared, classifier="tabpfn_thinking", seeds=(0,)), tmp_path)
-    assert out.licences["tabpfn"] == LICENCES["tabpfn"]
+    assert out.licences["tabpfn_api"] == LICENCES["tabpfn_api"]
+    assert "tabpfn" not in out.licences
+    assert out.model_revisions["tabpfn_thinking"] == "api:v3.5 effort=medium metric=roc_auc"
+    assert np.isnan(out.metrics["fit_latency_ms"])
+    assert np.isnan(out.metrics["predict_latency_ms"])
 
 
 def test_run_track_b_end_to_end(prepared: Paths, tmp_path: Path) -> None:

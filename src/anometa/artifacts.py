@@ -29,6 +29,7 @@ LICENCES: dict[str, str] = {
     "dinov3": "DINOv3 License",
     "siglip2": "Apache-2.0",
     "tabpfn": "tabpfn-3-5-license-v1.0 (non-commercial)",
+    "tabpfn_api": "Prior Labs API Terms and AUP",
     "anomalib": "Apache-2.0",
 }
 """Licence text for every third-party dataset and model this project uses."""

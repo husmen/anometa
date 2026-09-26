@@ -9,6 +9,7 @@ union keyed on `track`.
 
 import hashlib
 import json
+from collections.abc import Iterable
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, Literal, Self
@@ -142,6 +143,8 @@ class TrackBConfig(_CommonConfig):
                 raise ValueError(f"{self.classifier} is one-class and takes a single seed")
         elif self.k <= 0:
             raise ValueError("k must be > 0 for a few-shot classifier")
+        if self.classifier == "tabpfn_thinking" and self.classifier_params:
+            raise ValueError("tabpfn_thinking takes no classifier_params")
         if self.shot_lighting == "all" and self.split != "lock":
             raise ValueError("shot_lighting='all' requires split='lock'")
         _check_timm_requires_dinov3(self.encoder, self.encoder_backend)
@@ -189,7 +192,7 @@ def load_config(path: Path) -> ExperimentConfig:
     return _experiment_config_adapter.validate_python(data)
 
 
-def config_hash(cfg: ExperimentConfig) -> str:
+def config_hash(cfg: ExperimentConfig, *, exclude: Iterable[str] = ()) -> str:
     """Compute a stable content hash of an experiment config.
 
     Excludes `name` and `paths`: renaming a run or relocating its files
@@ -199,12 +202,14 @@ def config_hash(cfg: ExperimentConfig) -> str:
 
     Args:
         cfg: The experiment configuration to hash.
+        exclude: Further top-level fields to leave out, e.g. for a cache key
+            that must not depend on them.
 
     Returns:
         The hex-encoded SHA-256 digest of the config's canonical JSON dump.
     """
     payload = json.dumps(
-        cfg.model_dump(mode="json", exclude={"name", "paths"}),
+        cfg.model_dump(mode="json", exclude={"name", "paths", *exclude}),
         sort_keys=True,
         separators=(",", ":"),
     )
