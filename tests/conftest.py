@@ -86,6 +86,9 @@ def ad2_root(tmp_path: Path) -> Path:
 def paths(tmp_path: Path, ad2_root: Path) -> Paths:
     """Build `Paths` with `data` at `ad2_root` and the rest under `tmp_path`.
 
+    `configs` points at an empty `tmp_path / "configs"`, so tests never read
+    the repository's pinned archive checksums.
+
     Args:
         tmp_path: Pytest's per-test temporary directory.
         ad2_root: The fake AD2 data root.
@@ -98,4 +101,5 @@ def paths(tmp_path: Path, ad2_root: Path) -> Paths:
         cache=tmp_path / "cache",
         artifacts=tmp_path / "artifacts",
         splits=tmp_path / "splits",
+        configs=tmp_path / "configs",
     )
