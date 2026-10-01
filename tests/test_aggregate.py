@@ -4,7 +4,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from anometa.metrics.aggregate import bootstrap_ci, group_metrics, summarize
+from anometa.metrics.aggregate import (
+    bootstrap_ci,
+    group_metrics,
+    paired_bootstrap_diff,
+    summarize,
+)
 from anometa.metrics.image import image_metrics
 
 
@@ -143,3 +148,78 @@ def test_bootstrap_ci_ece_bal_known_value():
     df = pred_frame().assign(score_balanced=0.2)
     ci = bootstrap_ci(df, "ece_bal", probabilistic=True, n_boot=200)
     assert ci == pytest.approx((0.3, 0.3, 0.3))
+
+
+def _two_scenario_frame(seed: int = 0) -> pd.DataFrame:
+    """Build two scenarios x three seeds of 12 good and 12 bad scenes under two lightings.
+
+    Scores are noisy but informative (`0.5 * label + uniform`).
+    """
+    rng = np.random.default_rng(seed)
+    rows = [
+        dict(
+            scenario=scenario,
+            seed=s,
+            scene_id=f"{kind}/{i:03d}",
+            image_id=f"{kind}/{i:03d}_{lighting}",
+            label=label,
+            lighting=lighting,
+            score=0.5 * label + rng.random(),
+        )
+        for scenario in ("vial", "can")
+        for s in range(3)
+        for label, kind in [(0, "good"), (1, "bad")]
+        for i in range(12)
+        for lighting in ("regular", "shift_1")
+    ]
+    return pd.DataFrame(rows)
+
+
+def test_paired_bootstrap_diff_known_values():
+    """A perfect run against its inverse differs by exactly 1; a run against itself by 0."""
+    df = pred_frame(shifted_ok=True)
+    inverted = df.assign(score=1 - df["score"])
+    assert paired_bootstrap_diff(df, inverted, "auroc", probabilistic=False, n_boot=100) == (
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+    )
+    noisy = _two_scenario_frame()
+    same = paired_bootstrap_diff(noisy, noisy, "auroc", probabilistic=False, n_boot=100)
+    assert same == (0.0, 0.0, 0.0, 0.0)
+
+
+def test_paired_bootstrap_diff_is_narrower_than_unpaired():
+    """Two runs that differ by small noise get a paired CI far narrower than either run's own CI.
+
+    The point is the difference of the two runs' summarize means, input row
+    order does not matter, and the same seed reproduces the result.
+    """
+    a = _two_scenario_frame()
+    b = a.assign(score=a["score"] + np.random.default_rng(9).normal(0, 0.05, len(a)))
+    point, lo, hi, share = paired_bootstrap_diff(a, b, "auroc", probabilistic=False, n_boot=300)
+    expected = (
+        summarize(group_metrics(a, False))["auroc"] - summarize(group_metrics(b, False))["auroc"]
+    )
+    assert point == pytest.approx(expected)
+    assert lo <= point <= hi
+    assert 0.0 <= share <= 1.0
+    _, a_lo, a_hi = bootstrap_ci(a, "auroc", probabilistic=False, n_boot=300)
+    assert hi - lo < 0.5 * (a_hi - a_lo)
+    shuffled = b.sample(frac=1, random_state=0)
+    assert paired_bootstrap_diff(a, shuffled, "auroc", probabilistic=False, n_boot=300) == (
+        point,
+        lo,
+        hi,
+        share,
+    )
+
+
+def test_paired_bootstrap_diff_rejects_unpaired_runs():
+    """Runs over different rows, or with different labels, raise ValueError."""
+    a = _two_scenario_frame()
+    with pytest.raises(ValueError, match="same rows"):
+        paired_bootstrap_diff(a, a.iloc[1:], "auroc", probabilistic=False, n_boot=10)
+    with pytest.raises(ValueError, match="same rows"):
+        paired_bootstrap_diff(a, a.assign(label=1 - a["label"]), "auroc", probabilistic=False)

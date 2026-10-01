@@ -432,6 +432,28 @@ _bo_parser.add_argument(
 _bo_parser.set_defaults(func=_cmd_bo)
 
 
+def _cmd_report(args: argparse.Namespace) -> int:
+    """Run the `report` subcommand: build the results page and figures for one split.
+
+    Args:
+        args: Parsed arguments; `split` (`dev` or `lock`).
+
+    Returns:
+        `0` on success.
+    """
+    from anometa.report import build_report
+
+    print(build_report(Paths().artifacts, Path("reports"), args.split))
+    return 0
+
+
+_report_parser = SUBPARSERS.add_parser("report", help="Build results tables and figures")
+_report_parser.add_argument(
+    "--split", default="dev", choices=["dev", "lock"], help="Which split's runs to report"
+)
+_report_parser.set_defaults(func=_cmd_report)
+
+
 def _cmd_demo(args: argparse.Namespace) -> int:
     """Run the `demo` subcommand: launch the Streamlit few-shot labelling demo.
 

@@ -6,7 +6,8 @@ an optional `score_balanced` (a probability under a balanced training prior,
 see `anometa.metrics.image.image_metrics`). `group_metrics` reduces it to one
 row per (scenario, seed); `summarize` reduces that further to scalars;
 `bootstrap_ci` estimates a confidence interval for one column of it by
-resampling seeds and scenes.
+resampling seeds and scenes, and `paired_bootstrap_diff` does the same for the
+difference between two runs scored on the same rows.
 """
 
 from collections.abc import Callable
@@ -188,6 +189,75 @@ def summarize(groups: pd.DataFrame) -> dict[str, float]:
     return out
 
 
+def _check_metric(metric: str, probabilistic: bool) -> None:
+    """Reject a metric name that is not a `group_metrics` column.
+
+    Args:
+        metric: The metric name.
+        probabilistic: Whether calibration metrics are available.
+
+    Raises:
+        KeyError: If `metric` is not a `group_metrics` column for this
+            `probabilistic` setting.
+    """
+    if metric.removeprefix("gap_") not in _metric_names(probabilistic):
+        raise KeyError(f"{metric!r} is not a group_metrics column (probabilistic={probabilistic})")
+
+
+def _replicates(
+    pred: pd.DataFrame, metric: str, scores: list[_Arrays], n_boot: int, seed: int
+) -> NDArray[np.float64]:
+    """Draw bootstrap replicates of a metric's mean for one or more score sets.
+
+    The resampling is the one `bootstrap_ci` describes. Every score set is
+    scored on the same draws, so replicates of different score sets over the
+    same rows are paired.
+
+    Args:
+        pred: Predictions frame sorted by `scenario, seed, image_id` with a
+            fresh index; only its structure columns are read.
+        metric: A `group_metrics` column name.
+        scores: `_arrays` outputs aligned with `pred`'s rows.
+        n_boot: Number of bootstrap replicates.
+        seed: RNG seed.
+
+    Returns:
+        Array of shape `(len(scores), n_boot)`: the replicate means.
+    """
+    # Codes follow sorted (scenario, label, scene_id): each (scenario, label) is one code range.
+    scene_of_row = (
+        pred.groupby(["scenario", "label", "scene_id"], sort=True).ngroup().to_numpy(dtype=np.intp)
+    )
+    blocks: dict[str, list[tuple[int, int]]] = {}
+    for (scenario, _label), g in pred.groupby(["scenario", "label"], sort=True):
+        codes = scene_of_row[g.index.to_numpy(dtype=np.intp)]
+        first = int(codes.min())
+        blocks.setdefault(str(scenario), []).append((first, int(codes.max()) - first + 1))
+    seed_rows: dict[str, list[NDArray[np.intp]]] = {}
+    for (scenario, _seed), g in pred.groupby(["scenario", "seed"], sort=True):
+        seed_rows.setdefault(str(scenario), []).append(g.index.to_numpy(dtype=np.intp))
+
+    rng = np.random.default_rng(seed)
+    counts = np.zeros(int(scene_of_row.max()) + 1, dtype=np.intp)
+    replicates = np.empty((len(scores), n_boot), dtype=np.float64)
+    for b in range(n_boot):
+        group_values: list[list[float]] = [[] for _ in scores]
+        for scenario, pool in seed_rows.items():
+            drawn = rng.integers(0, len(pool), size=len(pool))
+            for start, size in blocks[scenario]:
+                counts[start : start + size] = np.bincount(
+                    rng.integers(0, size, size=size), minlength=size
+                )
+            for d in drawn:
+                rows = pool[d]
+                idx = np.repeat(rows, counts[scene_of_row[rows]])
+                for values, arrays in zip(group_values, scores, strict=True):
+                    values.append(_value(metric, arrays, idx))
+        for i, values in enumerate(group_values):
+            replicates[i, b] = _nanmean(np.asarray(values, dtype=np.float64))
+    return replicates
+
+
 def bootstrap_ci(
     pred: pd.DataFrame,
     metric: str,
@@ -228,43 +298,71 @@ def bootstrap_ci(
         KeyError: If `metric` is not a `group_metrics` column for this
             `probabilistic` setting.
     """
-    if metric.removeprefix("gap_") not in _metric_names(probabilistic):
-        raise KeyError(f"{metric!r} is not a group_metrics column (probabilistic={probabilistic})")
+    _check_metric(metric, probabilistic)
     pred = pred.sort_values(["scenario", "seed", "image_id"], ignore_index=True)
-    arrays = _arrays(pred, probabilistic)
-
-    # Codes follow sorted (scenario, label, scene_id): each (scenario, label) is one code range.
-    scene_of_row = (
-        pred.groupby(["scenario", "label", "scene_id"], sort=True).ngroup().to_numpy(dtype=np.intp)
-    )
-    blocks: dict[str, list[tuple[int, int]]] = {}
-    for (scenario, _label), g in pred.groupby(["scenario", "label"], sort=True):
-        codes = scene_of_row[g.index.to_numpy(dtype=np.intp)]
-        first = int(codes.min())
-        blocks.setdefault(str(scenario), []).append((first, int(codes.max()) - first + 1))
-    seed_rows: dict[str, list[NDArray[np.intp]]] = {}
-    for (scenario, _seed), g in pred.groupby(["scenario", "seed"], sort=True):
-        seed_rows.setdefault(str(scenario), []).append(g.index.to_numpy(dtype=np.intp))
-
-    rng = np.random.default_rng(seed)
-    counts = np.zeros(int(scene_of_row.max()) + 1, dtype=np.intp)
-    replicates = np.empty(n_boot, dtype=np.float64)
-    for b in range(n_boot):
-        group_values: list[float] = []
-        for scenario, pool in seed_rows.items():
-            drawn = rng.integers(0, len(pool), size=len(pool))
-            for start, size in blocks[scenario]:
-                counts[start : start + size] = np.bincount(
-                    rng.integers(0, size, size=size), minlength=size
-                )
-            for d in drawn:
-                rows = pool[d]
-                idx = np.repeat(rows, counts[scene_of_row[rows]])
-                group_values.append(_value(metric, arrays, idx))
-        replicates[b] = _nanmean(np.asarray(group_values, dtype=np.float64))
-
+    replicates = _replicates(pred, metric, [_arrays(pred, probabilistic)], n_boot, seed)[0]
     point = _nanmean(group_metrics(pred, probabilistic)[metric].to_numpy(dtype=np.float64))
     if np.all(np.isnan(replicates)):
         return point, float("nan"), float("nan")
     lo, hi = np.nanpercentile(replicates, _CI_PERCENTILES)
     return point, float(lo), float(hi)
+
+
+_PAIR_KEYS: list[str] = ["scenario", "seed", "image_id"]
+
+
+def paired_bootstrap_diff(
+    pred_a: pd.DataFrame,
+    pred_b: pd.DataFrame,
+    metric: str,
+    *,
+    probabilistic: bool,
+    n_boot: int = 1000,
+    seed: int = 0,
+) -> tuple[float, float, float, float]:
+    """Bootstrap the difference of one `group_metrics` column between two runs.
+
+    Both runs must score the same evaluation rows (same scenarios, seeds and
+    images, as two classifiers at the same `k` and shot lighting do, since
+    shots depend only on seed, scenario, `k` and lighting). Each replicate
+    draws seeds and scenes once, as `bootstrap_ci` does, and scores both
+    runs on that draw, so the interval reflects the noise in the difference
+    rather than in each run alone.
+
+    Args:
+        pred_a: Predictions frame of run A (see module docstring).
+        pred_b: Predictions frame of run B, over the same rows.
+        metric: Any `group_metrics` column name, e.g. `"auroc"`.
+        probabilistic: Whether `score_balanced` feeds calibration metrics;
+            both frames must carry it when `True`.
+        n_boot: Number of bootstrap replicates.
+        seed: RNG seed; the same seed reproduces the same output.
+
+    Returns:
+        `(point, ci_lo, ci_hi, share_positive)`: `point` is A's metric minus
+        B's, each the NaN-ignoring mean over `group_metrics` rows; `ci_lo`
+        and `ci_hi` are the 2.5th/97.5th percentiles of the replicate
+        differences; `share_positive` is the share of replicates where A
+        minus B is above zero.
+
+    Raises:
+        KeyError: If `metric` is not a `group_metrics` column for this
+            `probabilistic` setting.
+        ValueError: If the two runs do not score the same rows with the same
+            labels.
+    """
+    _check_metric(metric, probabilistic)
+    a = pred_a.sort_values(_PAIR_KEYS, ignore_index=True)
+    b = pred_b.sort_values(_PAIR_KEYS, ignore_index=True)
+    if len(a) != len(b) or not a[[*_PAIR_KEYS, "label"]].equals(b[[*_PAIR_KEYS, "label"]]):
+        raise ValueError("paired runs must score the same rows with the same labels")
+    scores = [_arrays(a, probabilistic), _arrays(b, probabilistic)]
+    replicates = _replicates(a, metric, scores, n_boot, seed)
+    diffs = replicates[0] - replicates[1]
+    point = _nanmean(group_metrics(a, probabilistic)[metric].to_numpy(dtype=np.float64))
+    point -= _nanmean(group_metrics(b, probabilistic)[metric].to_numpy(dtype=np.float64))
+    valid = diffs[~np.isnan(diffs)]
+    if valid.size == 0:
+        return point, float("nan"), float("nan"), float("nan")
+    lo, hi = np.percentile(valid, _CI_PERCENTILES)
+    return point, float(lo), float(hi), float(np.mean(valid > 0))
