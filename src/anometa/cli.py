@@ -454,6 +454,34 @@ _report_parser.add_argument(
 _report_parser.set_defaults(func=_cmd_report)
 
 
+def _cmd_inspect(args: argparse.Namespace) -> int:
+    """Run the `inspect` subcommand: write a Rerun recording of one run.
+
+    Prints the `.rrd` path and the command that opens it.
+
+    Args:
+        args: Parsed arguments; `run_id` and `max_images`.
+
+    Returns:
+        `0` on success.
+    """
+    from anometa.gui.rerun_log import write_rrd
+
+    paths = Paths()
+    out = write_rrd(paths.artifacts / args.run_id, paths, max_images=args.max_images)
+    print(out)
+    print(f"rerun {out}")
+    return 0
+
+
+_inspect_parser = SUBPARSERS.add_parser("inspect", help="Write a Rerun recording of one run")
+_inspect_parser.add_argument("run_id", help="Run directory name under the artifacts folder")
+_inspect_parser.add_argument(
+    "--max-images", type=int, default=50, help="Most evaluation images to log"
+)
+_inspect_parser.set_defaults(func=_cmd_inspect)
+
+
 def _cmd_demo(args: argparse.Namespace) -> int:
     """Run the `demo` subcommand: launch the Streamlit few-shot labelling demo.
 
