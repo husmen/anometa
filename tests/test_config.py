@@ -15,6 +15,7 @@ from anometa.config import (
     config_hash,
     load_config,
     run_id,
+    seed_parallelism,
 )
 
 
@@ -152,3 +153,23 @@ def test_track_a_timm_backend_requires_dinov3(encoder: EncoderName | None) -> No
     """The timm encoder backend is only wired up for DINOv3 checkpoints."""
     with pytest.raises(ValidationError):
         TrackAConfig(model="patchcore", encoder=encoder, encoder_backend="timm")
+
+
+@pytest.mark.parametrize(
+    ("workers", "executor"), [("0", "thread"), ("two", "thread"), ("2", "fork")]
+)
+def test_seed_parallelism_rejects_bad_env(
+    monkeypatch: pytest.MonkeyPatch, workers: str, executor: str
+) -> None:
+    """A non-positive or non-integer worker count, or an unknown executor, raises ValueError."""
+    monkeypatch.setenv("ANOMETA_SEED_WORKERS", workers)
+    monkeypatch.setenv("ANOMETA_SEED_EXECUTOR", executor)
+    with pytest.raises(ValueError, match="ANOMETA_SEED_"):
+        seed_parallelism()
+
+
+def test_seed_parallelism_defaults_to_serial(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Without the environment variables, seeds run serially in the calling thread."""
+    monkeypatch.delenv("ANOMETA_SEED_WORKERS", raising=False)
+    monkeypatch.delenv("ANOMETA_SEED_EXECUTOR", raising=False)
+    assert seed_parallelism() == (1, "thread")

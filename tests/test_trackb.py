@@ -4,7 +4,9 @@ from collections.abc import Mapping
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
+import torch
 from conftest import cfg_b
 from numpy.typing import NDArray
 
@@ -215,3 +217,37 @@ def test_apply_overrides() -> None:
         "seeds": [0, 1],
     }
     assert apply_overrides({"k": 1, "seeds": [0]}, ["seeds=null"]) == {"k": 1}
+
+
+@pytest.mark.parametrize("executor", ["thread", "process"])
+def test_parallel_seeds_match_serial(
+    prepared: Paths, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, executor: str
+) -> None:
+    """Seeds fitted concurrently, in threads or processes, give exactly the serial predictions."""
+    cfg = cfg_b(prepared, seeds=(0, 1, 2), device="cpu")
+    serial = run_track_b(cfg, tmp_path).predictions
+    monkeypatch.setenv("ANOMETA_SEED_WORKERS", "3")
+    monkeypatch.setenv("ANOMETA_SEED_EXECUTOR", executor)
+    pd.testing.assert_frame_equal(run_track_b(cfg, tmp_path).predictions, serial)
+
+
+@pytest.mark.models
+def test_parallel_tabpfn_seeds_match_serial(
+    prepared: Paths, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TabPFN-3.5-Fast seeds fitted in threads give the serial scores, on CUDA or else CPU."""
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    cfg = cfg_b(prepared, classifier="tabpfn_fast", seeds=(0, 1, 2), device=device)
+    serial = run_track_b(cfg, tmp_path).predictions
+    monkeypatch.setenv("ANOMETA_SEED_WORKERS", "3")
+    pd.testing.assert_frame_equal(run_track_b(cfg, tmp_path).predictions, serial)
+
+
+def test_threaded_seeds_refuse_mps(
+    prepared: Paths, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Threads on MPS raise a ValueError pointing at the process executor, before any fit."""
+    monkeypatch.setattr(pipeline, "resolve_device", lambda device: "mps")
+    monkeypatch.setenv("ANOMETA_SEED_WORKERS", "2")
+    with pytest.raises(ValueError, match="ANOMETA_SEED_EXECUTOR=process"):
+        run_track_b(cfg_b(prepared), tmp_path)
