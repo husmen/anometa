@@ -9,6 +9,7 @@ union keyed on `track`.
 
 import hashlib
 import json
+import os
 from collections.abc import Iterable
 from enum import StrEnum
 from pathlib import Path
@@ -249,6 +250,37 @@ def resolve_device(device: str) -> Literal["cuda", "mps", "cpu"]:
     if device == "cpu":
         return "cpu"
     raise ValueError(f"unknown device: {device!r}")
+
+
+SeedExecutor = Literal["thread", "process"]
+
+
+def seed_parallelism() -> tuple[int, SeedExecutor]:
+    """Read how many seeds a Track B run fits concurrently, and with what.
+
+    Execution settings, not experiment settings: they come from the
+    environment, so they change neither `config_hash` nor `run_id`, and every
+    entry point (CLI, search, demo) honours them. The manifest's `hardware`
+    block records them, since concurrent seeds inflate the per-seed latencies.
+
+    Returns:
+        `(workers, executor)` from `ANOMETA_SEED_WORKERS` (default `1`, i.e.
+        serial) and `ANOMETA_SEED_EXECUTOR` (`"thread"`, the default, or
+        `"process"`).
+
+    Raises:
+        ValueError: If `ANOMETA_SEED_WORKERS` isn't a positive integer or
+            `ANOMETA_SEED_EXECUTOR` isn't `"thread"` or `"process"`.
+    """
+    raw_workers = os.environ.get("ANOMETA_SEED_WORKERS", "1")
+    if not raw_workers.isdigit() or int(raw_workers) < 1:
+        raise ValueError(f"ANOMETA_SEED_WORKERS must be a positive integer, got {raw_workers!r}")
+    executor = os.environ.get("ANOMETA_SEED_EXECUTOR", "thread")
+    if executor == "thread":
+        return int(raw_workers), "thread"
+    if executor == "process":
+        return int(raw_workers), "process"
+    raise ValueError(f"ANOMETA_SEED_EXECUTOR must be 'thread' or 'process', got {executor!r}")
 
 
 def run_id(cfg: ExperimentConfig) -> str:

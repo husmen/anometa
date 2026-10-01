@@ -10,8 +10,12 @@ its PCA and feature-assembly building blocks.
 """
 
 import json
+import multiprocessing
 import time
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
+from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
+from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
@@ -24,11 +28,13 @@ from sklearn.decomposition import PCA
 from anometa.artifacts import LICENCES, TrackOutput
 from anometa.config import (
     ONE_CLASS,
+    ClassifierName,
     FeatureBlock,
     Scenario,
     TrackBConfig,
     config_hash,
     resolve_device,
+    seed_parallelism,
 )
 from anometa.data.splits import BudgetError, eval_rows, load_split, sample_few_shot
 from anometa.features.extract import Features, load_features
@@ -206,6 +212,98 @@ def fit_and_score_shots(
     return eval_df, score, score_balanced, fit_ms, predict_ms
 
 
+@dataclass(frozen=True)
+class _SeedTask:
+    """One (scenario, seed)'s inputs to `_score_seed`; picklable for a process pool."""
+
+    feats: Features
+    pca: PCA | None
+    train_rows: NDArray[np.int64]
+    features: tuple[FeatureBlock, ...]
+    shots: list[str]
+    split_df: pd.DataFrame
+    split: Literal["dev", "lock"]
+    classifier: ClassifierName
+    classifier_params: dict[str, int | float | str]
+    seed: int
+    device: str
+    cache_key: str | None
+    cache_dir: Path | None
+
+
+def _score_seed(
+    task: _SeedTask,
+) -> tuple[pd.DataFrame, NDArray[np.float64], NDArray[np.float64], float, float, float]:
+    """Build a fresh scorer for one seed and run `fit_and_score_shots` with it.
+
+    Module-level so a process pool can pickle it. Every scorer seeds only its
+    own generator, except `tabpfn_outlier`, which is one-class and so always
+    runs a single seed.
+
+    Args:
+        task: The (scenario, seed)'s inputs.
+
+    Returns:
+        `fit_and_score_shots`' tuple plus this process's peak allocated CUDA
+        memory in MB (NaN off CUDA), which a process pool's parent can't see.
+    """
+    scorer = make_scorer(
+        task.classifier,
+        task.classifier_params,
+        seed=task.seed,
+        device=task.device,
+        cache_key=task.cache_key,
+        cache_dir=task.cache_dir,
+    )
+    result = fit_and_score_shots(
+        task.feats,
+        task.pca,
+        task.train_rows,
+        task.features,
+        task.shots,
+        task.split_df,
+        task.split,
+        scorer,
+        task.device,
+    )
+    peak_mb = torch.cuda.max_memory_allocated() / 2**20 if task.device == "cuda" else float("nan")
+    return (*result, peak_mb)
+
+
+@contextmanager
+def _seed_pool(device: str) -> Generator[Executor | None]:
+    """Open the executor `seed_parallelism` asks for, or `None` to run seeds serially.
+
+    Processes start with `spawn`, the start method that is safe once CUDA is
+    initialised.
+
+    Args:
+        device: The resolved device the seeds run on.
+
+    Yields:
+        A thread or process pool with `ANOMETA_SEED_WORKERS` workers, or
+        `None` for one worker.
+
+    Raises:
+        ValueError: For threads on MPS, which aborts on concurrent use.
+    """
+    workers, kind = seed_parallelism()
+    if workers == 1:
+        yield None
+        return
+    if kind == "thread" and device == "mps":
+        raise ValueError("MPS aborts on concurrent threads; set ANOMETA_SEED_EXECUTOR=process")
+    pool: Executor = (
+        ThreadPoolExecutor(max_workers=workers)
+        if kind == "thread"
+        else ProcessPoolExecutor(
+            max_workers=workers, mp_context=multiprocessing.get_context("spawn")
+        )
+    )
+    with pool:
+        yield pool
+
+
 def _encoder_revision(feats: Features) -> str:
     """Format a `model_revisions` entry from a scenario's feature provenance.
 
@@ -270,6 +368,7 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
     pred_parts: list[pd.DataFrame] = []
     fit_latencies_ms: list[float] = []
     predict_latencies_ms: list[float] = []
+    worker_peaks_mb: list[float] = []
     model_revisions: dict[str, str] = {}
     licences: dict[str, str] = {"ad2": LICENCES["ad2"]}
     if cfg.classifier in _TABPFN_VERSIONS:
@@ -301,56 +400,70 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
                     )
             seed_shots[str(seed)] = shots
 
-    for scenario in cfg.scenarios:
-        split_df = splits[scenario]
-        seed_shots = shots_by_scenario[str(scenario)]
-        feats = load_features(cfg.encoder, scenario, cfg.paths, cfg.encoder_backend)
-        encoder_revision = _encoder_revision(feats)
-        if model_revisions.setdefault(cfg.encoder, encoder_revision) != encoder_revision:
-            raise ValueError(
-                f"{scenario}: {cfg.encoder} features come from {encoder_revision}, but earlier "
-                f"scenarios' from {model_revisions[cfg.encoder]}; re-extract them with one setup"
-            )
-        family = "dinov3" if cfg.encoder.startswith("dinov3") else "siglip2"
-        licences.setdefault(family, LICENCES[family])
+    with _seed_pool(device) as pool:
+        for scenario in cfg.scenarios:
+            split_df = splits[scenario]
+            seed_shots = shots_by_scenario[str(scenario)]
+            feats = load_features(cfg.encoder, scenario, cfg.paths, cfg.encoder_backend)
+            encoder_revision = _encoder_revision(feats)
+            if model_revisions.setdefault(cfg.encoder, encoder_revision) != encoder_revision:
+                raise ValueError(
+                    f"{scenario}: {cfg.encoder} features come from {encoder_revision}, but "
+                    f"earlier scenarios' from {model_revisions[cfg.encoder]}; re-extract them "
+                    "with one setup"
+                )
+            family = "dinov3" if cfg.encoder.startswith("dinov3") else "siglip2"
+            licences.setdefault(family, LICENCES[family])
 
-        train_rows: NDArray[np.int64] = np.flatnonzero(
-            np.char.startswith(feats.image_id, "train/good/")
-        ).astype(np.int64)
-        train_embedding = embedding(feats, train_rows, cfg.features)
-        pca: PCA | None = None
-        if train_embedding is not None:
-            assert cfg.pca_dim is not None  # guaranteed by TrackBConfig validation
-            pca = fit_pca(train_embedding, cfg.pca_dim)
+            train_rows: NDArray[np.int64] = np.flatnonzero(
+                np.char.startswith(feats.image_id, "train/good/")
+            ).astype(np.int64)
+            train_embedding = embedding(feats, train_rows, cfg.features)
+            pca: PCA | None = None
+            if train_embedding is not None:
+                assert cfg.pca_dim is not None  # guaranteed by TrackBConfig validation
+                pca = fit_pca(train_embedding, cfg.pca_dim)
 
-        for seed in cfg.seeds:
-            shots = seed_shots[str(seed)]
-            if cfg.classifier == "tabpfn_thinking":
-                scorer = make_scorer(
-                    cfg.classifier,
-                    cfg.classifier_params,
+            tasks = [
+                _SeedTask(
+                    feats=feats,
+                    pca=pca,
+                    train_rows=train_rows,
+                    features=cfg.features,
+                    shots=seed_shots[str(seed)],
+                    split_df=split_df,
+                    split=cfg.split,
+                    classifier=cfg.classifier,
+                    classifier_params=cfg.classifier_params,
                     seed=seed,
                     device=device,
-                    cache_key=f"{thinking_key}/{scenario}-{seed}",
-                    cache_dir=cfg.paths.cache / "thinking",
+                    cache_key=(
+                        f"{thinking_key}/{scenario}-{seed}"
+                        if cfg.classifier == "tabpfn_thinking"
+                        else None
+                    ),
+                    cache_dir=(
+                        cfg.paths.cache / "thinking"
+                        if cfg.classifier == "tabpfn_thinking"
+                        else None
+                    ),
                 )
-            else:
-                scorer = make_scorer(
-                    cfg.classifier, cfg.classifier_params, seed=seed, device=device
-                )
+                for seed in cfg.seeds
+            ]
+            results = map(_score_seed, tasks) if pool is None else pool.map(_score_seed, tasks)
+            for task, (eval_df, score, score_balanced, fit_ms, predict_ms, peak_mb) in zip(
+                tasks, results, strict=True
+            ):
+                fit_latencies_ms.append(fit_ms)
+                predict_latencies_ms.append(predict_ms)
+                worker_peaks_mb.append(peak_mb)
 
-            eval_df, score, score_balanced, fit_ms, predict_ms = fit_and_score_shots(
-                feats, pca, train_rows, cfg.features, shots, split_df, cfg.split, scorer, device
-            )
-            fit_latencies_ms.append(fit_ms)
-            predict_latencies_ms.append(predict_ms)
-
-            part = eval_df[["image_id", "scene_id", "label", "lighting"]].copy()
-            part["scenario"] = str(scenario)
-            part["seed"] = seed
-            part["score"] = score
-            part["score_balanced"] = score_balanced
-            pred_parts.append(part)
+                part = eval_df[["image_id", "scene_id", "label", "lighting"]].copy()
+                part["scenario"] = str(scenario)
+                part["seed"] = task.seed
+                part["score"] = score
+                part["score_balanced"] = score_balanced
+                pred_parts.append(part)
 
     if cfg.classifier in _TABPFN_VERSIONS:
         # After the fits: on a fresh host the first fit downloads the checkpoint.
@@ -371,7 +484,7 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
         float(np.median(predict_latencies_ms)) if timed else float("nan")
     )
     if device == "cuda":
-        metrics["peak_vram_mb"] = torch.cuda.max_memory_allocated() / 2**20
+        metrics["peak_vram_mb"] = max(torch.cuda.max_memory_allocated() / 2**20, *worker_peaks_mb)
 
     return TrackOutput(
         metrics=metrics,

@@ -20,7 +20,15 @@ from typing import Literal
 
 import pandas as pd
 
-from anometa.config import ExperimentConfig, Paths, Scenario, config_hash, resolve_device, run_id
+from anometa.config import (
+    ExperimentConfig,
+    Paths,
+    Scenario,
+    config_hash,
+    resolve_device,
+    run_id,
+    seed_parallelism,
+)
 from anometa.data.download import read_sha256sums
 from anometa.data.splits import split_hash as _split_hash
 
@@ -127,16 +135,20 @@ def _hardware_info(cfg: ExperimentConfig) -> dict[str, object]:
             concrete device this run uses.
 
     Returns:
-        `platform`, `machine`, `cpu_count` and the resolved `device`; plus
+        `platform`, `machine`, `cpu_count`, the resolved `device`, and
+        `seed_workers` and `seed_executor` from `seed_parallelism`; plus
         `cuda_device_name` and `cuda_vram_mb` when the resolved device is
         `"cuda"`.
     """
     device = resolve_device(cfg.device)
+    workers, executor = seed_parallelism()
     info: dict[str, object] = {
         "platform": platform.system(),
         "machine": platform.machine(),
         "cpu_count": os.cpu_count(),
         "device": device,
+        "seed_workers": workers,
+        "seed_executor": executor,
     }
     if device == "cuda":
         import torch  # lazy: only needed to describe a CUDA device
