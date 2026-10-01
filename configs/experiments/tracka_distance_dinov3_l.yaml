@@ -1,0 +1,5 @@
+name: tracka-distance-dinov3-l
+track: A
+split: dev
+model: patch_distance
+encoder: dinov3_l
