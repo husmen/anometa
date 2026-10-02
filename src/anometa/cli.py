@@ -15,11 +15,18 @@ import torch
 import yaml
 from pydantic import TypeAdapter
 
-from anometa.config import ExperimentConfig, Paths, Scenario, resolve_device
+from anometa.config import (
+    ExperimentConfig,
+    Paths,
+    Scenario,
+    load_configs,
+    resolve_device,
+    run_id,
+)
 from anometa.data.ad2 import index_scenario, lighting_counts
 from anometa.data.download import fetch_scenario
 from anometa.data.splits import make_split, write_split
-from anometa.experiment import run_experiment
+from anometa.experiment import LockAlreadyEvaluatedError, run_experiment
 from anometa.features.encoders import load_encoder
 from anometa.features.extract import extract_scenario
 from anometa.search.grid import GridSpec, grid_configs, run_grid
@@ -500,6 +507,65 @@ def _cmd_demo(args: argparse.Namespace) -> int:
 
 _demo_parser = SUBPARSERS.add_parser("demo", help="Launch the Streamlit few-shot labelling demo")
 _demo_parser.set_defaults(func=_cmd_demo)
+
+
+def lock_configs(frozen_dir: Path) -> list[ExperimentConfig]:
+    """Load every frozen config and force it onto the lock split.
+
+    Args:
+        frozen_dir: Folder of YAML files, each holding one config or a list.
+
+    Returns:
+        Every config of every `*.yaml` file (files in name order), revalidated
+        with `split="lock"`.
+    """
+    adapter: TypeAdapter[ExperimentConfig] = TypeAdapter(ExperimentConfig)
+    return [
+        adapter.validate_python(cfg.model_dump() | {"split": "lock"})
+        for path in sorted(frozen_dir.glob("*.yaml"))
+        for cfg in load_configs(path)
+    ]
+
+
+def _cmd_lock(args: argparse.Namespace) -> int:
+    """Run the `lock` subcommand: evaluate every frozen config once on the lock split.
+
+    A config whose lock run already exists is reported as already evaluated
+    and never rerun. Writes one row per config (`run_id`, `status`, `error`,
+    then the run's metrics) to `artifacts/lock_summary.csv`.
+
+    Args:
+        args: Parsed arguments; `frozen_dir`.
+
+    Returns:
+        `0` if no run failed in this invocation, else `1`.
+    """
+    import pandas as pd
+
+    rows: list[dict[str, object]] = []
+    for cfg in lock_configs(Path(args.frozen_dir)):
+        try:
+            result = run_experiment(cfg)
+        except LockAlreadyEvaluatedError as exc:
+            print(f"{run_id(cfg)}: already evaluated ({exc})")
+            rows.append({"run_id": run_id(cfg), "status": "already evaluated", "error": None})
+            continue
+        error = result.error.strip().splitlines()[-1] if result.error else None
+        print(f"{result.run_id}: {result.status}" + (f" ({error})" if error else ""))
+        rows.append({"run_id": result.run_id, "status": result.status, "error": error})
+        rows[-1] |= result.metrics
+    summary = Paths().artifacts / "lock_summary.csv"
+    summary.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(rows).to_csv(summary, index=False)
+    print(summary)
+    return 1 if any(row["status"] == "failed" for row in rows) else 0
+
+
+_lock_parser = SUBPARSERS.add_parser(
+    "lock", help="Evaluate the frozen configs once on the lock split"
+)
+_lock_parser.add_argument("frozen_dir", help="Folder of frozen YAML configs, e.g. configs/frozen")
+_lock_parser.set_defaults(func=_cmd_lock)
 
 
 def main(argv: list[str] | None = None) -> int:
