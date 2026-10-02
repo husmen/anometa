@@ -193,6 +193,20 @@ def load_config(path: Path) -> ExperimentConfig:
     return _experiment_config_adapter.validate_python(data)
 
 
+def load_configs(path: Path) -> list[ExperimentConfig]:
+    """Load and validate every experiment config in a YAML file.
+
+    Args:
+        path: Path to a YAML file holding one config mapping or a list of them.
+
+    Returns:
+        The validated configs, in file order.
+    """
+    data: object = yaml.safe_load(path.read_text())
+    items = data if isinstance(data, list) else [data]
+    return [_experiment_config_adapter.validate_python(item) for item in items]
+
+
 def config_hash(cfg: ExperimentConfig, *, exclude: Iterable[str] = ()) -> str:
     """Compute a stable content hash of an experiment config.
 
