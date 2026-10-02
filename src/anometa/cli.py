@@ -509,6 +509,35 @@ _demo_parser = SUBPARSERS.add_parser("demo", help="Launch the Streamlit few-shot
 _demo_parser.set_defaults(func=_cmd_demo)
 
 
+def _cmd_parity(args: argparse.Namespace) -> int:
+    """Run the `parity` subcommand: compare DINOv3's transformers and timm backends.
+
+    Args:
+        args: Parsed arguments; `encoder`, `scenario`, `n` and `device`.
+
+    Returns:
+        `0` on success.
+    """
+    from anometa.features.parity import run_parity
+
+    result = run_parity(args.encoder, args.scenario, Paths(), n_images=args.n, device=args.device)
+    for key, value in result.items():
+        print(f"{key}: {value}")
+    return 0
+
+
+_parity_parser = SUBPARSERS.add_parser(
+    "parity", help="Compare DINOv3's transformers and timm backends"
+)
+_parity_parser.add_argument("--encoder", required=True, choices=["dinov3_s", "dinov3_l"])
+_parity_parser.add_argument(
+    "--scenario", type=Scenario, choices=list(Scenario), default=Scenario.VIAL
+)
+_parity_parser.add_argument("--n", type=int, default=32, help="Images compared")
+_parity_parser.add_argument("--device", default="auto", choices=["auto", "cuda", "mps", "cpu"])
+_parity_parser.set_defaults(func=_cmd_parity)
+
+
 def lock_configs(frozen_dir: Path) -> list[ExperimentConfig]:
     """Load every frozen config and force it onto the lock split.
 
