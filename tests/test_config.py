@@ -99,6 +99,28 @@ def test_name_rejects_path_traversal() -> None:
             k=1,
             encoder_backend="timm",
         ),
+        dict(
+            features=("cls",),
+            pca_dim=16,
+            classifier="mahalanobis",
+            k=0,
+            seeds=(0,),
+            classifier_params={"n_normals": 8},
+        ),  # n_normals is for few-shot classifiers
+        dict(
+            features=("cls",),
+            pca_dim=16,
+            classifier="tabpfn",
+            k=1,
+            classifier_params={"n_normals": 0},
+        ),
+        dict(
+            features=("cls",),
+            pca_dim=16,
+            classifier="tabpfn",
+            k=1,
+            classifier_params={"n_normals": 2.5},
+        ),
     ],
 )
 def test_trackb_rejects_inconsistent_configs(kwargs: dict[str, object]) -> None:

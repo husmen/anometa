@@ -143,6 +143,31 @@ def design_matrix(
     return np.concatenate(parts, axis=1)
 
 
+def context_normals(
+    train_rows: NDArray[np.int64], n_normals: int | None, *, seed: int, scenario: Scenario
+) -> NDArray[np.int64]:
+    """Pick the train normals a few-shot scorer fits on.
+
+    TabPFN's predictions are better calibrated with fewer normals in its
+    context (PLAN_1 § Track B), so `n_normals` draws a subsample, seeded by
+    `(seed, scenario)` on a stream separate from shot sampling.
+
+    Args:
+        train_rows: Row positions of the scenario's train normals.
+        n_normals: How many to keep; `None` or at least `len(train_rows)`
+            keeps every row.
+        seed: The run seed.
+        scenario: The scenario, so scenarios draw independently.
+
+    Returns:
+        The kept row positions, sorted.
+    """
+    if n_normals is None or n_normals >= len(train_rows):
+        return train_rows
+    rng = np.random.default_rng([seed, list(Scenario).index(scenario), 7])
+    return np.sort(rng.choice(train_rows, size=n_normals, replace=False))
+
+
 def fit_and_score_shots(
     feats: Features,
     pca: PCA | None,
@@ -326,7 +351,8 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
     few-shot shots, so a `BudgetError` surfaces before any PCA or scorer fit
     runs. Then, for each scenario: loads its cached features and fits one
     PCA on the scenario's train normals. For each seed: fits a fresh scorer
-    on train normals (y=0) plus that seed's shots (y=1, empty for one-class
+    on train normals (y=0; `classifier_params["n_normals"]` of them when
+    set, see `context_normals`) plus that seed's shots (y=1, empty for one-class
     classifiers), times the fit and the timed `anomaly_score` call on the
     split's evaluation rows (CUDA synchronised), and prior-corrects
     probabilistic scores to a balanced 50/50 prior. `tabpfn_thinking`
@@ -360,6 +386,8 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
     """
     device = resolve_device(cfg.device)
     probabilistic = cfg.classifier not in ONE_CLASS
+    n_normals_param = cfg.classifier_params.get("n_normals")
+    n_normals = n_normals_param if isinstance(n_normals_param, int) else None
     thinking_key = config_hash(cfg, exclude=_THINKING_KEY_EXCLUDE)
 
     if device == "cuda":
@@ -428,7 +456,7 @@ def run_track_b(cfg: TrackBConfig, run_dir: Path) -> TrackOutput:
                 _SeedTask(
                     feats=feats,
                     pca=pca,
-                    train_rows=train_rows,
+                    train_rows=context_normals(train_rows, n_normals, seed=seed, scenario=scenario),
                     features=cfg.features,
                     shots=seed_shots[str(seed)],
                     split_df=split_df,

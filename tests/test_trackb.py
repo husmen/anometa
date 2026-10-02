@@ -18,7 +18,7 @@ from anometa.data.splits import BudgetError, eval_rows, load_split, sample_few_s
 from anometa.features.extract import cache_path
 from anometa.metrics.image import prior_correct
 from anometa.trackb.classifiers import Scorer
-from anometa.trackb.pipeline import run_track_b
+from anometa.trackb.pipeline import context_normals, run_track_b
 
 
 def record_fits(monkeypatch: pytest.MonkeyPatch, build_as: ClassifierName) -> list[tuple[int, int]]:
@@ -156,6 +156,44 @@ def test_pca_and_fit_never_see_lock_rows(
     assert seen["pca"] == 6
     assert fits == [(6 + 2, 2), (6 + 2, 2)]
     assert not lock & set(out.predictions.image_id)
+
+
+def test_n_normals_shrinks_only_the_scorer_context(
+    prepared: Paths, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """With n_normals=3, each scorer fits on 3 of the 6 train normals plus k=2 shots.
+
+    PCA still fits on all 6 normals, and `score_balanced` is prior-corrected
+    from the fit prior the scorer actually saw, k / (3 + k).
+    """
+    seen: dict[str, int] = {}
+    real_fit_pca = pipeline.fit_pca
+    monkeypatch.setattr(
+        pipeline,
+        "fit_pca",
+        lambda e, d: seen.setdefault("pca", e.shape[0]) and real_fit_pca(e, d),
+    )
+    fits = record_fits(monkeypatch, "logreg")
+    out = run_track_b(cfg_b(prepared, classifier_params={"n_normals": 3}), tmp_path)
+    assert seen["pca"] == 6
+    assert fits == [(3 + 2, 2), (3 + 2, 2)]
+    pred = out.predictions
+    np.testing.assert_allclose(
+        pred.score_balanced, prior_correct(pred.score.to_numpy(dtype=np.float64), 2 / (3 + 2))
+    )
+
+
+def test_context_normals_is_seeded_and_keeps_all_when_asked_for_more() -> None:
+    """Draws are sorted, reproducible and differ by seed; n >= the pool or None keeps every row."""
+    rows = np.arange(10, 40, dtype=np.int64)
+    a = context_normals(rows, 8, seed=0, scenario=Scenario.VIAL)
+    assert len(a) == 8
+    assert np.all(np.diff(a) > 0)
+    assert set(a) <= set(rows)
+    np.testing.assert_array_equal(a, context_normals(rows, 8, seed=0, scenario=Scenario.VIAL))
+    assert not np.array_equal(a, context_normals(rows, 8, seed=1, scenario=Scenario.VIAL))
+    np.testing.assert_array_equal(context_normals(rows, 30, seed=0, scenario=Scenario.VIAL), rows)
+    np.testing.assert_array_equal(context_normals(rows, None, seed=0, scenario=Scenario.VIAL), rows)
 
 
 def test_one_class_run_scores_all_dev(prepared: Paths, tmp_path: Path) -> None:

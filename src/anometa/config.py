@@ -119,6 +119,10 @@ class TrackBConfig(_CommonConfig):
     pca_dim: PositiveInt | None
     classifier: ClassifierName
     classifier_params: dict[str, int | float | str] = {}
+    """Classifier hyperparameters (see `trackb.classifiers`), plus `n_normals`
+    for every few-shot classifier: the number of train normals in the fit
+    set, a seeded subsample (`trackb.pipeline.context_normals`); all of them
+    when absent."""
     k: NonNegativeInt
     shot_lighting: Literal["regular", "all"] = "regular"
     encoder_backend: Literal["transformers", "timm"] = "transformers"
@@ -146,6 +150,12 @@ class TrackBConfig(_CommonConfig):
             raise ValueError("k must be > 0 for a few-shot classifier")
         if self.classifier == "tabpfn_thinking" and self.classifier_params:
             raise ValueError("tabpfn_thinking takes no classifier_params")
+        n_normals = self.classifier_params.get("n_normals")
+        if n_normals is not None:
+            if self.classifier in ONE_CLASS:
+                raise ValueError("n_normals applies to few-shot classifiers only")
+            if not isinstance(n_normals, int) or isinstance(n_normals, bool) or n_normals < 1:
+                raise ValueError("n_normals must be a positive integer")
         if self.shot_lighting == "all" and self.split != "lock":
             raise ValueError("shot_lighting='all' requires split='lock'")
         _check_timm_requires_dinov3(self.encoder, self.encoder_backend)
