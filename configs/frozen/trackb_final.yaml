@@ -1,0 +1,13 @@
+# Frozen Track B final configuration: dinov3_l, cls+mean_patch+novelty, pca16, default settings, seeds 0-9 (Task 25). Chosen from dev results only; see docs/plans/PLAN_1_RUN_LOG.md.
+- {name: lock-tabpfn-k1, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn, k: 1}
+- {name: lock-tabpfn-k2, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn, k: 2}
+- {name: lock-tabpfn-k5, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn, k: 5}
+- {name: lock-tabpfn-fast-k1, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn_fast, k: 1}
+- {name: lock-tabpfn-fast-k2, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn_fast, k: 2}
+- {name: lock-tabpfn-fast-k5, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn_fast, k: 5}
+- {name: lock-logreg-k1, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: logreg, k: 1}
+- {name: lock-logreg-k2, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: logreg, k: 2}
+- {name: lock-logreg-k5, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: logreg, k: 5}
+- {name: lock-knn-k1, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: knn, k: 1}
+- {name: lock-knn-k2, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: knn, k: 2}
+- {name: lock-knn-k5, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: knn, k: 5}

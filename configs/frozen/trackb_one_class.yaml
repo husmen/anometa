@@ -1,0 +1,3 @@
+# Frozen label-free controls on their dev-best features (dinov3_l novelty, no PCA) (Task 25). Chosen from dev results only; see docs/plans/PLAN_1_RUN_LOG.md.
+- {name: lock-mahalanobis, track: B, encoder: dinov3_l, features: [novelty], pca_dim: null, classifier: mahalanobis, k: 0, seeds: [0]}
+- {name: lock-tabpfn-outlier, track: B, encoder: dinov3_l, features: [novelty], pca_dim: null, classifier: tabpfn_outlier, k: 0, seeds: [0]}

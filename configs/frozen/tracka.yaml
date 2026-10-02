@@ -1,0 +1,5 @@
+# Frozen Track A baselines, unchanged from dev (Task 25). Chosen from dev results only; see docs/plans/PLAN_1_RUN_LOG.md.
+- {name: lock-tracka-patchcore, track: A, model: patchcore}
+- {name: lock-tracka-efficientad-s, track: A, model: efficientad_s}
+- {name: lock-tracka-distance-dinov3-s, track: A, model: patch_distance, encoder: dinov3_s}
+- {name: lock-tracka-distance-dinov3-l, track: A, model: patch_distance, encoder: dinov3_l}
