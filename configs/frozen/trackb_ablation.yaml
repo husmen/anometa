@@ -1,0 +1,5 @@
+# Frozen ablation: shots from every lighting (lock only), larger budgets; logreg as the control (Task 25). Chosen from dev results only; see docs/plans/PLAN_1_RUN_LOG.md.
+- {name: lock-ablation-tabpfn-k10, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn, k: 10, shot_lighting: all, split: lock}
+- {name: lock-ablation-tabpfn-k20, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn, k: 20, shot_lighting: all, split: lock}
+- {name: lock-ablation-logreg-k10, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: logreg, k: 10, shot_lighting: all, split: lock}
+- {name: lock-ablation-logreg-k20, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: logreg, k: 20, shot_lighting: all, split: lock}

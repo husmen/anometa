@@ -1,0 +1,7 @@
+# Frozen TabPFN with 32 train normals in context (n_normals fixed at 32 before the dev rows ran) (Task 25). Chosen from dev results only; see docs/plans/PLAN_1_RUN_LOG.md.
+- {name: lock-tabpfn-n32-k1, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn, k: 1, classifier_params: {n_normals: 32}}
+- {name: lock-tabpfn-n32-k2, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn, k: 2, classifier_params: {n_normals: 32}}
+- {name: lock-tabpfn-n32-k5, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn, k: 5, classifier_params: {n_normals: 32}}
+- {name: lock-tabpfn-fast-n32-k1, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn_fast, k: 1, classifier_params: {n_normals: 32}}
+- {name: lock-tabpfn-fast-n32-k2, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn_fast, k: 2, classifier_params: {n_normals: 32}}
+- {name: lock-tabpfn-fast-n32-k5, track: B, encoder: dinov3_l, features: [cls, mean_patch, novelty], pca_dim: 16, classifier: tabpfn_fast, k: 5, classifier_params: {n_normals: 32}}
