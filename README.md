@@ -19,7 +19,29 @@ Anometa investigates whether TabPFN 3.5 can effectively leverage frozen vision-f
 
 ## Results
 
-Lock-split results are added after the single lock evaluation. Dev-split progress is recorded in [`docs/plans/PLAN_1_RUN_LOG.md`](docs/plans/PLAN_1_RUN_LOG.md).
+Lock split, evaluated once after the configuration was frozen on the dev split (full tables: [`reports/lock/results.md`](reports/lock/results.md); the path there: [`docs/plans/PLAN_1_RUN_LOG.md`](docs/plans/PLAN_1_RUN_LOG.md)). Track B uses DINOv3-L CLS, mean-patch and patch-novelty features, PCA to 16 dimensions, 10 seeds; brackets are 95% bootstrap intervals over seeds and scenes.
+
+| image AUROC, all 8 scenarios | k=1 | k=2 | k=5 |
+|---|---|---|---|
+| **TabPFN-3.5** | **0.761** [0.702, 0.814] | **0.778** [0.722, 0.828] | **0.789** [0.734, 0.840] |
+| TabPFN-3.5-Fast | 0.758 | 0.775 | 0.790 |
+| Logistic regression | 0.683 [0.633, 0.732] | 0.740 [0.688, 0.785] | 0.745 [0.681, 0.802] |
+| kNN | 0.567 | 0.608 | 0.662 |
+| Mahalanobis, no labels | 0.766 | | |
+| TabPFN unsupervised outlier score, no labels | 0.778 | | |
+
+- With one labelled defect, TabPFN-3.5 beats logistic regression by 0.078 AUROC (paired 95% interval [+0.009, +0.146]); at k = 2 and 5 it leads by about 0.04, within noise.
+- TabPFN is far better calibrated: its balanced NLL is about half of logistic regression's at every k (0.65 vs 1.25 at k=1), with intervals well clear of zero.
+- It ties the label-free controls: on AD2, 1–5 labels add little over a good novelty score, and TabPFN is the only supervised model here that matches one (logistic regression and kNN score below both label-free controls).
+- TabPFN-3.5-Fast matches TabPFN-3.5 within 0.003 at a quarter of the latency (71 ms vs 276 ms per scenario and seed on an RTX 3090).
+
+| pixel-level (Track A, unsupervised) | AU-PRO@0.05 | AU-PRO@0.30 | SegF1 | image AUROC |
+|---|---|---|---|---|
+| **DINOv3-L patch distance (training-free)** | **0.385** | **0.583** | **0.375** | **0.780** |
+| PatchCore | 0.222 | 0.460 | 0.198 | 0.720 |
+| EfficientAD-S | 0.182 | 0.371 | 0.150 | 0.653 |
+
+Reproduction: the best dev configurations give the same AUROC within 0.001 on a CPU-only Ryzen 7 7700 and within 0.004 on an M4 Pro, and the ungated timm DINOv3 weights match the gated ones within noise.
 
 ## Setup
 

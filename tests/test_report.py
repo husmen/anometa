@@ -17,6 +17,7 @@ from anometa.report import (
     matched_cells,
     one_class_on_fewshot_rows,
     paired_comparisons,
+    with_variants,
 )
 
 
@@ -221,3 +222,14 @@ def test_matched_cells_lower_is_better_for_calibration():
     out = matched_cells(fewshot, "nll_bal").set_index("scope")
     assert out.loc["all", "mean_diff"] == pytest.approx(-0.6)
     assert out.loc["all", "share_tabpfn_better"] == 1.0
+
+
+def test_with_variants_names_context_size_runs_apart():
+    """A tabpfn run with n_normals becomes its own classifier; tuned params do not."""
+    runs = pd.DataFrame(
+        {
+            "classifier": ["tabpfn", "tabpfn", "logreg"],
+            "params": ["{}", '{"n_normals": 32}', '{"C": 0.01}'],
+        }
+    )
+    assert list(with_variants(runs)["classifier"]) == ["tabpfn", "tabpfn n_normals=32", "logreg"]
