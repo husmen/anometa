@@ -359,6 +359,19 @@ def matched_cells(fewshot: pd.DataFrame, metric: str = "auroc") -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def _slug(name: str) -> str:
+    """Turn a classifier name (e.g. `tabpfn n_normals=32`) into a file-name stem.
+
+    Args:
+        name: The name.
+
+    Returns:
+        `name` with every run of characters other than letters, digits and
+        `_` replaced by `-`.
+    """
+    return re.sub(r"[^A-Za-z0-9_]+", "-", name)
+
+
 def _save(fig: Figure, out: Path) -> Path:
     """Save a figure as PNG, creating its directory.
 
@@ -511,6 +524,26 @@ def _section(title: str, body: list[str]) -> list[str]:
     return [f"## {title}", "", *(line for part in body for line in (part, ""))]
 
 
+def with_variants(track_b: pd.DataFrame) -> pd.DataFrame:
+    """Rename runs with a non-default context size as their own classifier.
+
+    `n_normals` changes what the scorer sees rather than tuning it, so a
+    `tabpfn` run with `n_normals: 32` is reported as `tabpfn n_normals=32`
+    and is never pooled with (or picked over) the default `tabpfn` runs.
+
+    Args:
+        track_b: Track B `load_runs` rows.
+
+    Returns:
+        `track_b` with `classifier` renamed where `params` sets `n_normals`.
+    """
+    names = [
+        f"{classifier} n_normals={n}" if (n := json.loads(params).get("n_normals")) else classifier
+        for classifier, params in zip(track_b["classifier"], track_b["params"], strict=True)
+    ]
+    return track_b.assign(classifier=names)
+
+
 def fixed_set_budget(fewshot: pd.DataFrame, one_class: pd.DataFrame) -> pd.DataFrame:
     """Score every label budget of one configuration on the same evaluation rows.
 
@@ -520,7 +553,9 @@ def fixed_set_budget(fewshot: pd.DataFrame, one_class: pd.DataFrame) -> pd.DataF
     k's for the same seed), so every smaller-k run of a configuration also
     scored the largest k's evaluation rows; this table rescores them there.
     The configuration per classifier is its best run at its largest k; the
-    best run of each one-class classifier is scored on the same rows.
+    best run of each one-class classifier is scored on the same rows. Only
+    regular-lit shots count: shots from every lighting are a separate
+    ablation and not nested with them.
 
     Args:
         fewshot: Few-shot `load_runs` rows.
@@ -532,6 +567,7 @@ def fixed_set_budget(fewshot: pd.DataFrame, one_class: pd.DataFrame) -> pd.DataF
         configuration ran; one-class rows fill `k=0` only.
     """
     keys = ["encoder", "features", "pca_dim", "params", "shot_lighting"]
+    fewshot = fewshot[fewshot["shot_lighting"] == "regular"]
     rows: list[dict[str, object]] = []
     ref_pred: pd.DataFrame | None = None
     for classifier, g in fewshot.groupby("classifier", sort=True):
@@ -620,7 +656,7 @@ def build_report(
     figures = page_dir / "figures"
     figures.mkdir(parents=True, exist_ok=True)
     runs = load_runs(artifacts, split)
-    track_b = runs[runs["track"] == "B"]
+    track_b = with_variants(runs[runs["track"] == "B"])
     fewshot = track_b[~track_b["classifier"].isin(ONE_CLASS)]
     one_class = track_b[track_b["classifier"].isin(ONE_CLASS)]
     track_a = runs[runs["track"] == "A"]
@@ -631,7 +667,8 @@ def build_report(
     else:
         best = fewshot.loc[fewshot.groupby(["classifier", "k"])["auroc"].idxmax()]
         best = _matched_one_class(with_ci(best, "auroc"), one_class)
-        cols = ["classifier", "k", "encoder", "features", "pca_dim", "auroc", "auroc_lo"]
+        cols = ["classifier", "k", "shot_lighting", "encoder", "features", "pca_dim", "auroc"]
+        cols += ["auroc_lo"]
         cols += ["auroc_hi", *(f"{c}_auroc" for c in sorted(ONE_CLASS) if f"{c}_auroc" in best)]
         plot_budget_curves(track_b, figures / "budget_curves.png")
         lines += _section(
@@ -694,7 +731,7 @@ def build_report(
         for classifier, g in fewshot.groupby("classifier"):
             plot_reliability(
                 _predictions(g.loc[g["auroc"].idxmax(), "run_dir"]),
-                figures / f"reliability_{classifier}.png",
+                figures / f"reliability_{_slug(str(classifier))}.png",
             )
         lines += _section(
             "Calibration",
@@ -702,7 +739,7 @@ def build_report(
                 "Mean over runs; `_bal` after the prior correction to 50/50.",
                 markdown_table(fewshot.groupby("classifier")[calib].mean().reset_index()),
                 *(
-                    f"![Reliability {c}](figures/reliability_{c}.png)"
+                    f"![Reliability {c}](figures/reliability_{_slug(c)}.png)"
                     for c in sorted(fewshot["classifier"].unique())
                 ),
             ],
@@ -752,11 +789,13 @@ def build_report(
 
     search_dir = artifacts / "search"
     search_body: list[str] = []
-    if search_dir.is_dir() and _search_files(search_dir):
+    if split == "lock":
+        search_body.append("Searches run on the dev split only; see the dev report.")
+    elif search_dir.is_dir() and _search_files(search_dir):
         plot_search(search_dir, figures / "search.png")
         search_body.append("![TPE against TabPFN-BO](figures/search.png)")
     db = artifacts / "optuna.db"
-    if db.is_file():
+    if split == "dev" and db.is_file():
         import optuna
 
         storage = f"sqlite:///{db}"
