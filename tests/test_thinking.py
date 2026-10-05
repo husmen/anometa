@@ -98,7 +98,7 @@ def test_thinking_cache_layout_shared_across_runs(prepared, tmp_path, fake_clien
 
 
 def test_thinking_cost_sums_fit_and_predict(monkeypatch, fake_client):
-    """`thinking_cost` sums the fit and predict token estimates, both at medium effort."""
+    """`thinking_cost` sums the fit (medium effort) and predict token estimates."""
 
     class FakeEstimate:
         """Stand-in for `tabpfn_client`'s `EstimateCostResponse`: only `estimated_cost` is read."""
@@ -109,10 +109,19 @@ def test_thinking_cost_sums_fit_and_predict(monkeypatch, fake_client):
 
     calls = []
 
-    def fake_estimate_cost(x_train, x_test, *, operation, thinking_effort):
-        """Record which operation was estimated and return a distinct fixed cost."""
+    def fake_estimate_cost(x_train, x_test, *, operation, thinking_effort=None):
+        """Record which operation was estimated and return a distinct fixed cost.
+
+        Mirrors the real client and server: `thinking_fit` takes no test rows
+        and needs `thinking_effort`; `thinking_predict` rejects `thinking_effort`.
+        """
         calls.append(operation)
-        assert thinking_effort == "medium"
+        if operation == "thinking_fit":
+            if x_test is not None:
+                raise ValueError("thinking_fit does not use X_test")
+            assert thinking_effort == "medium"
+        elif thinking_effort is not None:
+            raise ValueError("thinking_effort is only valid for thinking_fit")
         return FakeEstimate(10_000 if operation == "thinking_fit" else 15_000)
 
     monkeypatch.setattr(fake_client, "estimate_cost", fake_estimate_cost, raising=False)
@@ -120,3 +129,35 @@ def test_thinking_cost_sums_fit_and_predict(monkeypatch, fake_client):
     x_eval = np.zeros((2, 2), dtype=np.float32)
     assert thinking_cost(x_fit, x_eval) == 25_000
     assert calls == ["thinking_fit", "thinking_predict"]
+
+
+def test_thinking_retries_after_rate_limit(tmp_path, fake_client, monkeypatch):
+    """A rate-limited fit is retried after the named wait; other errors and daily limits are not."""
+    import anometa.trackb.classifiers as classifiers
+
+    slept: list[float] = []
+    monkeypatch.setattr(classifiers, "_sleep", slept.append)
+    real_fit = fake_client.TabPFNClassifier.fit
+    failures = ["Fail to call fit: [HTTP 429] Rate limit exceeded. Retry in 33s.."]
+
+    def flaky_fit(self, X, y):
+        """Fail once with the API's rate-limit message, then fit normally."""
+        if failures:
+            raise RuntimeError(failures.pop())
+        return real_fit(self, X, y)
+
+    monkeypatch.setattr(fake_client.TabPFNClassifier, "fit", flaky_fit)
+    f = tmp_path / "k.npz"
+    x = np.zeros((2, 2), dtype=np.float32)
+    ThinkingScorer(0, f).fit(x, np.array([0, 1])).anomaly_score(x)
+    assert slept == [34]
+    assert f.exists()
+
+    failures.append("Fail to call fit: [HTTP 500] boom")
+    with pytest.raises(RuntimeError, match="HTTP 500"):
+        ThinkingScorer(0, tmp_path / "other.npz").fit(x, np.array([0, 1])).anomaly_score(x)
+
+    failures.append("Fail to call fit: [HTTP 429] Daily usage limit reached.")
+    with pytest.raises(RuntimeError, match="Daily usage limit"):
+        ThinkingScorer(0, tmp_path / "third.npz").fit(x, np.array([0, 1])).anomaly_score(x)
+    assert slept == [34]
