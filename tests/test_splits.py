@@ -10,6 +10,7 @@ from anometa.data.ad2 import index_scenario
 from anometa.data.splits import (
     BudgetError,
     eval_rows,
+    lighting_fold,
     load_split,
     make_split,
     sample_few_shot,
@@ -111,3 +112,48 @@ def test_cli_split_writes_only_downloaded_scenarios_and_never_overwrites(
     (paths.splits / "vial.csv").write_text("sentinel\n")
     assert main(["split"]) == 0
     assert (paths.splits / "vial.csv").read_text() == "sentinel\n"
+
+
+def test_lighting_fold_keeps_context_and_evaluation_apart(split_df):
+    """Adaptation and shot scenes never appear in the evaluation rows, under any lighting.
+
+    The adaptation pool holds `adapt_max` good scenes, the shots are the
+    regular-lit images of `k` defect scenes, and every other scene is
+    evaluated under every lighting.
+    """
+    for seed in range(5):
+        fold = lighting_fold(split_df, scenario=Scenario.VIAL, seed=seed, k=2, adapt_max=2)
+        eval_scenes = set(fold.eval_rows.scene_id)
+        assert len(fold.adapt_scenes) == 2
+        assert not eval_scenes & set(fold.adapt_scenes)
+        shot_scenes = set(split_df.set_index("image_id").loc[fold.shots, "scene_id"])
+        assert len(shot_scenes) == 2
+        assert not eval_scenes & shot_scenes
+        assert all(i.endswith("_regular") for i in fold.shots)
+        assert set(fold.eval_rows.lighting) == set(split_df.lighting)
+        assert eval_scenes | set(fold.adapt_scenes) | shot_scenes == set(split_df.scene_id)
+
+
+def test_lighting_fold_is_seeded(split_df):
+    """The same seed gives the same fold; different seeds give different adaptation scenes."""
+    a = lighting_fold(split_df, scenario=Scenario.VIAL, seed=0, k=1, adapt_max=2)
+    b = lighting_fold(split_df, scenario=Scenario.VIAL, seed=0, k=1, adapt_max=2)
+    assert a.adapt_scenes == b.adapt_scenes
+    assert a.shots == b.shots
+    others = {
+        tuple(
+            lighting_fold(split_df, scenario=Scenario.VIAL, seed=s, k=1, adapt_max=2).adapt_scenes
+        )
+        for s in range(1, 8)
+    }
+    assert len(others | {tuple(a.adapt_scenes)}) > 1
+
+
+def test_lighting_fold_dev_pool_and_budget(split_df):
+    """The dev pool uses dev scenes only; too few good scenes raises BudgetError."""
+    fold = lighting_fold(split_df, scenario=Scenario.VIAL, seed=0, k=1, adapt_max=1, pool="dev")
+    dev = set(split_df.loc[split_df.split == "dev", "scene_id"])
+    assert set(fold.adapt_scenes) <= dev
+    assert set(fold.eval_rows.scene_id) <= dev
+    with pytest.raises(BudgetError, match="good scenes"):
+        lighting_fold(split_df, scenario=Scenario.VIAL, seed=0, k=1, adapt_max=4)

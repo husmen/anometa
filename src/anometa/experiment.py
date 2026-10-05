@@ -32,6 +32,7 @@ from anometa.config import ExperimentConfig, config_hash, run_id
 RUNNERS: dict[str, str | Callable[[ExperimentConfig, Path], TrackOutput]] = {
     "A": "anometa.tracka.pipeline:run_track_a",
     "B": "anometa.trackb.pipeline:run_track_b",
+    "L": "anometa.trackb.lighting:run_lighting",
 }
 """Each track's runner, as an `"module:attr"` import string or a callable."""
 
