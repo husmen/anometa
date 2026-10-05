@@ -184,10 +184,63 @@ class TrackAConfig(_CommonConfig):
         return self
 
 
-ExperimentConfig = Annotated[TrackAConfig | TrackBConfig, Field(discriminator="track")]
-"""A validated Track A or Track B experiment config, selected by `track`."""
+class LightingConfig(_CommonConfig):
+    """Post-freeze lighting-adaptation study (PLAN_1 § Post-freeze study).
 
-_experiment_config_adapter: TypeAdapter[TrackAConfig | TrackBConfig] = TypeAdapter(ExperimentConfig)
+    For every scenario, fold seed and target lighting, the context holds the
+    train normals, `k` regular-lit defect shots (few-shot classifiers only)
+    and the target-lit images of the first `adapt_normals` adaptation
+    scenes; the target-lit images of every other scene are scored (see
+    `data.splits.lighting_fold`). The defaults are the frozen Track B
+    configuration.
+    """
+
+    track: Literal["L"] = "L"
+    seeds: Annotated[tuple[int, ...], Field(min_length=1)] = tuple(range(10))
+    encoder: EncoderName = "dinov3_l"
+    features: Annotated[tuple[FeatureBlock, ...], Field(min_length=1)] = (
+        "cls",
+        "mean_patch",
+        "novelty",
+    )
+    pca_dim: PositiveInt | None = 16
+    classifier: ClassifierName
+    k: PositiveInt = 2
+    adapt_normals: NonNegativeInt = 0
+    adapt_max: PositiveInt = 2
+    scene_pool: Literal["all", "dev"] = "all"
+    encoder_backend: Literal["transformers", "timm"] = "transformers"
+
+    @field_validator("features")
+    @classmethod
+    def _canonicalise_features(cls, value: tuple[FeatureBlock, ...]) -> tuple[FeatureBlock, ...]:
+        """Deduplicate feature blocks and sort into `cls, mean_patch, novelty` order."""
+        return tuple(sorted(set(value), key=lambda block: _FEATURE_ORDER[block]))
+
+    @model_validator(mode="after")
+    def _check_consistency(self) -> Self:
+        """Reject combinations that don't correspond to a runnable study run."""
+        has_embedding = bool(set(self.features) & {"cls", "mean_patch"})
+        if has_embedding != (self.pca_dim is not None):
+            raise ValueError("pca_dim is required with cls or mean_patch, and None otherwise")
+        if self.adapt_normals > self.adapt_max:
+            raise ValueError("adapt_normals cannot exceed adapt_max")
+        if self.classifier == "tabpfn_thinking":
+            raise ValueError("tabpfn_thinking is not part of the lighting study")
+        if self.split != "dev":
+            raise ValueError("the lighting study picks its scenes with scene_pool; split stays dev")
+        _check_timm_requires_dinov3(self.encoder, self.encoder_backend)
+        return self
+
+
+ExperimentConfig = Annotated[
+    TrackAConfig | TrackBConfig | LightingConfig, Field(discriminator="track")
+]
+"""A validated Track A, Track B or lighting-study config, selected by `track`."""
+
+_experiment_config_adapter: TypeAdapter[TrackAConfig | TrackBConfig | LightingConfig] = TypeAdapter(
+    ExperimentConfig
+)
 
 
 def load_config(path: Path) -> ExperimentConfig:

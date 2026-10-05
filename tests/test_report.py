@@ -7,11 +7,12 @@ import pandas as pd
 import pytest
 from conftest import cfg_b
 
-from anometa.config import Scenario, TrackAConfig
+from anometa.config import LightingConfig, Scenario, TrackAConfig
 from anometa.experiment import run_experiment
 from anometa.report import (
     build_report,
     fixed_set_budget,
+    lighting_paired,
     load_runs,
     markdown_table,
     matched_cells,
@@ -233,3 +234,32 @@ def test_with_variants_names_context_size_runs_apart():
         }
     )
     assert list(with_variants(runs)["classifier"]) == ["tabpfn", "tabpfn n_normals=32", "logreg"]
+
+
+def test_lighting_section_and_paired_comparisons(prepared):
+    """Lighting-study runs get their own report section and the pre-declared paired rows.
+
+    Two logreg runs (m = 0 and m = 2) are relabelled as TabPFN so the m = 2
+    vs m = 0 comparison runs without loading TabPFN; the pair scores the
+    same rows, so the comparison yields a finite interval.
+    """
+    for m in (0, 2):
+        cfg = LightingConfig(
+            encoder="dinov3_s",
+            pca_dim=4,
+            classifier="logreg",
+            k=1,
+            adapt_normals=m,
+            scenarios=(Scenario.VIAL,),
+            seeds=(0, 1),
+            paths=prepared,
+        )
+        assert run_experiment(cfg).status == "ok"
+    runs = load_runs(prepared.artifacts, "dev")
+    lighting = runs[runs.track == "L"].assign(classifier="tabpfn")
+    out = lighting_paired(lighting, n_boot=50)
+    assert list(out.comparison.unique()) == ["tabpfn m=2 vs m=0"]
+    assert set(out.metric) == {"auroc", "nll_bal"}
+    assert out["diff_lo"].le(out["diff"]).all()
+    page = build_report(prepared.artifacts, prepared.artifacts.parent / "reports", "dev")
+    assert "Lighting adaptation" in page.read_text()

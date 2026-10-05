@@ -40,6 +40,7 @@ _CONFIG_COLUMNS: list[str] = [
     "shot_lighting",
     "model",
     "params",
+    "adapt_normals",
     "config_hash",
 ]
 """Flattened config columns of `load_runs`, before the metrics."""
@@ -94,6 +95,7 @@ def load_runs(artifacts: Path, split: Literal["dev", "lock"]) -> pd.DataFrame:
             "params": json.dumps(config.get("classifier_params") or {}, sort_keys=True)
             if config.get("track") == "B"
             else None,
+            "adapt_normals": config.get("adapt_normals"),
             "config_hash": manifest["config_hash"],
         }
         row |= json.loads((run_dir / "metrics.json").read_text())
@@ -354,6 +356,73 @@ def matched_cells(fewshot: pd.DataFrame, metric: str = "auroc") -> pd.DataFrame:
                         "share_tabpfn_better": float(
                             np.mean(diff > 0 if higher_is_better else diff < 0)
                         ),
+                    }
+                )
+    return pd.DataFrame(rows)
+
+
+def lighting_paired(lighting: pd.DataFrame, n_boot: int = 1000) -> pd.DataFrame:
+    """Run the lighting study's pre-declared paired comparisons (PLAN_1 § Post-freeze study).
+
+    Compares, on shifted-lighting images, TabPFN-3.5 with m adaptation
+    scenes against m = 0, and TabPFN-3.5 against each control at the
+    largest m, per k. Each (scenario, lighting) pair is its own bootstrap
+    stratum, because every pair has its own fitted context.
+
+    Args:
+        lighting: Track L `load_runs` rows.
+        n_boot: Bootstrap replicates per comparison.
+
+    Returns:
+        One row per comparison: `k`, `comparison`, `metric`, `diff` (first
+        minus second), `diff_lo`, `diff_hi` and `p_first_better`.
+    """
+    runs = {
+        (str(c), k, m): d
+        for c, k, m, d in zip(
+            lighting["classifier"],
+            lighting["k"].astype(int).tolist(),
+            lighting["adapt_normals"].astype(int).tolist(),
+            lighting["run_dir"],
+            strict=True,
+        )
+    }
+
+    def shifted(key: tuple[str, int, int]) -> pd.DataFrame:
+        """Shifted-lighting predictions of one run, grouped by (scenario, lighting)."""
+        p = _predictions(runs[key])
+        p = p[p["lighting"] != "regular"]
+        return p.assign(scenario=p["scenario"] + "|" + p["lighting"])
+
+    rows: list[dict[str, object]] = []
+    m_max = max(m for _, _, m in runs)
+    for k in sorted({k for _, k, _ in runs}):
+        plan = [
+            (f"tabpfn m={m} vs m=0", ("tabpfn", k, m), ("tabpfn", k, 0))
+            for m in range(1, m_max + 1)
+        ]
+        plan += [
+            (f"tabpfn vs {c}, m={m_max}", ("tabpfn", k, m_max), (c, k, m_max))
+            for c in ("logreg", "mahalanobis", "tabpfn_outlier", "tabpfn_fast", "knn")
+        ]
+        for name, a, b in plan:
+            if a not in runs or b not in runs:
+                continue
+            for metric in ("auroc", "nll_bal"):
+                if metric == "nll_bal" and b[0] in ONE_CLASS:
+                    continue
+                d, lo, hi, share = paired_bootstrap_diff(
+                    shifted(a), shifted(b), metric, probabilistic=metric != "auroc", n_boot=n_boot
+                )
+                rows.append(
+                    {
+                        "k": k,
+                        "comparison": name,
+                        "metric": metric,
+                        "diff": d,
+                        "diff_lo": lo,
+                        "diff_hi": hi,
+                        "p_first_better": share if metric == "auroc" else 1 - share,
                     }
                 )
     return pd.DataFrame(rows)
@@ -785,6 +854,24 @@ def build_report(
             body.append(markdown_table(track_b.groupby("classifier")["auroc"].max().reset_index()))
         lines += _section(
             "Track A against Track B", ["Image AUROC; Track B best per classifier.", *body]
+        )
+
+    lighting = runs[runs["track"] == "L"]
+    if not lighting.empty:
+        cols = ["classifier", "k", "adapt_normals", "regular/auroc", "shifted/auroc", "gap_auroc"]
+        cols += [c for c in ("shifted/nll_bal",) if c in lighting.columns]
+        table = lighting.sort_values(["k", "classifier", "adapt_normals"])[cols]
+        lines += _section(
+            "Lighting adaptation (post-freeze study)",
+            [
+                "Separate study (PLAN_1 § Post-freeze study), not part of the lock benchmark. "
+                "Scene-level folds over every public test scene; m = good scenes whose "
+                "target-lit images join the context. `shifted` averages every shifted "
+                "(scenario, lighting) pair; `gap_auroc` is regular minus shifted.",
+                markdown_table(table),
+                "Pre-declared paired comparisons on shifted lighting (95% bootstrap CI).",
+                markdown_table(lighting_paired(lighting)),
+            ],
         )
 
     search_dir = artifacts / "search"
