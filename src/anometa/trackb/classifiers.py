@@ -14,6 +14,8 @@ only uses the scikit-learn classifiers never pays for loading them.
 """
 
 import os
+import re
+import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from functools import cache
@@ -396,6 +398,43 @@ def _build_tabpfn_outlier(
     return _TabPFNOutlierScorer(model, seed, n_permutations)
 
 
+_sleep: Callable[[float], None] = time.sleep
+"""Waits between rate-limited Thinking calls; a module attribute so tests can replace it."""
+_RATE_LIMIT_RETRIES = 5
+_RETRY_IN = re.compile(r"Retry in (\d+)s")
+
+
+def _with_rate_limit_retry[T](call: Callable[[], T]) -> T:
+    """Run one Prior Labs API call, retrying after an HTTP 429 rate-limit reply.
+
+    The API answers too many Thinking calls per minute with HTTP 429 and
+    names the wait ("Retry in 33s"); this waits that long plus one second
+    and retries, up to `_RATE_LIMIT_RETRIES` times. Any other error
+    propagates at once, including the daily token limit (also HTTP 429, but
+    with no wait named, since retrying cannot succeed before the reset).
+
+    Args:
+        call: The API call to run.
+
+    Returns:
+        The call's result.
+
+    Raises:
+        RuntimeError: The last rate-limit error after all retries, or any
+            non-rate-limit error from the client.
+    """
+    for attempt in range(_RATE_LIMIT_RETRIES + 1):
+        try:
+            return call()
+        except RuntimeError as exc:
+            message = str(exc)
+            wait = _RETRY_IN.search(message)
+            if "HTTP 429" not in message or wait is None or attempt == _RATE_LIMIT_RETRIES:
+                raise
+            _sleep(int(wait.group(1)) + 1)
+    raise AssertionError("unreachable")
+
+
 @dataclass
 class ThinkingScorer:
     """`Scorer` wrapping TabPFN-3.5-Thinking via the Prior Labs API, cached to disk.
@@ -459,8 +498,9 @@ class ThinkingScorer:
             thinking_timeout_s=self.timeout_s,
             random_state=self.seed,
         )
-        clf.fit(self._x, self._y)
-        proba = np.asarray(clf.predict_proba(X))
+        x_fit, y_fit = self._x, self._y
+        _with_rate_limit_retry(lambda: clf.fit(x_fit, y_fit))
+        proba = np.asarray(_with_rate_limit_retry(lambda: clf.predict_proba(X)))
         p = proba[:, list(clf.classes_).index(1)].astype(np.float64)
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)
         tmp = self.cache_file.with_name(self.cache_file.name + ".tmp")
@@ -473,8 +513,9 @@ class ThinkingScorer:
 def thinking_cost(X_fit: NDArray[np.float32], X_eval: NDArray[np.float32]) -> int:
     """Estimate the Prior Labs token cost of one TabPFN-3.5-Thinking fit and predict.
 
-    Both estimates use `thinking_effort="medium"`, matching `ThinkingScorer`'s
-    default. Every operation costs at least 10,000 tokens against a 5M
+    The fit estimate uses `thinking_effort="medium"`, matching `ThinkingScorer`'s
+    default; the server accepts no effort for the predict estimate and no test
+    rows for the fit estimate. Every operation costs at least 10,000 tokens against a 5M
     token/day default budget: call this before a real Thinking run and check
     the estimate against the remaining budget.
 
@@ -489,10 +530,10 @@ def thinking_cost(X_fit: NDArray[np.float32], X_eval: NDArray[np.float32]) -> in
     import tabpfn_client
 
     fit_cost = tabpfn_client.estimate_cost(
-        X_fit, X_eval, operation="thinking_fit", thinking_effort="medium"
+        X_fit, None, operation="thinking_fit", thinking_effort="medium"
     ).estimated_cost
     predict_cost = tabpfn_client.estimate_cost(
-        X_fit, X_eval, operation="thinking_predict", thinking_effort="medium"
+        X_fit, X_eval, operation="thinking_predict"
     ).estimated_cost
     return fit_cost + predict_cost
 
