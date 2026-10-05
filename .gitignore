@@ -221,3 +221,6 @@ __marimo__/
 /data/
 /cache/
 /artifacts/
+
+# Explainer video outputs (wav, mp4, srt)
+/docs/video/out/
