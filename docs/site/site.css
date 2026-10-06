@@ -14,8 +14,6 @@
 .lp-caption { text-align: center; color: var(--muted); font-size: 14.5px; margin: 8px auto 0 }
 .lp-sec { scroll-margin-top: 16px } .lp-sec h2 { margin-top: 44px }
 .lp-sec p, .lp-sec li { max-width: none }
-.lp-name { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 4px 20px 12px; margin-top: 32px }
-.lp-name h2 { margin-top: 16px }
 .lp-fig { margin: 18px 0 }
 .lp-fig img { width: 100%; height: auto; display: block; border-radius: 8px }
 .lp-note { color: var(--muted); font-size: 15px }

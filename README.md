@@ -16,12 +16,9 @@
 
 ## What is Anometa?
 
-**Anometa** = **ano**maly + **meta**. "Meta" has two meanings:
+Anometa investigates whether TabPFN-3.5 can leverage frozen vision-foundation-model representations for few-shot industrial anomaly detection. A frozen DINOv3 encoder turns each image into one short table row; TabPFN-3.5 reads the rows of normal parts plus a handful of labelled defects as its context and scores every new image in one forward pass, with no model training. Using MVTec AD 2 as the primary benchmark, the project explores how visual representations, compact feature projections and TabPFN interact under limited labelled data, with particular attention to label efficiency, calibration and robustness to lighting and domain shifts. TabPFN-3.5 also serves as an unsupervised outlier scorer and, in a prototype, scores one row per image patch to draw defect maps.
 
-- **Meta-learning, today.** TabPFN is a meta-learned model: it was pre-trained on millions of synthetic tasks and learns a new task in context, from a table of examples, with no training per task. Anometa applies it to anomaly detection on frozen vision-foundation-model features.
-- **A meta-framework, tomorrow.** The experiment API, artifacts and protocol are not tied to one model or dataset, so other foundation models, detectors and benchmarks can plug into the same pipeline.
-
-The initial focus is TabPFN-3.5 on MVTec AD 2, built for the Prior Labs TabPFN-3.5 hackathon. Anometa investigates whether TabPFN 3.5 can leverage frozen vision-foundation-model representations for few-shot industrial anomaly detection: how visual representations, compact feature projections and TabPFN interact under limited labelled data, with attention to label efficiency, calibration and robustness to lighting and domain shifts. More datasets, models and tracks can follow (see the [roadmap](https://husmen.github.io/anometa/docs/roadmap.html)).
+The name is **ano**maly + **meta**: meta-learning, as TabPFN learns each task in context, and a meta-framework not tied to one model or dataset. TabPFN-3.5 and MVTec AD 2, chosen for the Prior Labs TabPFN-3.5 hackathon, are the starting point (see the [roadmap](https://husmen.github.io/anometa/docs/roadmap.html)).
 
 ## How it works
 

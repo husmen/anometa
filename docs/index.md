@@ -4,9 +4,9 @@
 
 [Project page](https://husmen.github.io/anometa/) · [Full report](https://husmen.github.io/anometa/report/) · [Code](https://github.com/husmen/anometa) · [Explainer video](https://husmen.github.io/anometa/#video)
 
-Factories need to catch defects, but defects are rare: often there are a handful of labelled examples, sometimes one. Anometa asks whether TabPFN-3.5, a foundation model for tables, can turn a few labelled defect images into a useful detector. It never trains a vision model. A frozen DINOv3 encoder turns each image into one short table row, and TabPFN classifies new rows in context, in one forward pass.
+Anometa investigates whether TabPFN-3.5 can leverage frozen vision-foundation-model representations for few-shot industrial anomaly detection. A frozen DINOv3 encoder turns each image into one short table row; TabPFN-3.5 reads the rows of normal parts plus a handful of labelled defects as its context and scores every new image in one forward pass, with no model training. Using MVTec AD 2 as the primary benchmark, the project explores how visual representations, compact feature projections and TabPFN interact under limited labelled data, with particular attention to label efficiency, calibration and robustness to lighting and domain shifts. TabPFN-3.5 also serves as an unsupervised outlier scorer and, in a prototype, scores one row per image patch to draw defect maps.
 
-The name is **ano**maly + **meta**. Today "meta" means meta-learning: TabPFN was pre-trained on millions of synthetic tasks and learns a new one from its context. Tomorrow it means a meta-framework: the experiment API, artifacts and protocol are not tied to one model or dataset. TabPFN-3.5 and MVTec AD 2 are the starting point.
+The name is **ano**maly + **meta**: meta-learning, as TabPFN learns each task in context, and a meta-framework not tied to one model or dataset. TabPFN-3.5 and MVTec AD 2, chosen for the Prior Labs TabPFN-3.5 hackathon, are the starting point (see the [roadmap](roadmap.md)).
 
 ```{figure} report/data/trackc_gallery.webp
 :alt: One defect image per MVTec AD 2 scenario with the DINOv3-L distance, PatchCore and TabPFN-Fast anomaly maps

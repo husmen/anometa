@@ -26,12 +26,10 @@
 <section class="lp-sec">
 <h2>Abstract</h2>
 <p>Factories need to catch defects, but defects are rare: often there is a handful of labelled examples, sometimes one. <strong>Can TabPFN-3.5, a foundation model for tables, turn a few labelled defect images into a useful detector, using only frozen features from a vision foundation model?</strong> Anometa encodes each image with a frozen DINOv3 vision transformer, compresses it to one table row, and lets TabPFN-3.5 classify new rows in context, with no gradient updates. On the 8 scenarios of MVTec AD 2, under a protocol that freezes the configuration on a dev split and evaluates it once on a held-out lock split, TabPFN reaches a lock AUROC of $tab1 with one labelled defect per scenario (logistic regression: $log1), and its probabilities have about half the balanced log loss. A good label-free novelty score ranks images just as well, so on this benchmark the frozen DINOv3 features do most of the work. A prototype that scores one row per image patch turns TabPFN into a defect-map generator that beats its own input maps on the dev split.</p>
+<p class="lp-note">The name is <strong>ano</strong>maly + <strong>meta</strong>: meta-learning, as TabPFN learns each task in context, and a meta-framework not tied to one model or dataset. TabPFN-3.5 and MVTec AD 2, chosen for the Prior Labs TabPFN-3.5 hackathon, are the starting point (see the <a href="docs/roadmap.html">roadmap</a>).</p>
 </section>
 
-<section class="lp-sec lp-name">
-<h2>Why "Anometa"?</h2>
-<p><strong>Ano</strong>maly + <strong>meta</strong>. Today, "meta" means meta-learning: TabPFN was pre-trained on millions of synthetic tasks and learns a new one in context. Tomorrow, it means a meta-framework: the experiment API, artifacts and protocol are not tied to one model or dataset, so other foundation models, detectors and benchmarks can plug in. TabPFN-3.5 and MVTec AD 2 are the starting point.</p>
-</section>
+
 
 <section class="lp-sec">
 <h2>Method</h2>
