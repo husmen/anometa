@@ -117,6 +117,10 @@ Every command (Track A, grid, Optuna, TabPFN-BO, report, lock, parity, Rerun), t
 - TabPFN-3.5 by Prior Labs.
 - MVTec AD 2 by MVTec Software GmbH (Heckler-Kram et al., 2025), CC BY-NC-SA 4.0.
 
+## AI use
+
+Several AI providers and models, from small open-source models running locally to frontier models, were used at different steps of this project: planning, coding, analysis, writing, figures and the narrated video. Every reported number comes from the run artifacts and the code in this repository.
+
 ## Citation
 
 ```bibtex

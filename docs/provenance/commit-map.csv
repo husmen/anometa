@@ -1,162 +1,161 @@
-old_sha,new_sha,date,subject
-714da232d78e61f5dc58400d30566f887a849125,a7dacfa8aa8be4abdd303b559c117807ad144efc,2026-09-26T12:08:42+03:00,Initial commit
-9aa85ebd39cd0aa40e825fa0024a0c0ded0395a0,5092022bfe8a8f94f5880db8ee054cb47d9a740d,2026-09-26T16:19:39+03:00,docs: initial plan
-9c5c13248e3fd13f378d1fbeb526b089877aeaae,8ebc2f95e56297c3ee728d07d3638d87e9856fc6,2026-09-26T16:21:02+03:00,docs: refined plan
-1322bf04b47f969bba4696316e284f22a3ff50fe,89e10aba89dbb7e29a1c7f671d3e05c7826a22e7,2026-09-26T16:27:19+03:00,WIP on wip/plan-1-implementation: a7dacfa Initial commit
-d34aa12655bcb22094c95d8cc03c3883963af7a6,06128bb8679dbc8bdff826b762bcef98ae4f2806,2026-09-26T16:27:19+03:00,index on wip/plan-1-implementation: a7dacfa Initial commit
-ef1b1af5324b87d4daaf0b12225fdc112fc33fde,e0e976dd2193b1b77eef25b7bd73fcbac6bca1f9,2026-09-26T19:58:49+03:00,"chore: scaffold anometa package, tooling and CLI entry point"
-24306f84164b83a6656d7f5a6dfa6e72f1ee370e,866cc713adac8ef42c301dc147ee8acef05b5956,2026-09-26T19:58:50+03:00,fix: raise when indexing a scenario that was never extracted
-341b99fa42617cfcc65730553b170c8c54e24a19,4a503932ce920649092f758a34df499d4147422d,2026-09-26T19:58:50+03:00,feat: index AD2 scenarios with lighting and scene ids
-45cff2a4385368197123688dab9f540dbe7376b8,73b918caa6e80d47a1e545cea3190f3699230563,2026-09-26T19:58:50+03:00,fix: canonicalise config hash and tighten config validation
-63109626cdfcc58fe5d951503b6d8e5a398a43b6,0ee289a576455591704f232ccf9c66822d61e61e,2026-09-26T19:58:50+03:00,build: set package description and Apache-2.0 licence metadata
-66a9a2ccea701425af6f546d9a1ca9def2af43e2,0dd202069fb7033ce9887b7e4c41972ae0c795a3,2026-09-26T19:58:50+03:00,"fix: detect truncated downloads, treat 416 as complete, extract atomically"
-ce5c6866ca959f2e802a3c3df7275679a2638bb9,3a06e3a0d18e65afcf17f4eb60c3509d0a745b25,2026-09-26T19:58:50+03:00,"feat: download AD2 scenario archives with resumable, hash-pinned fetch"
-d2771bd441febebc1f319a85b2ed98aff217d6f4,9dc657ef2f3f3979f91c97016aa26cbb035ff49a,2026-09-26T19:58:50+03:00,feat: add experiment configuration schema and hashing
-d44ead0f4c9d2b569388b736ce5e43b7c17615b8,0ee289a576455591704f232ccf9c66822d61e61e,2026-09-26T19:58:50+03:00,"docs: tick Tasks 1-5 progress and sync plan with implementation (planning-only commit, removed; code identical to new_sha)"
-1360a869447a6fbd376f0146b9cbaebfa3f46239,6da1074a3d7f1b8c4f97172b91d61b49c6bb2ed1,2026-09-26T19:59:04+03:00,build: use placeholder package author
-bd2258b77af371185174796b68c58e8bde0cf44c,6da1074a3d7f1b8c4f97172b91d61b49c6bb2ed1,2026-09-26T19:59:05+03:00,"docs: record Task 4 TabPFN check on M4 Pro (planning-only commit, removed; code identical to new_sha)"
-ab9a77a26c68388b56f551614a5c012321ef17e5,61dd95fda6e2379470cbacc4e98e3f6198d09a15,2026-09-26T20:16:08+03:00,feat: split test_public by scene and sample nested few-shot sets
-2266ac3f28f8e23507ac64de052f52665f80db98,e9487a803d525a5ab81213c1b6888c909ab089ea,2026-09-26T20:27:39+03:00,"feat: add run_experiment with manifests, run log, resume and lock guard"
-e26c35c51de34b4c9a63cce2b9acb3f995e55dd3,a133cd4edc63b5834c82382a624b2a0127faa654,2026-09-26T20:55:42+03:00,feat: add frozen DINOv3 and SigLIP2 encoders with pinned revisions
-570fb93948603a74d196c2ab0f5e0b22de03a9c0,a72396408691ff051f5033e0ce8650846ab16efb,2026-09-26T21:07:36+03:00,feat: add leave-one-out patch novelty and distance maps
-fde1cdc564a5bcf64935af0ccab79384c331c496,70ad998f073881b4a3b133ce7cf2b45ccca7b24a,2026-09-26T21:23:36+03:00,feat: extract and cache per-scenario encoder features
-f61cea14d8c8053d6f71dc98bb7ace0192f9543a,9e4d2da114463acba1929eb868c671d70df578e9,2026-09-26T21:33:27+03:00,fix: write feature cache atomically via temp file and os.replace
-4b329fa1b502ef2f8a2fb72984396b13a4d24650,2a63c5a80d2685d3550614a10a83c9481a7e4ee9,2026-09-26T21:41:22+03:00,"feat: add image metrics, ECE and prior correction"
-91db997d9f0478f09a676ae3437ee33d5c400267,588e074094c69e100d9e073adc8c009c669deacc,2026-09-26T21:53:20+03:00,feat: aggregate metrics with robustness gap and scene bootstrap
-28467ae76bcaa9f0acdbec9eefe6b0f6ccbcde75,d41e16343ccfc212d0628fb9166c15e87bc8ab3b,2026-09-26T21:59:50+03:00,test: cover bootstrap_ci with multiple scenarios and seeds
-7734758a36c30f430d327965bc3b66143f32703a,4e60bc43278056f6b87ddd44ceae2926b337dfa9,2026-09-26T22:07:34+03:00,"fix: claim lock run directory, write manifest last, capture provenance first"
-ef150303ad8c0ff222c0961c9813791f83dec9ca,9b3d47d151107e3cc39c8ea094f55f35addbd67b,2026-09-26T22:09:05+03:00,fix: fall back to timm when a gated error is wrapped in OSError
-2db1f44a7d31650144a451f905f8bd11d970a06c,ac6982b9f841e64a7c1536c0ac79e0cc94ebe908,2026-09-26T22:11:05+03:00,"feat: record feature cache provenance, reject non-finite encodings, time extraction"
-a405e0ed459607fd27a6649a1aa89c7da0dcc1bc,b8e0985f2228ea8db770589eee0799d2c334a304,2026-09-26T22:11:25+03:00,fix: refuse lock-split configs in anometa run
-7e2454acedc044828b2e31bf0cdf667437075cba,961d905702e64d87d5c32d1ca3a6cc89b39b568f,2026-09-26T22:11:50+03:00,"test: prove split never overwrites via sentinel, document fake helper"
-de62055b1917906c2a7d68df2460b4e4ec78f3d3,621ff799258c66f3a4aac104905950aea621f6df,2026-09-26T22:12:17+03:00,fix: report the original-sample statistic as the bootstrap point
-674e65b5942b0215a4f828321e100c0b62e5a637,88bf9c45ac3f9574844402108a4d6dc8fb6c105f,2026-09-26T22:12:44+03:00,"fix: reject priors outside (0, 1) in prior_correct"
-dd8f1cb09ef5290df0ffc21196ae44c3076279c6,b1575c90630de35eef04d0930bdc077db1bd85e8,2026-09-26T22:31:32+03:00,feat: add Track B scorers and one-class controls
-ad5075a3cc9b46d703f85cbfa9993c8bad00e1ce,5b3d45fbd5821dc4f28b80074b23580f3b8cfabd,2026-09-26T22:56:06+03:00,feat: add Track B pipeline and run overrides
-9664b160f2656b3fdcc4054a422dc8bcb9224ad4,729275d5e1cd0ed3eeac81f4b65f3eb2222edacd,2026-09-26T23:07:12+03:00,fix: reuse eval_rows in the exhaustive-shots BudgetError guard
-bb126263677faab884ebaa8229ef2988f1486eae,0ea6309529b3c4c939e43cfd18dc43d3a5c4d818,2026-09-26T23:19:21+03:00,feat: add TabPFNWithImages reference check
-94147284b9c1eed202168b109c398c3fdab75238,d0a4abaeb371f7d9458954b5af8b84cdd4b7cd1b,2026-09-26T23:44:11+03:00,fix: share one scene draw across seeds in bootstrap_ci
-8e88283df99f3fe9d9a84002b32c25d3b77da998,55a6e01db18b23add5ca6b52bb8af1f25bce40cd,2026-09-26T23:44:21+03:00,docs: document the gap sign in group_metrics
-fbc23a13aa2dd792eaf465d626a84a722e9d2d46,421efd73764711f02f66bb0fe6a397a0fdb9afb7,2026-09-26T23:44:46+03:00,test: add known-value tests for probabilistic metrics
-ee9a3dea743a5a64bfad24d97405d91ca6b113a6,2a572d7ecb13549ee3e9d14253d6edbccf206a56,2026-09-26T23:46:06+03:00,fix: read the tabpfn checkpoint revision after the fits
-306134e1e5ce438f47703012416b3831ffc68ef8,68de04b593d520579085cba2ae7534327b055597,2026-09-26T23:47:12+03:00,fix: pin tabpfn_outlier to the v3.5 checkpoint and record its revision
-6934a42e334cde93965aabe5a9a0a25a136a031b,0dbd789fc354acd96902b1efbf8d6ded55c826e7,2026-09-26T23:49:00+03:00,fix: sample every scenario's shots before any fit
-ddfc4480d460325e741b7623821e310ab948e7b5,7986d7fccf1ad6e6f5b94808eb714e79b8b82f8b,2026-09-26T23:49:36+03:00,fix: reject mixed feature provenance across scenarios
-3879d654bb7e79aaa992293928281223467df49e,955cab0d4c4a688bd6035c943eda83c08e4291a1,2026-09-26T23:50:02+03:00,refactor: share embedding assembly between the PCA fit and design_matrix
-eb88fa3d725f809f51e3b5148115a1fac73ce477,aa0a35d607cb0bc8b5daff7bf4fa0d00f25de124,2026-09-26T23:50:36+03:00,test: check balanced scores and scorer fit rows in track b tests
-b07cc70c1c020a59039a877a34b1e7c392d66f4e,20deb28032f2cf79addb33b2c2f60d1b3d07201a,2026-09-26T23:51:00+03:00,fix: accept several key=value pairs per --set flag
-78aaee9eaa38b68a19917fd917a90bff47e03da6,69761dc9c608896b19851203e6d1a4f0b3cf56c5,2026-09-26T23:51:19+03:00,feat: print the failure reason from anometa run
-3ee661b554b71677b53e02c72ddb0af5cbca4681,60371fa74ae9ccf33a37855c096f73acdbf3e46f,2026-09-26T23:51:46+03:00,refactor: import trackb.reference lazily in the cli
-419ef40c95764f4dcff4400b64549ce0c1969574,1714941f2510d8613b24bbb5290b2b8967354c76,2026-09-26T23:52:00+03:00,test: pin the extract cli test to cpu
-72f97be0a939f6d20f03d09fa11637ff294aff38,48f8eb8e57d67303224b6598511c80f3ce79a32e,2026-09-26T23:52:28+03:00,fix: name the existing run in the renamed-lock error
-a1789b5c707efd6c3f58011c5841a395b0b062b7,3cb0c48bc35034a5e200ef76810af7d81f6b66b0,2026-09-26T23:52:44+03:00,docs: add docstrings to the classifier build closures
-eaad6245fbbad0a35eeeefe5bde5bcb989e9c79e,ca27aa1b650d4ec475332577523ed9b1b4eef091,2026-09-27T00:06:15+03:00,feat: add search space encoding and cached-feature grid
-b89cb3a44976bfde7edfb74674b90d55394d4a08,b61f505ac21811b21cf2a4b52422f683e38c312f,2026-09-27T00:18:30+03:00,feat: add Optuna NSGA-II and TPE searches
-7a611ab89610032dc01c2f6d6a5cfb6ff901fa09,9e46647ee7afee9f3d8b0fa91463a42bd948c2e3,2026-09-27T00:34:16+03:00,feat: add TabPFN-surrogate Bayesian optimization loop
-ec783b018a751199bbeef02634df7ccee5df8dcb,b1be463c4398756933e6c31dea3dd97fa65099a3,2026-09-27T00:51:46+03:00,feat: add cached TabPFN-3.5-Thinking scorer
-59519f1d4761742874f27dac9c11edaca3e0359f,bdb2981034ef2e69ec18a1a773b3fb52507ce26a,2026-09-27T01:02:11+03:00,fix: record tabpfn licence for tabpfn_thinking runs
-4f94f0fb2c8a549350de924b8eb0ec85ccfb9200,48c1a710477ef55e2ea4bd862219a532f733fe85,2026-09-27T01:18:45+03:00,feat: add Streamlit few-shot labelling demo
-59369981af9dd4c5c499deb5ff487a5948277353,4bab889e2033181648b65af3116b76adf5416001,2026-09-27T01:35:12+03:00,fix: address task-23 review findings in the demo's run tab and fit path
-124deff1c9d4fc085a51abd913b60aa45c511a70,c566c2bbb53425b768bfbc8eaed24ac3eb111f54,2026-09-27T01:53:07+03:00,test: fake tabpfn_client in thinking tests and default tabpfn env vars
-4e90ead0517327cdcf1a1c764505c959120fa00d,e170d25af4766c99ad17852bfea9b2d596324fa9,2026-09-27T01:53:22+03:00,fix: close and atomically write the thinking prediction cache
-4bb3207e6d97986fc9a3a771053b9985b2268a20,f749dfe03a1b00b5f69c106cbd2b23677b68ebcd,2026-09-27T01:54:04+03:00,fix: key the thinking cache per scenario and seed and reject its params
-253d7c5daac9103e3f2c9b8125dea239e324f28b,646d9d398354123d33041ff012a2864e504c2f35,2026-09-27T01:54:18+03:00,"fix: record thinking runs with api terms, api revision and nan latency"
-be4a424362f8ff4d87a0a66de09e6c75fbea8812,cb3e3c24e763cc435c8f5c368d9e71b1719f843e,2026-09-27T01:55:10+03:00,fix: resume optuna and bo searches without repeating trials
-ec2bffaa1d3609dd0326d1b285a316ada2dc43bd,a5bb5ddb6a6c4e5e06fdb781a308da4bbb93676f,2026-09-27T01:55:24+03:00,fix: feed the bo surrogate 0.5 for runs without a finite auroc
-6a8e9c4925e7c93f38faf4004d4baa7c26bb904d,14840c401c502b7283aefb5ae5b26533283e27e8,2026-09-27T01:55:42+03:00,fix: minimise the absolute train/test auroc gap in nsga-ii
-43dde78eacd70cd8f331f7254066b141c47efeea,1e93052750c5cec06e60483939e529a6793180bd,2026-09-27T01:56:02+03:00,fix: clamp unit-cube coordinates before decoding
-da2a433a9962e4f0414cb36c276dff35920afcc4,ecae088ddf667eaf3eb72293bca9a8251849d8db,2026-09-27T01:56:19+03:00,perf: import optuna only where a search runs
-6f9678ea798ee324489f83fd4258765e98aadcee,fc3f499c86bf68ba0553cda2d5c7ecc6c2061bbe,2026-09-27T01:56:34+03:00,feat: add --device to anometa bo
-f98cf43d74f83e4230764ca1fe5f850443c34a1e,bb65e829b7f9d529c2ebe50a15559f08dd1318d4,2026-09-27T01:56:46+03:00,fix: print per-run grid progress and record raising runs as errors
-59557eb259a71679c624a2a121d141df38db8c36,06994db2679f35c58c6faae9f34e25258c5a8f3a,2026-09-27T01:57:00+03:00,refactor: type grid one-class keys as a literal and drop _classifier_name
-116f9115b24c27f0b62158632f60f4330cf2243d,ed101ae64b304587565f43852ddb7b4481398d64,2026-09-27T01:57:06+03:00,test: ignore backoff's python 3.14 asyncio deprecation warning
-d6a8ad6403ef5a2e5d8837b59e882c406a61ba96,ed101ae64b304587565f43852ddb7b4481398d64,2026-09-27T02:06:56+03:00,"docs: tick Tasks 6-15, 18-21 and 23 and record review decisions in the plan (planning-only commit, removed; code identical to new_sha)"
-b69975cd5adad10654a3763f344a0e2b9ce32938,11bef2bd9b4437eab2ec5e8e0778486184827622,2026-10-01T16:38:09+03:00,"feat: add AU-PRO, SegF1 and ClassF1 with vendored reference code"
-9820b60ad104147817ab3acc63e9cf6a9d378d7a,a780d8c660aca7b3cf3c16835b51846f9161b9f7,2026-10-01T16:39:17+03:00,"docs: add AGENTS.md, hackathon brief and README references"
-ebd207b4b71ef9e2cf2cb35c3c51f1f2c13412c7,a780d8c660aca7b3cf3c16835b51846f9161b9f7,2026-10-01T16:39:18+03:00,"docs: add patch-maps wayfinder map, research and tickets (planning-only commit, removed; code identical to new_sha)"
-4ba3e639ae944e185b3731b06db966de4a31cf24,c57a7e5fddd8ad4d89717e343c4409401b1f603e,2026-10-01T16:46:48+03:00,"feat: restrict grid, Optuna and BO searches to chosen scenarios"
-632c590af09b4c4ddfdecd38a0bca27a26001bff,9684a75410e252ffc5f415a8a8552d1a9d2c0ca7,2026-10-01T16:57:30+03:00,feat: add Track A runner for anomalib models and patch distance maps
-90856f89d90a0b908f21e05e5a9581c9ff471435,c0b80056174ab39eac11ad8b549153e51bdeafd6,2026-10-01T16:58:40+03:00,feat: build results tables and figures from artifacts
-976df4ffd28351c56fe594c172b9fe2ccffe0f31,c721922c770abf7b4732f54865e6a5f0a743240d,2026-10-01T17:02:17+03:00,feat: add Rerun inspection recordings
-5580c0399203bc8cd03db36f3be0d10ec1a429a7,da84e7f86c6995ec4ba384b232e5060d2b9a0119,2026-10-01T17:03:19+03:00,fix: run encoders in bf16 on CUDA since dinov3_l overflows in fp16
-064ce6887fde50400311c9c1f9f5b2713b168a43,5c6b5abe1af120829dc0d873c8485e748efe2e10,2026-10-01T17:06:37+03:00,fix: upcast bf16 encodings to float32 before caching features
-81bbc255d0c04f67ca5e8fcbbf57395d54cde04a,22c7daf8fa148eead4727d1d1d9e249c514da587,2026-10-01T17:24:47+03:00,"docs: record 3090 gate, reference check and slice results"
-61c5e9ae2187f6229153dd2a2e650830408dc022,2a6b05505b2e3f1ea559998fec76e64cd4d723d9,2026-10-01T20:43:58+03:00,fix: disable EfficientAD progress bar so its checkpoint can be pickled
-6682afa746745b70d13e1197e0c8cc93ab65f65c,b0e7d9ddf0a9a7df28f578074234ad3926d90f77,2026-10-01T20:44:55+03:00,chore: pin sha256 of the remaining seven AD2 archives
-6f0f9b120c59982535edff062858679afd8d850e,713f34874f7d9246a22c171843a54b58ad5632bf,2026-10-01T20:44:55+03:00,chore: add dev/lock splits for the remaining seven scenarios
-a0c6875b3199a57d23320bb65504c710fb990dc0,4258b2e4a8f35d395b373adcacedc9d618d2cdc7,2026-10-01T20:56:46+03:00,feat: fit Track B seeds concurrently in a thread or process pool
-d47855ccbb8e1c786c0ae2d17654e8059fc6332d,18227092628f86722d253c8c87ea64cd92141947,2026-10-01T20:59:03+03:00,docs: document seed pool settings and add free-threading and cross-hardware backlog
-1497f2c966b9d970ec0a6febd60a0a3f7d309658,145493719c909c13c71daf2bab23da9e1f8d6d43,2026-10-01T21:51:35+03:00,perf: compute the PRO curve once for both AU-PRO limits
-6e9691fa1a1b1a53cd901796e7e30b5600eee06d,006094e0b949e11ef796b75a2b93d2fa4e295bcd,2026-10-01T21:51:37+03:00,perf: validate EfficientAD once after training instead of every epoch
-a74037748add2b9f5ba87842b568a90ea2a306f1,59b255f8e029776ffbd61efc68915186ad24f74d,2026-10-01T22:09:42+03:00,perf: load each TabPFN checkpoint once per process and reuse it
-990fff80ad2e9520daf2295a2b302871baac2a22,41367b8cacc2998a7abacda98399c18520670e03,2026-10-01T22:32:02+03:00,perf: keep EfficientAD train loader workers alive across epochs
-aabdb5b8b771f4d51c2ce6a11030ee1d18420697,cd78693a5720833c7d45f2a92a7ca0e89da82d7d,2026-10-01T22:39:26+03:00,fix: render integer columns as integers in report tables
-7dbd469dddb9716a8d7253a28b10d95787fcab15,cd78693a5720833c7d45f2a92a7ca0e89da82d7d,2026-10-01T22:40:56+03:00,"docs: add run log and record slice results and overnight decisions (planning-only commit, removed; code identical to new_sha)"
-f6368b10a8be352982e878c720c914ddf8ccb9c6,878cba70671bc523080f5c913cba1d0cd03bd463,2026-10-01T23:19:45+03:00,fix: leave the live train loader out when the datamodule is pickled
-aee511e8dfd0d6ecf5267d168c034ff686c1163a,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-01T23:27:15+03:00,revert: drop persistent EfficientAD train loader workers
-41bed040746ace9095be35fe0fec02debf63506a,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-01T23:32:01+03:00,"docs: correct the EfficientAD diagnosis and record the two-lane Phase B (planning-only commit, removed; code identical to new_sha)"
-b3fc19dc11b6ba348a801682337e50929afaca44,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T00:00:04+03:00,"docs: record full feature extraction and slice diagnostics (planning-only commit, removed; code identical to new_sha)"
-7b0d6ddf7ed1f0a46e83ae743ece7de3a3ab4a09,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T00:10:32+03:00,"docs: record full budget runs (planning-only commit, removed; code identical to new_sha)"
-d899aa1ed1c9d9fb588eb3250d1eebc7fc65dcb6,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T00:12:15+03:00,"docs: record why can and wallplugs score below chance (planning-only commit, removed; code identical to new_sha)"
-78c23284f438ae7f4913cb9b52f34ecd779b4354,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T03:41:50+03:00,"docs: record full grid results (planning-only commit, removed; code identical to new_sha)"
-f8ff71eece7a64f7a8fb9f15e24cb8e574904a51,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T05:42:47+03:00,"docs: record Track A results (planning-only commit, removed; code identical to new_sha)"
-ef05b8c55b53c73fc60cb80f1c74d3cc43720205,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T05:48:51+03:00,"docs: record search results and the BO seed 0 crash (planning-only commit, removed; code identical to new_sha)"
-a947a22fb50eae5ce08ba5dbafbbba0085db981c,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T05:49:02+03:00,"docs: tick Optuna studies (planning-only commit, removed; code identical to new_sha)"
-7e1a306fc7e2eaf448923847da57eb5e637fae33,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T05:51:47+03:00,"docs: add morning summary to run log (planning-only commit, removed; code identical to new_sha)"
-f07dcc16142675fe7faee8cd7c114e46e791f4d8,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T05:55:17+03:00,"docs: tick TabPFN-BO runs after the seed 0 resume (planning-only commit, removed; code identical to new_sha)"
-ab39c5b9366d82950982be5caa7162b22c09daa6,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T05:55:48+03:00,"docs: record per-scenario TabPFN versus logreg breakdown (planning-only commit, removed; code identical to new_sha)"
-198f350480d9adfca5eddaefc3eed078e458324f,6b81a1bd743ee5def552af1e462dd12983ac98c7,2026-10-02T05:55:55+03:00,"docs: refine morning summary headline (planning-only commit, removed; code identical to new_sha)"
-78305898f62f2c20cc38017a03079e859fe7dcdd,d2d2b58252621cd86fa3ba89140dd266b6d9ec71,2026-10-02T09:35:32+03:00,feat: save Track A results per scenario so interrupted runs resume
-41236e2e8edd06f3177588e8966911fce7afffce,d2d2b58252621cd86fa3ba89140dd266b6d9ec71,2026-10-02T09:36:28+03:00,"docs: record per-scenario resume and pending host steps (planning-only commit, removed; code identical to new_sha)"
-33219b298a3eafc27f2959b2141316a18d6e41fb,a23501547eac10a23d74c22a30090bb3d20b0439,2026-10-02T21:26:37+03:00,docs: record EfficientAD-S results on all 8 scenarios
-4d4dcecf4707765014f0323dca60380dee0d7f54,ffe019d6c03e8ecb7d05df392de7020187e3956a,2026-10-02T21:39:12+03:00,feat: add paired bootstrap of a metric difference between two runs
-ea41c907755e7c23981bc6f159d366bd60698d9e,8ed44ec47b36cf6c4f66d7ab686e141cbbf025bb,2026-10-02T21:39:22+03:00,feat: compare TabPFN with each control on paired rows in the report
-605d6e15c5e36ccd782c41865128e733ec37aac2,c45abb521e5ea13a58c4d1926f10737ba6e06e48,2026-10-02T21:41:18+03:00,feat: add a label budget table scored on fixed evaluation rows
-a9a894d91b73b02980bbf076b64ad1bd3d421f6a,80300775e8ce563190c519b6408301bbe07a16de,2026-10-02T21:45:43+03:00,"docs: draft README setup, access checklist, commands and limitations"
-1c86368256c331e70c5166c4a358447ed0a22f92,7269ea27da93192f1a8365bdc7bac55794e539bb,2026-10-02T21:47:43+03:00,feat: add lock command that evaluates frozen configs once
-b475af9c2c469311026aa2ce12d4937e31f41f8e,7269ea27da93192f1a8365bdc7bac55794e539bb,2026-10-02T21:48:55+03:00,"docs: record paired comparison, latency and lock command in the run log (planning-only commit, removed; code identical to new_sha)"
-06f8caba96b6eb843e60c0a5f821a88eccbd775f,7269ea27da93192f1a8365bdc7bac55794e539bb,2026-10-02T21:49:46+03:00,"docs: propose the Task 25 freeze from dev results (planning-only commit, removed; code identical to new_sha)"
-7d79ba8ebea153a76bf16234432558dc6a3a1e83,074188008e554aa0f69820bbdefe77011b70e4df,2026-10-02T21:52:15+03:00,feat: add DINOv3 transformers versus timm parity check
-3826948262f4bab8217530fccf9ea73b0d2c65ec,8615a9c2b21a247b76c3ae4202530668918512ca,2026-10-02T21:54:04+03:00,feat: compare calibration on matched grid cells in the report
-6f9a81df3f4b1d7f73f2eead12f4279879dad2f0,e0e6d2f9c23d1cc33138a49a756b90bf4b84a815,2026-10-02T21:54:19+03:00,feat: sort one-class controls by AUROC in the report
-09c1ab915badbaf5dcff510c91ad5d9a21dab2f0,e0e6d2f9c23d1cc33138a49a756b90bf4b84a815,2026-10-02T21:54:37+03:00,"docs: record calibration comparison in the run log (planning-only commit, removed; code identical to new_sha)"
-35eb341e4072d5e6e5d5818e3713cc741fdafa2d,bfbc375e5f30f32f7880fc756317137ebf532c5c,2026-10-02T21:55:05+03:00,docs: update AGENTS status after the dev report and lock command
-62716a55a9745edd52f1538ddd4edac04d4afabb,bfbc375e5f30f32f7880fc756317137ebf532c5c,2026-10-02T21:58:48+03:00,"docs: record CPU-only reproduction of the best dev configs (planning-only commit, removed; code identical to new_sha)"
-3c53bc1f04a29044276c8c7339ef0a88a2e457d9,bfbc375e5f30f32f7880fc756317137ebf532c5c,2026-10-02T22:02:33+03:00,"docs: record DINOv3 backend parity results (planning-only commit, removed; code identical to new_sha)"
-e7ce5103083e6873fb7adafb1576c090a573651b,bfbc375e5f30f32f7880fc756317137ebf532c5c,2026-10-02T22:10:56+03:00,"docs: record M4 Pro reproduction and the review summary (planning-only commit, removed; code identical to new_sha)"
-3e413160319e0eb5a921712b44786d44c43383f6,bfbc375e5f30f32f7880fc756317137ebf532c5c,2026-10-02T22:11:46+03:00,"docs: summarise cross-hardware results (planning-only commit, removed; code identical to new_sha)"
-d306b55e7a564811af5958757ff3f90232a160a3,bfbc375e5f30f32f7880fc756317137ebf532c5c,2026-10-02T22:11:55+03:00,"docs: record why the free-threaded backlog item is deferred (planning-only commit, removed; code identical to new_sha)"
-593f4c540a1a2ca0cbd4f979a2d11e31c150c13a,bfbc375e5f30f32f7880fc756317137ebf532c5c,2026-10-02T22:18:34+03:00,"docs: record the normals-subsampling probe (planning-only commit, removed; code identical to new_sha)"
-8b680cf8d427b5d93d77a49edeac88c4ac095389,bfbc375e5f30f32f7880fc756317137ebf532c5c,2026-10-02T22:18:43+03:00,"docs: add the subsampling probe to the review summary (planning-only commit, removed; code identical to new_sha)"
-0bf2998c7ed0d180061e4c4ef2887e476508d404,9ea96f9fccd132da8d35c0578cd15d074a0746c6,2026-10-02T22:50:47+03:00,feat: add n_normals to fit few-shot scorers on a subsample of train normals
-68f530178ea2f86807e3a53538b56ad1748bd725,e029b24c3ce5339eb615b231d500e3aadc70643a,2026-10-02T23:21:49+03:00,chore: freeze final configuration
-faa65df09d0385f1c5c3ee067b908c2ee3dfd74d,e029b24c3ce5339eb615b231d500e3aadc70643a,2026-10-02T23:22:25+03:00,"docs: update review summary after the freeze (planning-only commit, removed; code identical to new_sha)"
-74b7bd454f4ff835960a2386000112d4c1767f6b,97d26e753be105d16607abefe1ed5bf12464b4dc,2026-10-03T06:30:54+03:00,fix: report n_normals runs as their own classifier and keep the ablation out of fixed rows
-7155d408ab83aca54e361b74d419f061f4e5b493,fa31ffe7ca0241feae73d181aabf1f2c0a70ba91,2026-10-03T06:42:11+03:00,fix: use safe figure names and skip dev searches in the lock report
-4fa3308b84f1202c74a02d55ad057d9c6583f798,ee85c0d89bcc50f06168526187fdb1713db47750,2026-10-03T06:48:06+03:00,docs: add lock-split results
-c289b7a3e78ce74d3e850a2db02d041f6374cab4,ee85c0d89bcc50f06168526187fdb1713db47750,2026-10-03T06:48:39+03:00,"docs: record lock-split results (planning-only commit, removed; code identical to new_sha)"
-e7d93ff7f85402575fe8c50b8bb18635e4015583,04cc4d8273ac296573f3f5f3fed87f7ae76b7df0,2026-10-03T06:48:55+03:00,docs: add lock results to the README
-e95af93bd46d8d285eef284de7d1a79323240925,fa22c6822c60593adc284788e416db2465314117,2026-10-03T06:49:04+03:00,docs: tighten the label-free comparison wording
-1ccf4f820ebec06cb3cf462b4a4069b032b208e7,fa22c6822c60593adc284788e416db2465314117,2026-10-03T06:49:16+03:00,"docs: put the lock headline at the top of the run log (planning-only commit, removed; code identical to new_sha)"
-a61ac87ea09681d18d1c293507b12452e1be6cb3,fa22c6822c60593adc284788e416db2465314117,2026-10-03T17:17:43+03:00,"docs: record cross-hardware runs and the HTML report (planning-only commit, removed; code identical to new_sha)"
-b0aed555cee51c822d5e2abc9dad5759485edb5f,1e19d0f426efa0f818018e5727f8b75ef2152827,2026-10-03T17:17:53+03:00,docs: link the HTML report and mark Task 29 done
-e8c249812ad7f7fd0591a972744a33e4e5e7a504,1e19d0f426efa0f818018e5727f8b75ef2152827,2026-10-05T09:54:31+03:00,"docs: fix the lighting-adaptation study protocol before any run (planning-only commit, removed; code identical to new_sha)"
-bdcfade5df890bb6706e496078d78d9aa506333c,17318f74e3567ae9ed5a132ebeac443d9260e9cd,2026-10-05T09:58:22+03:00,feat: add the lighting-adaptation study as experiment track L
-aae9c30719e85d95b0e8d05a7acfb694e0119126,21c6c460350079c74e64c1c8da0d86c1175c698d,2026-10-05T10:02:31+03:00,feat: report the lighting-adaptation study with its paired comparisons
-607d5a67ef9a62172bab4f40eb173c0cc9e19c08,21c6c460350079c74e64c1c8da0d86c1175c698d,2026-10-05T12:08:32+03:00,"docs: record the lighting study and the Track C prototype (planning-only commit, removed; code identical to new_sha)"
-eb4d9dda568f4d9934068da5ab32dbdce79df2c3,69750d0c87fc09b4088f64a6ad07662e2a27c5a8,2026-10-05T12:11:25+03:00,docs: summarise the post-freeze studies
-fb0fdfd0f24099a6f4a36005ad8ab91950a0df3b,69750d0c87fc09b4088f64a6ad07662e2a27c5a8,2026-10-05T16:15:49+03:00,"docs: record Track C on all scenarios and lighting progress (planning-only commit, removed; code identical to new_sha)"
-4b4f76df30e4f1d5330c49c4b632d26ab95f08f1,d81176a1f4a18c096543f8b5bd7277190565c6e9,2026-10-05T23:20:51+03:00,docs: spec Track D and record the Track C prototype status
-2ab89a9e961c462c67909a2d7ae1126c9318c962,d81176a1f4a18c096543f8b5bd7277190565c6e9,2026-10-05T23:44:47+03:00,"docs: fix the Thinking ablation protocol before any API call (planning-only commit, removed; code identical to new_sha)"
-7fb8c4a6f2ff48aacaa852515ff77ea921ca34dd,ef97237532de212b34371bff610f34976e4bf521,2026-10-05T23:46:42+03:00,fix: send thinking cost estimates in the shape the API accepts
-8e746d4d4c5f6e20d210beac5aa2d97345dc15fd,b0d44c4027486301491c5b3ef9355679980496c9,2026-10-05T23:49:48+03:00,fix: retry Thinking calls after the API's rate-limit reply
-ff30021ced3ef75e5104d309a8e6a6c1878e3db8,bf3fb076d9b66f8ce7d8c490202f431e59ee19a7,2026-10-06T00:02:17+03:00,fix: do not retry Thinking calls after the daily token limit
-0f56488b0ed6067e74921a6fc98c2ac58329ead5,8e710df72a674bcf28ec9e795d01fa555ec20c37,2026-10-06T00:40:43+03:00,docs: add the Manim explainer video sources
-acc13db19438d47d56168fdfffa7ea69ecebfc8c,8e710df72a674bcf28ec9e795d01fa555ec20c37,2026-10-06T03:10:25+03:00,"docs: record the Thinking ablation at k=2 (planning-only commit, removed; code identical to new_sha)"
-57767822e4f1e024deee060a0a98cf58ce7c81de,8e710df72a674bcf28ec9e795d01fa555ec20c37,2026-10-06T03:18:02+03:00,"docs: record the lighting study outlier comparison (planning-only commit, removed; code identical to new_sha)"
-cfd61ff3607db24947b51ebd07af3c58bad1a17c,e97f868881378f405e8855a40a8e434bcfff7d99,2026-10-06T08:28:31+03:00,docs: use a rule-picked Wall Plugs example in the video maps scene
-1bf08e70b514c211b744ced854b7f4b60fb9f3ab,9eccaf0120da488fc80d286f4eb27642cfae98a3,2026-10-06T08:49:20+03:00,docs: compare lock pixel results with the MVTec AD 2 paper per scenario
-952faf2fd888bfeaf9e084d6deaeb383b62691e7,9eccaf0120da488fc80d286f4eb27642cfae98a3,2026-10-06T08:52:37+03:00,"docs: qualify pixel-level claims against the AD2 paper and untuned baselines (planning-only commit, removed; code identical to new_sha)"
-8f98aa12cae55634a19dd3890a751e8e032b5adf,27141a70f3e7b4e99068e9868001fe040a30943b,2026-10-06T09:51:26+03:00,docs: move the HTML report sources into the repo
-3695ced1584e8c68569598c51387331d69b99168,155e951c9143ce61331964befa03cdd0d0b14e28,2026-10-06T09:51:47+03:00,docs: explain the name and broaden the README scope
-d62c9b6b968f31082835f101c6d7a66b0e8a3a77,fe6533d525af25d926179498114235f8adb78b5e,2026-10-06T10:01:19+03:00,chore: stop tracking planning files and the hackathon terms
+old_sha,new_sha,mapping,date,subject
+714da232d78e61f5dc58400d30566f887a849125,4a291bddf738ea0913376edf5b6c78209473bb62,same-code,2026-09-26T12:08:42+03:00,Initial commit
+9aa85ebd39cd0aa40e825fa0024a0c0ded0395a0,4a291bddf738ea0913376edf5b6c78209473bb62,same-code,2026-09-26T16:19:39+03:00,docs: initial plan
+9c5c13248e3fd13f378d1fbeb526b089877aeaae,4a291bddf738ea0913376edf5b6c78209473bb62,exact,2026-09-26T16:21:02+03:00,docs: refined plan
+ef1b1af5324b87d4daaf0b12225fdc112fc33fde,03424c3c4616fb1212c8f57557294db8bbb63aee,squashed,2026-09-26T19:58:49+03:00,"chore: scaffold anometa package, tooling and CLI entry point"
+24306f84164b83a6656d7f5a6dfa6e72f1ee370e,792a54288837b5b2603c1a272a4b2425247537d8,squashed,2026-09-26T19:58:50+03:00,fix: raise when indexing a scenario that was never extracted
+341b99fa42617cfcc65730553b170c8c54e24a19,792a54288837b5b2603c1a272a4b2425247537d8,squashed,2026-09-26T19:58:50+03:00,feat: index AD2 scenarios with lighting and scene ids
+45cff2a4385368197123688dab9f540dbe7376b8,310d33e5f3999b07690c00d91b3eb8c6a18db9fa,squashed,2026-09-26T19:58:50+03:00,fix: canonicalise config hash and tighten config validation
+63109626cdfcc58fe5d951503b6d8e5a398a43b6,03424c3c4616fb1212c8f57557294db8bbb63aee,squashed,2026-09-26T19:58:50+03:00,build: set package description and Apache-2.0 licence metadata
+66a9a2ccea701425af6f546d9a1ca9def2af43e2,792a54288837b5b2603c1a272a4b2425247537d8,squashed,2026-09-26T19:58:50+03:00,"fix: detect truncated downloads, treat 416 as complete, extract atomically"
+ce5c6866ca959f2e802a3c3df7275679a2638bb9,792a54288837b5b2603c1a272a4b2425247537d8,squashed,2026-09-26T19:58:50+03:00,"feat: download AD2 scenario archives with resumable, hash-pinned fetch"
+d2771bd441febebc1f319a85b2ed98aff217d6f4,310d33e5f3999b07690c00d91b3eb8c6a18db9fa,squashed,2026-09-26T19:58:50+03:00,feat: add experiment configuration schema and hashing
+d44ead0f4c9d2b569388b736ce5e43b7c17615b8,03424c3c4616fb1212c8f57557294db8bbb63aee,squashed,2026-09-26T19:58:50+03:00,"docs: tick Tasks 1-5 progress and sync plan with implementation (planning-only commit, removed)"
+1360a869447a6fbd376f0146b9cbaebfa3f46239,03424c3c4616fb1212c8f57557294db8bbb63aee,squashed,2026-09-26T19:59:04+03:00,build: use placeholder package author
+bd2258b77af371185174796b68c58e8bde0cf44c,03424c3c4616fb1212c8f57557294db8bbb63aee,squashed,2026-09-26T19:59:05+03:00,"docs: record Task 4 TabPFN check on M4 Pro (planning-only commit, removed)"
+ab9a77a26c68388b56f551614a5c012321ef17e5,a78b1010b0de941c2202864b7bd5ae642860a4d6,exact,2026-09-26T20:16:08+03:00,feat: split test_public by scene and sample nested few-shot sets
+2266ac3f28f8e23507ac64de052f52665f80db98,2f7647ab130e5ddb0597216dcb3541b58092303c,squashed,2026-09-26T20:27:39+03:00,"feat: add run_experiment with manifests, run log, resume and lock guard"
+e26c35c51de34b4c9a63cce2b9acb3f995e55dd3,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-09-26T20:55:42+03:00,feat: add frozen DINOv3 and SigLIP2 encoders with pinned revisions
+570fb93948603a74d196c2ab0f5e0b22de03a9c0,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-09-26T21:07:36+03:00,feat: add leave-one-out patch novelty and distance maps
+fde1cdc564a5bcf64935af0ccab79384c331c496,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-09-26T21:23:36+03:00,feat: extract and cache per-scenario encoder features
+f61cea14d8c8053d6f71dc98bb7ace0192f9543a,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-09-26T21:33:27+03:00,fix: write feature cache atomically via temp file and os.replace
+4b329fa1b502ef2f8a2fb72984396b13a4d24650,d56f170e984a8438b3a7dc4e5d2671c97c3336bf,squashed,2026-09-26T21:41:22+03:00,"feat: add image metrics, ECE and prior correction"
+91db997d9f0478f09a676ae3437ee33d5c400267,d56f170e984a8438b3a7dc4e5d2671c97c3336bf,squashed,2026-09-26T21:53:20+03:00,feat: aggregate metrics with robustness gap and scene bootstrap
+28467ae76bcaa9f0acdbec9eefe6b0f6ccbcde75,d56f170e984a8438b3a7dc4e5d2671c97c3336bf,squashed,2026-09-26T21:59:50+03:00,test: cover bootstrap_ci with multiple scenarios and seeds
+7734758a36c30f430d327965bc3b66143f32703a,2f7647ab130e5ddb0597216dcb3541b58092303c,squashed,2026-09-26T22:07:34+03:00,"fix: claim lock run directory, write manifest last, capture provenance first"
+ef150303ad8c0ff222c0961c9813791f83dec9ca,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-09-26T22:09:05+03:00,fix: fall back to timm when a gated error is wrapped in OSError
+2db1f44a7d31650144a451f905f8bd11d970a06c,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-09-26T22:11:05+03:00,"feat: record feature cache provenance, reject non-finite encodings, time extraction"
+a405e0ed459607fd27a6649a1aa89c7da0dcc1bc,2f7647ab130e5ddb0597216dcb3541b58092303c,squashed,2026-09-26T22:11:25+03:00,fix: refuse lock-split configs in anometa run
+7e2454acedc044828b2e31bf0cdf667437075cba,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-09-26T22:11:50+03:00,"test: prove split never overwrites via sentinel, document fake helper"
+de62055b1917906c2a7d68df2460b4e4ec78f3d3,d56f170e984a8438b3a7dc4e5d2671c97c3336bf,squashed,2026-09-26T22:12:17+03:00,fix: report the original-sample statistic as the bootstrap point
+674e65b5942b0215a4f828321e100c0b62e5a637,d56f170e984a8438b3a7dc4e5d2671c97c3336bf,squashed,2026-09-26T22:12:44+03:00,"fix: reject priors outside (0, 1) in prior_correct"
+dd8f1cb09ef5290df0ffc21196ae44c3076279c6,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T22:31:32+03:00,feat: add Track B scorers and one-class controls
+ad5075a3cc9b46d703f85cbfa9993c8bad00e1ce,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T22:56:06+03:00,feat: add Track B pipeline and run overrides
+9664b160f2656b3fdcc4054a422dc8bcb9224ad4,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:07:12+03:00,fix: reuse eval_rows in the exhaustive-shots BudgetError guard
+bb126263677faab884ebaa8229ef2988f1486eae,61d322270314564ca4ec6c9c2515362b59fec811,squashed,2026-09-26T23:19:21+03:00,feat: add TabPFNWithImages reference check
+94147284b9c1eed202168b109c398c3fdab75238,d56f170e984a8438b3a7dc4e5d2671c97c3336bf,squashed,2026-09-26T23:44:11+03:00,fix: share one scene draw across seeds in bootstrap_ci
+8e88283df99f3fe9d9a84002b32c25d3b77da998,d56f170e984a8438b3a7dc4e5d2671c97c3336bf,squashed,2026-09-26T23:44:21+03:00,docs: document the gap sign in group_metrics
+fbc23a13aa2dd792eaf465d626a84a722e9d2d46,d56f170e984a8438b3a7dc4e5d2671c97c3336bf,squashed,2026-09-26T23:44:46+03:00,test: add known-value tests for probabilistic metrics
+ee9a3dea743a5a64bfad24d97405d91ca6b113a6,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:46:06+03:00,fix: read the tabpfn checkpoint revision after the fits
+306134e1e5ce438f47703012416b3831ffc68ef8,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:47:12+03:00,fix: pin tabpfn_outlier to the v3.5 checkpoint and record its revision
+6934a42e334cde93965aabe5a9a0a25a136a031b,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:49:00+03:00,fix: sample every scenario's shots before any fit
+ddfc4480d460325e741b7623821e310ab948e7b5,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:49:36+03:00,fix: reject mixed feature provenance across scenarios
+3879d654bb7e79aaa992293928281223467df49e,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:50:02+03:00,refactor: share embedding assembly between the PCA fit and design_matrix
+eb88fa3d725f809f51e3b5148115a1fac73ce477,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:50:36+03:00,test: check balanced scores and scorer fit rows in track b tests
+b07cc70c1c020a59039a877a34b1e7c392d66f4e,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:51:00+03:00,fix: accept several key=value pairs per --set flag
+78aaee9eaa38b68a19917fd917a90bff47e03da6,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:51:19+03:00,feat: print the failure reason from anometa run
+3ee661b554b71677b53e02c72ddb0af5cbca4681,61d322270314564ca4ec6c9c2515362b59fec811,squashed,2026-09-26T23:51:46+03:00,refactor: import trackb.reference lazily in the cli
+419ef40c95764f4dcff4400b64549ce0c1969574,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-09-26T23:52:00+03:00,test: pin the extract cli test to cpu
+72f97be0a939f6d20f03d09fa11637ff294aff38,2f7647ab130e5ddb0597216dcb3541b58092303c,squashed,2026-09-26T23:52:28+03:00,fix: name the existing run in the renamed-lock error
+a1789b5c707efd6c3f58011c5841a395b0b062b7,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-09-26T23:52:44+03:00,docs: add docstrings to the classifier build closures
+eaad6245fbbad0a35eeeefe5bde5bcb989e9c79e,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T00:06:15+03:00,feat: add search space encoding and cached-feature grid
+b89cb3a44976bfde7edfb74674b90d55394d4a08,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T00:18:30+03:00,feat: add Optuna NSGA-II and TPE searches
+7a611ab89610032dc01c2f6d6a5cfb6ff901fa09,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T00:34:16+03:00,feat: add TabPFN-surrogate Bayesian optimization loop
+ec783b018a751199bbeef02634df7ccee5df8dcb,e52a2187ff522dc6e05d6cc31c4f6d6d1844a01b,squashed,2026-09-27T00:51:46+03:00,feat: add cached TabPFN-3.5-Thinking scorer
+59519f1d4761742874f27dac9c11edaca3e0359f,e52a2187ff522dc6e05d6cc31c4f6d6d1844a01b,squashed,2026-09-27T01:02:11+03:00,fix: record tabpfn licence for tabpfn_thinking runs
+4f94f0fb2c8a549350de924b8eb0ec85ccfb9200,d76b27a3a845e705f5c1126f9da22c3ca32d5c14,squashed,2026-09-27T01:18:45+03:00,feat: add Streamlit few-shot labelling demo
+59369981af9dd4c5c499deb5ff487a5948277353,d76b27a3a845e705f5c1126f9da22c3ca32d5c14,squashed,2026-09-27T01:35:12+03:00,fix: address task-23 review findings in the demo's run tab and fit path
+124deff1c9d4fc085a51abd913b60aa45c511a70,9be25649037a0d87bda092f1819469a80c824b47,squashed,2026-09-27T01:53:07+03:00,test: fake tabpfn_client in thinking tests and default tabpfn env vars
+4e90ead0517327cdcf1a1c764505c959120fa00d,9be25649037a0d87bda092f1819469a80c824b47,squashed,2026-09-27T01:53:22+03:00,fix: close and atomically write the thinking prediction cache
+4bb3207e6d97986fc9a3a771053b9985b2268a20,9be25649037a0d87bda092f1819469a80c824b47,squashed,2026-09-27T01:54:04+03:00,fix: key the thinking cache per scenario and seed and reject its params
+253d7c5daac9103e3f2c9b8125dea239e324f28b,9be25649037a0d87bda092f1819469a80c824b47,squashed,2026-09-27T01:54:18+03:00,"fix: record thinking runs with api terms, api revision and nan latency"
+be4a424362f8ff4d87a0a66de09e6c75fbea8812,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T01:55:10+03:00,fix: resume optuna and bo searches without repeating trials
+ec2bffaa1d3609dd0326d1b285a316ada2dc43bd,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T01:55:24+03:00,fix: feed the bo surrogate 0.5 for runs without a finite auroc
+6a8e9c4925e7c93f38faf4004d4baa7c26bb904d,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T01:55:42+03:00,fix: minimise the absolute train/test auroc gap in nsga-ii
+43dde78eacd70cd8f331f7254066b141c47efeea,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T01:56:02+03:00,fix: clamp unit-cube coordinates before decoding
+da2a433a9962e4f0414cb36c276dff35920afcc4,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T01:56:19+03:00,perf: import optuna only where a search runs
+6f9678ea798ee324489f83fd4258765e98aadcee,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T01:56:34+03:00,feat: add --device to anometa bo
+f98cf43d74f83e4230764ca1fe5f850443c34a1e,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T01:56:46+03:00,fix: print per-run grid progress and record raising runs as errors
+59557eb259a71679c624a2a121d141df38db8c36,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-09-27T01:57:00+03:00,refactor: type grid one-class keys as a literal and drop _classifier_name
+116f9115b24c27f0b62158632f60f4330cf2243d,9be25649037a0d87bda092f1819469a80c824b47,squashed,2026-09-27T01:57:06+03:00,test: ignore backoff's python 3.14 asyncio deprecation warning
+d6a8ad6403ef5a2e5d8837b59e882c406a61ba96,9be25649037a0d87bda092f1819469a80c824b47,squashed,2026-09-27T02:06:56+03:00,"docs: tick Tasks 6-15, 18-21 and 23 and record review decisions in the plan (planning-only commit, removed)"
+b69975cd5adad10654a3763f344a0e2b9ce32938,e86350e1618dbe20055c8e6bc442998eba558364,squashed,2026-10-01T16:38:09+03:00,"feat: add AU-PRO, SegF1 and ClassF1 with vendored reference code"
+9820b60ad104147817ab3acc63e9cf6a9d378d7a,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-01T16:39:17+03:00,"docs: add AGENTS.md, hackathon brief and README references"
+ebd207b4b71ef9e2cf2cb35c3c51f1f2c13412c7,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-01T16:39:18+03:00,"docs: add patch-maps wayfinder map, research and tickets (planning-only commit, removed)"
+4ba3e639ae944e185b3731b06db966de4a31cf24,b0e4ab2ce74e874afd55d69e2de21478debdda28,squashed,2026-10-01T16:46:48+03:00,"feat: restrict grid, Optuna and BO searches to chosen scenarios"
+632c590af09b4c4ddfdecd38a0bca27a26001bff,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-01T16:57:30+03:00,feat: add Track A runner for anomalib models and patch distance maps
+90856f89d90a0b908f21e05e5a9581c9ff471435,5d390df8580319152d51fcb88b271b1ba2a58b7d,squashed,2026-10-01T16:58:40+03:00,feat: build results tables and figures from artifacts
+976df4ffd28351c56fe594c172b9fe2ccffe0f31,251354ab75b3acffc3aa77b2965afa8f79c03d7d,squashed,2026-10-01T17:02:17+03:00,feat: add Rerun inspection recordings
+5580c0399203bc8cd03db36f3be0d10ec1a429a7,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-10-01T17:03:19+03:00,fix: run encoders in bf16 on CUDA since dinov3_l overflows in fp16
+064ce6887fde50400311c9c1f9f5b2713b168a43,9763a354d2d9bf8c3a4880a4916b5e1c2bc32de4,squashed,2026-10-01T17:06:37+03:00,fix: upcast bf16 encodings to float32 before caching features
+81bbc255d0c04f67ca5e8fcbbf57395d54cde04a,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-01T17:24:47+03:00,"docs: record 3090 gate, reference check and slice results"
+61c5e9ae2187f6229153dd2a2e650830408dc022,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-01T20:43:58+03:00,fix: disable EfficientAD progress bar so its checkpoint can be pickled
+6682afa746745b70d13e1197e0c8cc93ab65f65c,eff9337224481731ba03f296e3e977a9d00808b5,squashed,2026-10-01T20:44:55+03:00,chore: pin sha256 of the remaining seven AD2 archives
+6f0f9b120c59982535edff062858679afd8d850e,eff9337224481731ba03f296e3e977a9d00808b5,squashed,2026-10-01T20:44:55+03:00,chore: add dev/lock splits for the remaining seven scenarios
+a0c6875b3199a57d23320bb65504c710fb990dc0,eff9337224481731ba03f296e3e977a9d00808b5,squashed,2026-10-01T20:56:46+03:00,feat: fit Track B seeds concurrently in a thread or process pool
+d47855ccbb8e1c786c0ae2d17654e8059fc6332d,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-01T20:59:03+03:00,docs: document seed pool settings and add free-threading and cross-hardware backlog
+1497f2c966b9d970ec0a6febd60a0a3f7d309658,e86350e1618dbe20055c8e6bc442998eba558364,squashed,2026-10-01T21:51:35+03:00,perf: compute the PRO curve once for both AU-PRO limits
+6e9691fa1a1b1a53cd901796e7e30b5600eee06d,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-01T21:51:37+03:00,perf: validate EfficientAD once after training instead of every epoch
+a74037748add2b9f5ba87842b568a90ea2a306f1,7a016ed6ed258e33fb9e883ea57f0fe8a9fd988a,squashed,2026-10-01T22:09:42+03:00,perf: load each TabPFN checkpoint once per process and reuse it
+990fff80ad2e9520daf2295a2b302871baac2a22,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-01T22:32:02+03:00,perf: keep EfficientAD train loader workers alive across epochs
+aabdb5b8b771f4d51c2ce6a11030ee1d18420697,5d390df8580319152d51fcb88b271b1ba2a58b7d,squashed,2026-10-01T22:39:26+03:00,fix: render integer columns as integers in report tables
+7dbd469dddb9716a8d7253a28b10d95787fcab15,5d390df8580319152d51fcb88b271b1ba2a58b7d,squashed,2026-10-01T22:40:56+03:00,"docs: add run log and record slice results and overnight decisions (planning-only commit, removed)"
+f6368b10a8be352982e878c720c914ddf8ccb9c6,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-01T23:19:45+03:00,fix: leave the live train loader out when the datamodule is pickled
+aee511e8dfd0d6ecf5267d168c034ff686c1163a,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-01T23:27:15+03:00,revert: drop persistent EfficientAD train loader workers
+41bed040746ace9095be35fe0fec02debf63506a,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-01T23:32:01+03:00,"docs: correct the EfficientAD diagnosis and record the two-lane Phase B (planning-only commit, removed)"
+b3fc19dc11b6ba348a801682337e50929afaca44,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T00:00:04+03:00,"docs: record full feature extraction and slice diagnostics (planning-only commit, removed)"
+7b0d6ddf7ed1f0a46e83ae743ece7de3a3ab4a09,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T00:10:32+03:00,"docs: record full budget runs (planning-only commit, removed)"
+d899aa1ed1c9d9fb588eb3250d1eebc7fc65dcb6,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T00:12:15+03:00,"docs: record why can and wallplugs score below chance (planning-only commit, removed)"
+78c23284f438ae7f4913cb9b52f34ecd779b4354,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T03:41:50+03:00,"docs: record full grid results (planning-only commit, removed)"
+f8ff71eece7a64f7a8fb9f15e24cb8e574904a51,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T05:42:47+03:00,"docs: record Track A results (planning-only commit, removed)"
+ef05b8c55b53c73fc60cb80f1c74d3cc43720205,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T05:48:51+03:00,"docs: record search results and the BO seed 0 crash (planning-only commit, removed)"
+a947a22fb50eae5ce08ba5dbafbbba0085db981c,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T05:49:02+03:00,"docs: tick Optuna studies (planning-only commit, removed)"
+7e1a306fc7e2eaf448923847da57eb5e637fae33,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T05:51:47+03:00,"docs: add morning summary to run log (planning-only commit, removed)"
+f07dcc16142675fe7faee8cd7c114e46e791f4d8,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T05:55:17+03:00,"docs: tick TabPFN-BO runs after the seed 0 resume (planning-only commit, removed)"
+ab39c5b9366d82950982be5caa7162b22c09daa6,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T05:55:48+03:00,"docs: record per-scenario TabPFN versus logreg breakdown (planning-only commit, removed)"
+198f350480d9adfca5eddaefc3eed078e458324f,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T05:55:55+03:00,"docs: refine morning summary headline (planning-only commit, removed)"
+78305898f62f2c20cc38017a03079e859fe7dcdd,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T09:35:32+03:00,feat: save Track A results per scenario so interrupted runs resume
+41236e2e8edd06f3177588e8966911fce7afffce,458fcb9e01681eaddf3fff286652ceb58cd56d9a,squashed,2026-10-02T09:36:28+03:00,"docs: record per-scenario resume and pending host steps (planning-only commit, removed)"
+33219b298a3eafc27f2959b2141316a18d6e41fb,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T21:26:37+03:00,docs: record EfficientAD-S results on all 8 scenarios
+4d4dcecf4707765014f0323dca60380dee0d7f54,5d390df8580319152d51fcb88b271b1ba2a58b7d,squashed,2026-10-02T21:39:12+03:00,feat: add paired bootstrap of a metric difference between two runs
+ea41c907755e7c23981bc6f159d366bd60698d9e,5d390df8580319152d51fcb88b271b1ba2a58b7d,squashed,2026-10-02T21:39:22+03:00,feat: compare TabPFN with each control on paired rows in the report
+605d6e15c5e36ccd782c41865128e733ec37aac2,5d390df8580319152d51fcb88b271b1ba2a58b7d,squashed,2026-10-02T21:41:18+03:00,feat: add a label budget table scored on fixed evaluation rows
+a9a894d91b73b02980bbf076b64ad1bd3d421f6a,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T21:45:43+03:00,"docs: draft README setup, access checklist, commands and limitations"
+1c86368256c331e70c5166c4a358447ed0a22f92,df81a3408c5160e1be626321a13d63848fab421b,squashed,2026-10-02T21:47:43+03:00,feat: add lock command that evaluates frozen configs once
+b475af9c2c469311026aa2ce12d4937e31f41f8e,df81a3408c5160e1be626321a13d63848fab421b,squashed,2026-10-02T21:48:55+03:00,"docs: record paired comparison, latency and lock command in the run log (planning-only commit, removed)"
+06f8caba96b6eb843e60c0a5f821a88eccbd775f,df81a3408c5160e1be626321a13d63848fab421b,squashed,2026-10-02T21:49:46+03:00,"docs: propose the Task 25 freeze from dev results (planning-only commit, removed)"
+7d79ba8ebea153a76bf16234432558dc6a3a1e83,1e3d7dad80d78303b2d1fc31bafbb8d413a72daf,squashed,2026-10-02T21:52:15+03:00,feat: add DINOv3 transformers versus timm parity check
+3826948262f4bab8217530fccf9ea73b0d2c65ec,5d390df8580319152d51fcb88b271b1ba2a58b7d,squashed,2026-10-02T21:54:04+03:00,feat: compare calibration on matched grid cells in the report
+6f9a81df3f4b1d7f73f2eead12f4279879dad2f0,5d390df8580319152d51fcb88b271b1ba2a58b7d,squashed,2026-10-02T21:54:19+03:00,feat: sort one-class controls by AUROC in the report
+09c1ab915badbaf5dcff510c91ad5d9a21dab2f0,5d390df8580319152d51fcb88b271b1ba2a58b7d,squashed,2026-10-02T21:54:37+03:00,"docs: record calibration comparison in the run log (planning-only commit, removed)"
+35eb341e4072d5e6e5d5818e3713cc741fdafa2d,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T21:55:05+03:00,docs: update AGENTS status after the dev report and lock command
+62716a55a9745edd52f1538ddd4edac04d4afabb,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T21:58:48+03:00,"docs: record CPU-only reproduction of the best dev configs (planning-only commit, removed)"
+3c53bc1f04a29044276c8c7339ef0a88a2e457d9,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T22:02:33+03:00,"docs: record DINOv3 backend parity results (planning-only commit, removed)"
+e7ce5103083e6873fb7adafb1576c090a573651b,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T22:10:56+03:00,"docs: record M4 Pro reproduction and the review summary (planning-only commit, removed)"
+3e413160319e0eb5a921712b44786d44c43383f6,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T22:11:46+03:00,"docs: summarise cross-hardware results (planning-only commit, removed)"
+d306b55e7a564811af5958757ff3f90232a160a3,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T22:11:55+03:00,"docs: record why the free-threaded backlog item is deferred (planning-only commit, removed)"
+593f4c540a1a2ca0cbd4f979a2d11e31c150c13a,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T22:18:34+03:00,"docs: record the normals-subsampling probe (planning-only commit, removed)"
+8b680cf8d427b5d93d77a49edeac88c4ac095389,f669d039b87b5c3bee8325133b6864358e314280,squashed,2026-10-02T22:18:43+03:00,"docs: add the subsampling probe to the review summary (planning-only commit, removed)"
+0bf2998c7ed0d180061e4c4ef2887e476508d404,3ff54e6bbff2c22c5f008b79f12577037061704b,same-code,2026-10-02T22:50:47+03:00,feat: add n_normals to fit few-shot scorers on a subsample of train normals
+68f530178ea2f86807e3a53538b56ad1748bd725,5f94e31a47f7110c46f65951c5c2a84f9fe721e9,exact,2026-10-02T23:21:49+03:00,chore: freeze final configuration
+faa65df09d0385f1c5c3ee067b908c2ee3dfd74d,5f94e31a47f7110c46f65951c5c2a84f9fe721e9,exact,2026-10-02T23:22:25+03:00,"docs: update review summary after the freeze (planning-only commit, removed)"
+74b7bd454f4ff835960a2386000112d4c1767f6b,69722e8b406c07cb844983f3dff3b1b13f634b55,squashed,2026-10-03T06:30:54+03:00,fix: report n_normals runs as their own classifier and keep the ablation out of fixed rows
+7155d408ab83aca54e361b74d419f061f4e5b493,69722e8b406c07cb844983f3dff3b1b13f634b55,same-code,2026-10-03T06:42:11+03:00,fix: use safe figure names and skip dev searches in the lock report
+4fa3308b84f1202c74a02d55ad057d9c6583f798,69722e8b406c07cb844983f3dff3b1b13f634b55,same-code,2026-10-03T06:48:06+03:00,docs: add lock-split results
+c289b7a3e78ce74d3e850a2db02d041f6374cab4,69722e8b406c07cb844983f3dff3b1b13f634b55,same-code,2026-10-03T06:48:39+03:00,"docs: record lock-split results (planning-only commit, removed)"
+e7d93ff7f85402575fe8c50b8bb18635e4015583,69722e8b406c07cb844983f3dff3b1b13f634b55,same-code,2026-10-03T06:48:55+03:00,docs: add lock results to the README
+e95af93bd46d8d285eef284de7d1a79323240925,69722e8b406c07cb844983f3dff3b1b13f634b55,same-code,2026-10-03T06:49:04+03:00,docs: tighten the label-free comparison wording
+1ccf4f820ebec06cb3cf462b4a4069b032b208e7,69722e8b406c07cb844983f3dff3b1b13f634b55,same-code,2026-10-03T06:49:16+03:00,"docs: put the lock headline at the top of the run log (planning-only commit, removed)"
+a61ac87ea09681d18d1c293507b12452e1be6cb3,69722e8b406c07cb844983f3dff3b1b13f634b55,same-code,2026-10-03T17:17:43+03:00,"docs: record cross-hardware runs and the HTML report (planning-only commit, removed)"
+b0aed555cee51c822d5e2abc9dad5759485edb5f,69722e8b406c07cb844983f3dff3b1b13f634b55,exact,2026-10-03T17:17:53+03:00,docs: link the HTML report and mark Task 29 done
+e8c249812ad7f7fd0591a972744a33e4e5e7a504,69722e8b406c07cb844983f3dff3b1b13f634b55,exact,2026-10-05T09:54:31+03:00,"docs: fix the lighting-adaptation study protocol before any run (planning-only commit, removed)"
+bdcfade5df890bb6706e496078d78d9aa506333c,a4371fdd84b0d2cc795201aa8ad3717db6ef6e91,squashed,2026-10-05T09:58:22+03:00,feat: add the lighting-adaptation study as experiment track L
+aae9c30719e85d95b0e8d05a7acfb694e0119126,a4371fdd84b0d2cc795201aa8ad3717db6ef6e91,same-code,2026-10-05T10:02:31+03:00,feat: report the lighting-adaptation study with its paired comparisons
+607d5a67ef9a62172bab4f40eb173c0cc9e19c08,a4371fdd84b0d2cc795201aa8ad3717db6ef6e91,same-code,2026-10-05T12:08:32+03:00,"docs: record the lighting study and the Track C prototype (planning-only commit, removed)"
+eb4d9dda568f4d9934068da5ab32dbdce79df2c3,a4371fdd84b0d2cc795201aa8ad3717db6ef6e91,exact,2026-10-05T12:11:25+03:00,docs: summarise the post-freeze studies
+fb0fdfd0f24099a6f4a36005ad8ab91950a0df3b,a4371fdd84b0d2cc795201aa8ad3717db6ef6e91,exact,2026-10-05T16:15:49+03:00,"docs: record Track C on all scenarios and lighting progress (planning-only commit, removed)"
+4b4f76df30e4f1d5330c49c4b632d26ab95f08f1,ca96563c11a5071a3e77f2678dd026879b37473e,squashed,2026-10-05T23:20:51+03:00,docs: spec Track D and record the Track C prototype status
+2ab89a9e961c462c67909a2d7ae1126c9318c962,ca96563c11a5071a3e77f2678dd026879b37473e,squashed,2026-10-05T23:44:47+03:00,"docs: fix the Thinking ablation protocol before any API call (planning-only commit, removed)"
+7fb8c4a6f2ff48aacaa852515ff77ea921ca34dd,59ba528412298211293955771fd25732c66def87,squashed,2026-10-05T23:46:42+03:00,fix: send thinking cost estimates in the shape the API accepts
+8e746d4d4c5f6e20d210beac5aa2d97345dc15fd,59ba528412298211293955771fd25732c66def87,squashed,2026-10-05T23:49:48+03:00,fix: retry Thinking calls after the API's rate-limit reply
+ff30021ced3ef75e5104d309a8e6a6c1878e3db8,59ba528412298211293955771fd25732c66def87,same-code,2026-10-06T00:02:17+03:00,fix: do not retry Thinking calls after the daily token limit
+0f56488b0ed6067e74921a6fc98c2ac58329ead5,2109c7466432ec7ccb8ee6a7b39bbfbf389bb3a3,same-code,2026-10-06T00:40:43+03:00,docs: add the Manim explainer video sources
+acc13db19438d47d56168fdfffa7ea69ecebfc8c,2109c7466432ec7ccb8ee6a7b39bbfbf389bb3a3,same-code,2026-10-06T03:10:25+03:00,"docs: record the Thinking ablation at k=2 (planning-only commit, removed)"
+57767822e4f1e024deee060a0a98cf58ce7c81de,2109c7466432ec7ccb8ee6a7b39bbfbf389bb3a3,same-code,2026-10-06T03:18:02+03:00,"docs: record the lighting study outlier comparison (planning-only commit, removed)"
+cfd61ff3607db24947b51ebd07af3c58bad1a17c,2109c7466432ec7ccb8ee6a7b39bbfbf389bb3a3,same-code,2026-10-06T08:28:31+03:00,docs: use a rule-picked Wall Plugs example in the video maps scene
+1bf08e70b514c211b744ced854b7f4b60fb9f3ab,b9fcf94fd9785fe728989878d4e03953cab4daa4,squashed,2026-10-06T08:49:20+03:00,docs: compare lock pixel results with the MVTec AD 2 paper per scenario
+952faf2fd888bfeaf9e084d6deaeb383b62691e7,b9fcf94fd9785fe728989878d4e03953cab4daa4,squashed,2026-10-06T08:52:37+03:00,"docs: qualify pixel-level claims against the AD2 paper and untuned baselines (planning-only commit, removed)"
+8f98aa12cae55634a19dd3890a751e8e032b5adf,2acaa64ac3f979fe02eed906fdd989b1596e3515,squashed,2026-10-06T09:51:26+03:00,docs: move the HTML report sources into the repo
+3695ced1584e8c68569598c51387331d69b99168,b9fcf94fd9785fe728989878d4e03953cab4daa4,squashed,2026-10-06T09:51:47+03:00,docs: explain the name and broaden the README scope
+d62c9b6b968f31082835f101c6d7a66b0e8a3a77,709020d5284074c4b0bd709854bae0a63e295a6f,squashed,2026-10-06T10:01:19+03:00,chore: stop tracking planning files and the hackathon terms
+e2e9c59dbdd374680b1d611aab757b511866ef1a,b2e2fff0fc195ba8998b076b892cfc680f6f2067,same-code,2026-10-06T14:03:42+03:00,docs: declare the tuned PatchCore study before it runs (squashed later; recorded by the tuned PatchCore runs; code identical to clean_sha)

@@ -188,7 +188,7 @@ classDiagram
 
 Every run writes `artifacts/<run-id>/`:
 
-- `manifest.json`: `run_id`, the full `config`, `config_hash`, `status`, `error`, `git_commit`, `git_dirty`, `dataset_hash` (from the pinned archive hashes), `split_hash` (from the split files), `model_revisions`, `licences`, `seeds`, `hardware`, `versions` (Python and key packages), `started_at` and `duration_s`.
+- `manifest.json`: `run_id`, the full `config`, `config_hash`, `status`, `error`, `git_commit`, `git_dirty` (runs from before the history cleanup also carry `git_commit_original` and `git_commit_mapping`, see [provenance](provenance.md)), `dataset_hash` (from the pinned archive hashes), `split_hash` (from the split files), `model_revisions`, `licences`, `seeds`, `hardware`, `versions` (Python and key packages), `started_at` and `duration_s`.
 - `metrics.json`: the metrics dict.
 - `predictions.parquet`: one row per (scenario, seed, image) with `scenario, seed, image_id, scene_id, label, lighting, score`, plus `score_balanced` for Track B.
 - `maps.npz` (Track A): float16 anomaly maps at model resolution, keyed `<scenario>/<image_id>`.

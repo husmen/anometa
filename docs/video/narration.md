@@ -28,7 +28,7 @@ On the lock half, with a single labelled defect, TabPFN reaches an AUROC of zero
 
 ## maps
 
-The same idea works at patch level. Each sixteen by sixteen pixel patch becomes a row, and TabPFN scores every patch to draw a defect map. On the dev split, averaged over all eight scenarios, these maps beat both the DINOv3 distance map and PatchCore.
+The same idea works at patch level. Each sixteen by sixteen pixel patch becomes a row, and TabPFN scores every patch to draw a defect map, shown here for one image per scenario. On the dev split, averaged over all eight scenarios, these maps beat the DINOv3 distance map. They also beat PatchCore, but PatchCore ran with default settings and was not tuned, so that gap is not conclusive.
 
 ## takeaways
 

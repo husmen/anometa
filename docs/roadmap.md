@@ -7,7 +7,6 @@ This page lists what is not built yet. The hackathon results are on the [results
 - **Hugging Face feature upload.** Publish the cached features, the Thinking prediction cache and the lock artifacts as a Hugging Face dataset, with a dataset card that states CC BY-NC-SA 4.0 and cites AD2. Anyone can then reproduce Track B on a laptop without extracting features. The upload needs the author's explicit approval.
 - **Thinking ablation, remaining runs.** Finish seeds 5–9 at k = 2 (10 of 40 predictions are cached, about 32 fits remain). Then run k = 1 and k = 5, as the protocol requires. A fit costs about 200k tokens, so the 5M daily API token limit allows about 25 fits a day. A limit increase (about 35M tokens) is requested. It would also cover a one-fit feasibility test of Track C on the API.
 - **Lighting study, last runs.** The three `tabpfn_outlier` runs at k = 1 are still running (about 15 h). They add the k = 1 version of one secondary comparison (TabPFN-3.5 minus the outlier score). The primary result does not depend on them.
-- **Video narration.** Pick the narration voice and rebuild the video.
 
 ## Track C: TabPFN anomaly maps
 

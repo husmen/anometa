@@ -125,7 +125,7 @@ The single lock evaluation ran all 28 frozen configurations once, and none was r
 
 ## Post-freeze studies
 
-Two studies ran after the single lock evaluation. Their protocols were fixed before any run. They are not part of the lock benchmark, and nothing in the frozen configuration changed because of them. Results are on the [results](results.md) page.
+Three studies ran after the single lock evaluation. Their protocols were fixed before any run. They are not part of the lock benchmark, and nothing in the frozen configuration changed because of them. Results are on the [results](results.md) page.
 
 ### Lighting adaptation
 
@@ -151,3 +151,15 @@ The study has its own config type, `anometa.config.LightingConfig` (track `L`), 
 - **Data sent to Prior Labs:** dev-split feature rows (18 numbers per image) and their labels, never images.
 
 Thinking was not part of the frozen configuration, so it has no lock run. At the time of writing, seeds 0 to 4 at k = 2 are complete; the rest waits for token budget.
+
+### Tuned PatchCore (dev split)
+
+Declared on 2026-10-06, before any run.
+
+**Question:** how much of the gap between our PatchCore and the MVTec AD 2 paper's, and between PatchCore and the other pixel methods, comes from running PatchCore untuned?
+
+- **Model:** anomalib PatchCore as in Track A (WideResNet-50, layer2 and layer3, 9 neighbours, no center crop). Only two settings change: the input size and the coreset ratio (`TrackAConfig.image_size`, `TrackAConfig.coreset_ratio`).
+- **Grid, in run order:** 384×384 and 512×512 at coreset 0.01, then 256×256 at coreset 0.1, then 384×384 at coreset 0.1 if time allows. The frozen default (256×256, coreset 0.01) is the reference.
+- **Data:** all 8 scenarios, dev split only. Maps, thresholds and metrics exactly as in Track A.
+- **Selection:** the highest mean dev AU-PRO@0.05 over the 8 scenarios. On a tie within 0.005, the cheaper setting wins.
+- **Reporting:** every grid point is reported, next to the default PatchCore and the DINOv3 distance map on the same dev images. The lock split is not part of this study. A lock evaluation of the selected setting would be a separate decision, declared before it runs.
