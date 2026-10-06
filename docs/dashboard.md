@@ -14,17 +14,20 @@ uv run anometa demo
 
 The command launches the Streamlit app in `anometa.dashboard.app`. It needs cached features, so run `anometa extract` first. It reads only cached features and dev images, never lock data.
 
-The sidebar picks a scenario, an encoder and a backend among the cached features, a classifier (TabPFN-3.5-Fast by default, or TabPFN-3.5) and a lighting filter for the gallery (`regular`, `shifted` or `all`).
+The sidebar picks a scenario (Vial by default), an encoder and a backend among the cached features, a classifier (TabPFN-3.5-Fast by default, or TabPFN-3.5), which lighting to show (`regular`, `shifted` or `all`) and the anomaly map: the cached DINOv3 patch distance map, or the maps of any finished dev Track A run (PatchCore or EfficientAD-S) found under `artifacts/`. A toggle hides the maps.
 
-The app has three tabs.
+The dashboard has three tabs.
 
-### Few-shot labelling
+### Detect
 
-1. The gallery shows the dev images of the scenario, without labels.
-2. Select one or more images that look defective. They become the k few-shot shots.
-3. The classifier refits on the train normals plus your picks and scores the rest of the dev images. The app shows the refit-and-rescore time.
-4. A ranked table lists every scored image with its balanced probability of being anomalous.
-5. Three numbers show the dev AUROC under regular lighting, under shifted lighting, and the gap between them.
+The page puts images and anomaly maps first.
+
+1. **Normal parts:** six defect-free training images, each next to its anomaly map.
+2. **Pick defect examples:** the dev images of the scenario as an unlabelled grid, 18 per page. Tick the ones that look defective; they become the k few-shot shots. Labels and maps stay hidden here, so the picks are by eye.
+3. **Results:** the classifier refits on the train normals plus your picks and scores the rest of the dev images. Four numbers show the number of picks, the dev AUROC under regular and under shifted lighting, and the fit-and-score time. Nine cards show the most (or least) anomalous images. Each card shows the image with its ground-truth defect outlined in red, its anomaly map, the defect probability and the true label.
+4. **Inspect one image:** any scored image, large, next to every available anomaly map.
+
+All maps of one source share one colour scale (the 1st to 99.5th percentile of the scenario's maps), so the same colour means the same score on every image.
 
 Images from the scenes you picked are left out of the scoring, as in Track B. The demo fits on `cls` and `mean_patch` features with PCA to 16 dimensions; these are not exposed as controls.
 
