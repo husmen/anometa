@@ -41,12 +41,12 @@ The [results](results.md) page has every table, the per-scenario comparison with
 ## Quickstart
 
 ```bash
-uv sync --extra gui
+uv sync --extra dashboard
 uv run anometa download --scenario vial   # MVTec AD 2 archive, hash-pinned
 uv run anometa split                      # dev/lock splits
 uv run anometa extract --encoder dinov3_l # frozen DINOv3-L features
 uv run anometa run configs/experiments/smoke_vial.yaml --set k=5 classifier=tabpfn
-uv run anometa demo                       # Streamlit few-shot demo
+uv run anometa demo                       # Streamlit few-shot dashboard
 ```
 
 TabPFN-3.5 weights need a licence acceptance and a token; DINOv3 needs gated Hugging Face access or the timm fallback. See [getting started](getting-started.md).
@@ -73,7 +73,7 @@ architecture
 tracks
 metrics
 dev-search
-gui
+dashboard
 reproducibility
 ```
 

@@ -7,7 +7,7 @@ Implemented: Milestones 1-2 (data, splits, `run_experiment`, encoders, feature c
 Dev commands:
 
 ```bash
-uv sync                        # install (extra `gui` for Streamlit/Rerun: uv sync --extra gui)
+uv sync                        # install (extra `dashboard` for Streamlit/Rerun: uv sync --extra dashboard)
 uv run ruff format --check
 uv run ruff check
 uv run pyrefly check
@@ -15,7 +15,7 @@ uv run pytest
 uv run pre-commit install      # once, after cloning
 uv run anometa download --scenario vial   # AD2 archives into data/ad2 (hash-pinned)
 uv run pytest -m data          # checks against the real data
-uv run anometa demo            # Streamlit few-shot demo
+uv run anometa demo            # Streamlit few-shot dashboard
 ```
 
 Track B seeds run serially by default. `ANOMETA_SEED_WORKERS=<n>` fits n seeds at once, and `ANOMETA_SEED_EXECUTOR=thread|process` picks the pool (default `thread`; MPS needs `process`). These are execution settings: run ids don't change, the manifest's `hardware` block records them, and concurrent seeds inflate the per-seed latencies, so take reported latencies from serial runs.
@@ -28,7 +28,7 @@ Anometa tests whether TabPFN-3.5 on frozen vision-foundation-model features (DIN
 
 ## Architecture
 
-- Python 3.14 managed with `uv`. Strict typing with pyrefly (`preset = "strict"`); lint and format with ruff; both run in pre-commit. Package and import name: `anometa` under `src/anometa/`. YAML configs under `configs/`, parsed into pydantic models. GUI extra `anometa[gui]`: Streamlit for control and the few-shot demo, Rerun for inspection.
+- Python 3.14 managed with `uv`. Strict typing with pyrefly (`preset = "strict"`); lint and format with ruff; both run in pre-commit. Package and import name: `anometa` under `src/anometa/`. YAML configs under `configs/`, parsed into pydantic models. Dashboard extra `anometa[dashboard]`: a Streamlit dashboard for few-shot detection, Rerun for inspection.
 - Two separate tracks. Keep them distinct in code and reporting:
   - Track A: unsupervised baselines (PatchCore, EfficientAD-S via anomalib).
   - Track B: supervised few-shot adaptation (frozen VFM, PCA, TabPFN-3.5 and controls).

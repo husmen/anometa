@@ -1,4 +1,4 @@
-"""Streamlit few-shot labelling demo: pick anomalies by eye, refit, rescore.
+"""Streamlit few-shot dashboard: pick anomalies by eye, refit, rescore.
 
 The gallery tab shows an unlabelled dev-image gallery for one cached
 (scenario, encoder, backend); picking rows there refits a Track B classifier
@@ -8,7 +8,7 @@ with the live regular-vs-shifted AUROC gap. The run tab launches one
 `run_experiment`. The results tab renders `reports/dev/figures/*.png`.
 
 `thumbnail_data_url`, `gallery_frame` and `fit_and_score` are pure and unit
-tested (`tests/test_app.py`); `main` is the Streamlit page itself, exercised
+tested (`tests/test_dashboard.py`); `main` is the Streamlit page itself, exercised
 by hand and by a headless health check.
 """
 
@@ -216,8 +216,8 @@ def main() -> None:
     `key=value` overrides, through `run_experiment`. Results tab: renders
     `reports/dev/figures/*.png`.
     """
-    st.set_page_config(page_title="Anometa few-shot demo", layout="wide")
-    st.title("Anometa few-shot demo")
+    st.set_page_config(page_title="Anometa dashboard", layout="wide")
+    st.title("Anometa dashboard")
     paths = Paths()
 
     pairs = _cached_pairs(paths)

@@ -12,5 +12,5 @@ tracka
 trackb
 metrics
 search
-gui
+dashboard
 ```

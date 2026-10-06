@@ -90,7 +90,7 @@ def embedding(
     """Concatenate the `cls`/`mean_patch` blocks requested in `blocks` for some rows.
 
     Public: also used by callers that need to fit a PCA before `design_matrix`
-    can run, e.g. the GUI demo's `fit_and_score`.
+    can run, e.g. the dashboard's `fit_and_score`.
 
     Args:
         feats: A scenario's cached features.
@@ -182,7 +182,7 @@ def fit_and_score_shots(
     """Fit `scorer` on train normals plus `shots`, score `split`'s eval rows, balance the scores.
 
     The per-seed fit/score/balance step shared by `run_track_b`'s scenario
-    loop and the GUI demo's `fit_and_score`, so the two paths can't silently
+    loop and the dashboard's `fit_and_score`, so the two paths can't silently
     diverge. `train_rows` selection and the PCA fit happen once per scenario
     in the caller, since `run_track_b` reuses both across seeds.
 

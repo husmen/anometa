@@ -472,7 +472,7 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
     Returns:
         `0` on success.
     """
-    from anometa.gui.rerun_log import write_rrd
+    from anometa.rerun_log import write_rrd
 
     paths = Paths()
     out = write_rrd(paths.artifacts / args.run_id, paths, max_images=args.max_images)
@@ -490,7 +490,7 @@ _inspect_parser.set_defaults(func=_cmd_inspect)
 
 
 def _cmd_demo(args: argparse.Namespace) -> int:
-    """Run the `demo` subcommand: launch the Streamlit few-shot labelling demo.
+    """Run the `demo` subcommand: launch the Streamlit few-shot dashboard.
 
     Args:
         args: Parsed arguments; none beyond the subcommand itself.
@@ -498,14 +498,14 @@ def _cmd_demo(args: argparse.Namespace) -> int:
     Returns:
         The Streamlit subprocess's exit code.
     """
-    app_path = Path(__file__).parent / "gui" / "app.py"
+    app_path = Path(__file__).parent / "dashboard" / "app.py"
     completed = subprocess.run(
         [sys.executable, "-m", "streamlit", "run", str(app_path)], check=False
     )
     return completed.returncode
 
 
-_demo_parser = SUBPARSERS.add_parser("demo", help="Launch the Streamlit few-shot labelling demo")
+_demo_parser = SUBPARSERS.add_parser("demo", help="Launch the Streamlit few-shot dashboard")
 _demo_parser.set_defaults(func=_cmd_demo)
 
 

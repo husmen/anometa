@@ -212,14 +212,14 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-gui = [
+dashboard = [
     { name = "rerun-sdk" },
     { name = "streamlit" },
 ]
 
 [package.dev-dependencies]
 dev = [
-    { name = "anometa", extra = ["gui"] },
+    { name = "anometa", extra = ["dashboard"] },
     { name = "pandas-stubs" },
     { name = "pre-commit" },
     { name = "pyrefly" },
@@ -246,10 +246,10 @@ requires-dist = [
     { name = "pyarrow", specifier = "!=25.0.0,<=25.0.1" },
     { name = "pydantic", specifier = "<=2.13.4" },
     { name = "pyyaml" },
-    { name = "rerun-sdk", marker = "extra == 'gui'", specifier = ">=0.38.1" },
+    { name = "rerun-sdk", marker = "extra == 'dashboard'", specifier = ">=0.38.1" },
     { name = "scikit-learn", specifier = "<=1.9.0" },
     { name = "scipy" },
-    { name = "streamlit", marker = "extra == 'gui'", specifier = ">=1.64.0" },
+    { name = "streamlit", marker = "extra == 'dashboard'", specifier = ">=1.64.0" },
     { name = "tabpfn", specifier = ">=9.0.0" },
     { name = "tabpfn-client", specifier = ">=0.6.0" },
     { name = "tabpfn-extensions", extras = ["image"], specifier = ">=0.6.3" },
@@ -258,11 +258,11 @@ requires-dist = [
     { name = "torchvision", specifier = ">=0.29" },
     { name = "transformers", specifier = ">=5.17.0" },
 ]
-provides-extras = ["gui"]
+provides-extras = ["dashboard"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "anometa", extras = ["gui"] },
+    { name = "anometa", extras = ["dashboard"] },
     { name = "pandas-stubs", specifier = "~=2.3.0" },
     { name = "pre-commit", specifier = ">=4.6.2" },
     { name = "pyrefly", specifier = ">=1.3.1" },

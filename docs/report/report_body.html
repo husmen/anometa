@@ -239,7 +239,7 @@
 <h2><span class="n">11</span>Reproduce</h2>
 <p>Python 3.14 with uv. TabPFN-3.5 weights need the licence accepted on platform.priorlabs.ai and <code>TABPFN_TOKEN</code>; DINOv3 needs gated Hugging Face access, or the ungated timm copies (equivalent within noise, measured). MVTec AD 2 is CC BY-NC-SA 4.0 and is downloaded from the official links <span class="cite">[<a href="#ref-4">4</a>]</span> with pinned SHA-256 hashes.</p>
 <div class="tw"><table><tbody>
-<tr><td>install and test</td><td><code>uv sync --extra gui &amp;&amp; uv run pytest</code></td></tr>
+<tr><td>install and test</td><td><code>uv sync --extra dashboard &amp;&amp; uv run pytest</code></td></tr>
 <tr><td>data and splits</td><td><code>uv run anometa download</code> · <code>uv run anometa split</code></td></tr>
 <tr><td>features</td><td><code>uv run anometa extract --encoder dinov3_l</code></td></tr>
 <tr><td>dev grid and searches</td><td><code>uv run anometa grid configs/search/grid.yaml</code> · <code>anometa optuna tpe --trials 60</code> · <code>anometa bo --trials 60</code></td></tr>

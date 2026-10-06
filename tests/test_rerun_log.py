@@ -1,4 +1,4 @@
-"""Tests for `anometa.gui.rerun_log`: Rerun inspection recordings of runs."""
+"""Tests for `anometa.rerun_log`: Rerun inspection recordings of runs."""
 
 import pytest
 
@@ -7,7 +7,7 @@ from anometa.experiment import run_experiment
 
 pytest.importorskip("rerun")
 
-from anometa.gui.rerun_log import write_rrd
+from anometa.rerun_log import write_rrd
 
 
 def test_write_rrd_for_track_a_run(prepared):

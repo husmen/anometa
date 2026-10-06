@@ -1,4 +1,4 @@
-"""Tests for `anometa.gui.app`: the Streamlit few-shot demo's pure functions."""
+"""Tests for `anometa.dashboard.app`: the Streamlit few-shot dashboard's pure functions."""
 
 from pathlib import Path
 
@@ -10,7 +10,7 @@ from anometa.features.extract import load_features
 
 pytest.importorskip("streamlit")
 
-from anometa.gui.app import fit_and_score, thumbnail_data_url
+from anometa.dashboard.app import fit_and_score, thumbnail_data_url
 
 
 def test_thumbnail_data_url(ad2_root: Path) -> None:

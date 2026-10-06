@@ -81,7 +81,7 @@ Reproduction: the best dev configurations give the same AUROC within 0.001 on a 
 Requires Python 3.14 and [uv](https://docs.astral.sh/uv/). Reported numbers come from an RTX 3090 (Linux, NVIDIA driver r580 or newer, since the PyPI torch wheels bundle CUDA 13.0). Track B on cached features also runs on a laptop CPU or Apple silicon.
 
 ```bash
-uv sync --extra gui
+uv sync --extra dashboard
 uv run pytest
 ```
 
@@ -99,7 +99,7 @@ uv run anometa download --scenario vial   # AD2 archive, hash-pinned (omit --sce
 uv run anometa split                      # dev/lock splits
 uv run anometa extract --encoder dinov3_l # frozen DINOv3-L features
 uv run anometa run configs/experiments/smoke_vial.yaml --set k=5 classifier=tabpfn
-uv run anometa demo                       # Streamlit few-shot demo
+uv run anometa demo                       # Streamlit few-shot dashboard
 ```
 
 Every command (Track A, grid, Optuna, TabPFN-BO, report, lock, parity, Rerun), the `--set` overrides and the seed-pool settings are in the [getting started guide](https://husmen.github.io/anometa/docs/getting-started.html). Build the docs locally with `uv run --group docs sphinx-build -W docs docs/_build/html`.

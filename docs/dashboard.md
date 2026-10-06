@@ -1,18 +1,18 @@
-# Demo and inspection
+# Dashboard and inspection
 
-The `gui` extra adds two tools: a Streamlit app for the few-shot demo and Rerun recordings for deep inspection of one run.
+The `dashboard` extra adds two tools: a Streamlit dashboard for few-shot detection and Rerun recordings for deep inspection of one run.
 
 ```bash
-uv sync --extra gui
+uv sync --extra dashboard
 ```
 
-## Few-shot demo
+## Few-shot dashboard
 
 ```bash
 uv run anometa demo
 ```
 
-The command launches the Streamlit app in `anometa.gui.app`. It needs cached features, so run `anometa extract` first. It reads only cached features and dev images, never lock data.
+The command launches the Streamlit app in `anometa.dashboard.app`. It needs cached features, so run `anometa extract` first. It reads only cached features and dev images, never lock data.
 
 The sidebar picks a scenario, an encoder and a backend among the cached features, a classifier (TabPFN-3.5-Fast by default, or TabPFN-3.5) and a lighting filter for the gallery (`regular`, `shifted` or `all`).
 

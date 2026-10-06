@@ -109,7 +109,7 @@ flowchart TD
 - PCA is fitted once per scenario, on the `train` normals only. The grid uses dimensions {16, 32, 64, 128}.
 - PCA covers the `cls` and `mean_patch` block only. The two novelty values are appended after PCA.
 - `novelty` alone uses no PCA (`pca_dim: null`).
-- `anometa.trackb.pipeline.fit_pca` and `anometa.trackb.pipeline.design_matrix` are the building blocks. The Streamlit demo reuses them (see [GUI](gui.md)).
+- `anometa.trackb.pipeline.fit_pca` and `anometa.trackb.pipeline.design_matrix` are the building blocks. The Streamlit dashboard reuses them (see [dashboard](dashboard.md)).
 
 ### Classifiers
 

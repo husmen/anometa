@@ -192,7 +192,7 @@ Every run writes `artifacts/<run-id>/`:
 - `metrics.json`: the metrics dict.
 - `predictions.parquet`: one row per (scenario, seed, image) with `scenario, seed, image_id, scene_id, label, lighting, score`, plus `score_balanced` for Track B.
 - `maps.npz` (Track A): float16 anomaly maps at model resolution, keyed `<scenario>/<image_id>`.
-- `inspect.rrd`: only on demand, written by `anometa inspect`. See [demo and inspection](gui.md).
+- `inspect.rrd`: only on demand, written by `anometa inspect`. See [dashboard and inspection](dashboard.md).
 
 The manifest's `hardware` block records the platform, CPU count, resolved device, seed pool settings and, on CUDA, the GPU name and VRAM.
 
@@ -246,9 +246,9 @@ src/anometa/
 │   └── tabpfn_bo.py     TabPFN-surrogate Bayesian optimisation loop
 ├── report.py            results tables and figures from artifacts
 ├── cli.py               the anometa entry point
-└── gui/                 extra anometa[gui]
-    ├── app.py           Streamlit demo
-    └── rerun_log.py     Rerun .rrd writer
+├── rerun_log.py         Rerun .rrd writer (extra anometa[dashboard])
+└── dashboard/           extra anometa[dashboard]
+    └── app.py           Streamlit dashboard
 ```
 
 See [tracks](tracks.md) for what Track A and Track B compute, and the [API reference](api/index.md) for every module.
@@ -298,10 +298,10 @@ flowchart LR
         optuna_search["optuna_search"]
         tabpfn_bo["tabpfn_bo"]
     end
-    subgraph guipkg["gui (extra)"]
+    subgraph dashpkg["dashboard (extra)"]
         app["app"]
-        rerun_log["rerun_log"]
     end
+    rerun_log["rerun_log (extra)"]
     experiment --> config & artifacts
     experiment -.->|"lazy"| tbpipe & tapipe
     artifacts --> config & splits & download

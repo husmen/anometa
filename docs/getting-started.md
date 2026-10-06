@@ -14,11 +14,11 @@ All reported metrics, latencies and VRAM figures come from an RTX 3090 on Linux.
 
 ```bash
 uv sync                 # package and dev tools
-uv sync --extra gui     # adds Streamlit and Rerun for the demo and inspection
+uv sync --extra dashboard  # adds Streamlit and Rerun for the dashboard and inspection
 uv run pre-commit install   # once, after cloning
 ```
 
-The `gui` extra holds `streamlit` and `rerun-sdk`. The `docs` dependency group holds Sphinx and its extensions; `uv run --group docs ...` installs it on demand.
+The `dashboard` extra holds `streamlit` and `rerun-sdk`. The `docs` dependency group holds Sphinx and its extensions; `uv run --group docs ...` installs it on demand.
 
 ## Licence and access checklist
 
@@ -70,7 +70,7 @@ The committed split files in `splits/` are never overwritten. See [protocol](pro
 | lock evaluation | `uv run anometa lock configs/frozen` |
 | backend parity | `uv run anometa parity --encoder dinov3_l` |
 | Rerun recording | `uv run anometa inspect <run-id>` |
-| few-shot demo | `uv run anometa demo` |
+| few-shot dashboard | `uv run anometa demo` |
 
 `uv run anometa <command> --help` lists every flag. The main ones:
 
@@ -85,7 +85,7 @@ The committed split files in `splits/` are never overwritten. See [protocol](pro
 - `lock <frozen_dir>`: evaluates every frozen config once on the lock split and writes `artifacts/lock_summary.csv`. A config whose lock run already exists is reported as already evaluated and never rerun.
 - `parity`: `--encoder dinov3_s|dinov3_l` (required), `--scenario` (default `vial`), `--n` (images compared, default 32), `--device`.
 - `inspect <run-id>`: writes `artifacts/<run-id>/inspect.rrd`. `--max-images` (default 50).
-- `demo`: launches the Streamlit app. Needs the `gui` extra.
+- `demo`: launches the Streamlit dashboard. Needs the `dashboard` extra.
 - `reference-check`: compares `TabPFNWithImages` from tabpfn-extensions with Track B on one scenario (`--scenario`, default `vial`; `--k`, default 5). It is a sanity check of the feature pipeline.
 
 The search commands only build dev-split configs. See [search](dev-search.md).
