@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use Anometa, please cite it as below."
+title: "Anometa: Few-Shot Industrial Anomaly Detection with TabPFN-3.5 on Frozen Vision Foundation Model Features"
+type: software
+authors:
+  - family-names: Menhour
+    given-names: Houssem
+repository-code: "https://github.com/husmen/anometa"
+url: "https://husmen.github.io/anometa/"
+license: Apache-2.0
+version: 0.1.0
+date-released: 2026-10-06
+keywords:
+  - anomaly detection
+  - few-shot learning
+  - TabPFN
+  - DINOv3
+  - MVTec AD 2
