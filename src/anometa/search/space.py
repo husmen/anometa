@@ -73,7 +73,7 @@ _CLASSIFIER_PARAM_KEY: dict[str, str] = {
 
 
 def parse_features(spec: str) -> tuple[FeatureBlock, ...]:
-    """Parse a `"+"`-joined feature-block spec into `FeatureBlock`s.
+    """Parse a `"+"`-joined feature-block spec into `FeatureBlock` members.
 
     Args:
         spec: Feature blocks joined by `"+"`, e.g. `"cls+mean_patch"` or

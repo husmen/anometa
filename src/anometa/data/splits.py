@@ -143,7 +143,7 @@ def sample_few_shot(
             `"all"` allows every lighting condition.
 
     Returns:
-        The sampled shots' `image_id`s, in draw order.
+        The `image_id` values of the sampled shots, in draw order.
 
     Raises:
         BudgetError: If `k` exceeds the pool size.
@@ -190,9 +190,9 @@ class LightingFold:
     """One fold of the lighting-adaptation study for one scenario.
 
     Attributes:
-        adapt_scenes: Good `scene_id`s whose images may join the context, in
+        adapt_scenes: Good `scene_id` values whose images may join the context, in
             draw order; the first m serve a run with m adaptation scenes.
-        shots: Regular-lit `image_id`s of the defect shot scenes, one per
+        shots: Regular-lit `image_id` values of the defect shot scenes, one per
             scene, in draw order.
         eval_rows: Split rows of every other scene in the pool, under every
             lighting.

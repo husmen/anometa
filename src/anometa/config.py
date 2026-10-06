@@ -367,6 +367,7 @@ def run_id(cfg: ExperimentConfig) -> str:
         cfg: The experiment configuration to identify.
 
     Returns:
-        `f"{cfg.name}-{config_hash(cfg)[:12]}"`.
+        The config name and the first 12 hex digits of `config_hash(cfg)`,
+        joined by a hyphen.
     """
     return f"{cfg.name}-{config_hash(cfg)[:12]}"

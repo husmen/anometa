@@ -89,8 +89,8 @@ def dataset_hash(scenarios: Sequence[Scenario], paths: Paths) -> str:
             `paths.configs / "data" / "sha256sums.txt"`.
 
     Returns:
-        The hex-encoded SHA-256 digest of `"<scenario>:<digest>"` per
-        scenario, joined with newlines, in `Scenario` order. A scenario
+        The hex-encoded SHA-256 digest of one line per scenario, joined
+        with newlines in `Scenario` order; each line is `"<scenario>:<digest>"`. A scenario
         whose archive isn't pinned yet (or a missing pins file) contributes
         `"missing"`.
     """
