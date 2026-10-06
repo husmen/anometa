@@ -1,0 +1,548 @@
+{
+ "machines": [
+  [
+   "3090",
+   "RTX 3090 (Ryzen 7 7700 host)",
+   "s-tab"
+  ],
+  [
+   "m4",
+   "M4 Pro, MPS",
+   "s-log"
+  ],
+  [
+   "ryzen",
+   "Ryzen 7 7700, CPU only",
+   "s-knn"
+  ]
+ ],
+ "stages": [
+  {
+   "label": "TabPFN-3.5 fit",
+   "sub": "one scenario, k = 2",
+   "values": {
+    "3090": 4.350811999756843,
+    "m4": 5.082020987174474,
+    "ryzen": 4.844687005970627
+   }
+  },
+  {
+   "label": "TabPFN-3.5 predict",
+   "sub": "one scenario's dev images",
+   "values": {
+    "3090": 187.55474800127558,
+    "m4": 821.9652914995095,
+    "ryzen": 1535.9981135115959
+   }
+  },
+  {
+   "label": "TabPFN-3.5-Fast predict",
+   "sub": "one scenario's dev images",
+   "values": {
+    "3090": 59.42607898032293,
+    "m4": 201.9251460005762,
+    "ryzen": 470.196065492928
+   }
+  },
+  {
+   "label": "Logistic regression fit",
+   "sub": "one scenario, k = 2",
+   "values": {
+    "3090": 17.013964490615763,
+    "m4": 1.2202709913253784,
+    "ryzen": 14.902352500939742
+   }
+  },
+  {
+   "label": "TabPFN outlier score",
+   "sub": "one scenario, no labels",
+   "values": {
+    "3090": 763.0396814784035,
+    "m4": 3251.418083993485,
+    "ryzen": 4808.869966494967
+   }
+  },
+  {
+   "label": "DINOv3-L encode",
+   "sub": "one 2448\u00d72048 image",
+   "values": {
+    "3090": 20.434491001651622,
+    "m4": 234.29142500390296,
+    "ryzen": 1115.7304035004927
+   }
+  },
+  {
+   "label": "DINOv3-S encode",
+   "sub": "one 2448\u00d72048 image",
+   "values": {
+    "3090": 11.895141602144577,
+    "m4": 33.368174999486655,
+    "ryzen": 109.56386200268754
+   }
+  },
+  {
+   "label": "TabPFN pipeline, Vial end to end",
+   "sub": "encode 472 images, fit, predict",
+   "values": {
+    "3090": 14265.458665793994,
+    "m4": 124100.83707817248,
+    "ryzen": 585014.9325659731
+   }
+  },
+  {
+   "label": "PatchCore, Vial end to end",
+   "sub": "fit + maps for every image",
+   "values": {
+    "3090": 17679.16,
+    "m4": 157100.0,
+    "ryzen": 151700.0
+   }
+  },
+  {
+   "label": "EfficientAD-S, Vial end to end",
+   "sub": "70,000 steps; M4 and CPU extrapolated",
+   "values": {
+    "3090": 2622982.6,
+    "m4": 14660500.0,
+    "ryzen": 36526400.0
+   }
+  }
+ ],
+ "table_headers": [
+  "stage",
+  "RTX 3090 (Ryzen 7 7700 host)",
+  "M4 Pro, MPS",
+  "Ryzen 7 7700, CPU only"
+ ],
+ "table_rows": [
+  [
+   "TabPFN-3.5 fit <span class=\"ci\">one scenario, k = 2</span>",
+   "4.4 ms",
+   "5.1 ms",
+   "4.8 ms"
+  ],
+  [
+   "TabPFN-3.5 predict <span class=\"ci\">one scenario's dev images</span>",
+   "187.6 ms",
+   "822.0 ms",
+   "1.54 s"
+  ],
+  [
+   "TabPFN-3.5-Fast predict <span class=\"ci\">one scenario's dev images</span>",
+   "59.4 ms",
+   "201.9 ms",
+   "470.2 ms"
+  ],
+  [
+   "Logistic regression fit <span class=\"ci\">one scenario, k = 2</span>",
+   "17.0 ms",
+   "1.2 ms",
+   "14.9 ms"
+  ],
+  [
+   "TabPFN outlier score <span class=\"ci\">one scenario, no labels</span>",
+   "763.0 ms",
+   "3.25 s",
+   "4.81 s"
+  ],
+  [
+   "DINOv3-L encode <span class=\"ci\">one 2448\u00d72048 image</span>",
+   "20.4 ms",
+   "234.3 ms",
+   "1.12 s"
+  ],
+  [
+   "DINOv3-S encode <span class=\"ci\">one 2448\u00d72048 image</span>",
+   "11.9 ms",
+   "33.4 ms",
+   "109.6 ms"
+  ],
+  [
+   "TabPFN pipeline, Vial end to end <span class=\"ci\">encode 472 images, fit, predict</span>",
+   "14.27 s",
+   "2.1 min",
+   "9.8 min"
+  ],
+  [
+   "PatchCore, Vial end to end <span class=\"ci\">fit + maps for every image</span>",
+   "17.68 s",
+   "2.6 min",
+   "2.5 min"
+  ],
+  [
+   "EfficientAD-S, Vial end to end <span class=\"ci\">70,000 steps; M4 and CPU extrapolated</span>",
+   "43.7 min",
+   "4.1 h",
+   "10.1 h"
+  ],
+  [
+   "TabPFN-3.5 dev AUROC, k = 2 <span class=\"ci\">same config everywhere</span>",
+   "0.7076",
+   "0.7078",
+   "0.7069"
+  ]
+ ],
+ "xhw": [
+  {
+   "machine": "m4",
+   "classifier": "tabpfn",
+   "k": 1,
+   "params": "{\"n_normals\": 32}",
+   "diff": 0.00043650793650795716,
+   "lo": -0.005640567818562553,
+   "hi": 0.006892244853670642
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn_outlier",
+   "k": 0,
+   "params": "{}",
+   "diff": 0.00039785879629639087,
+   "lo": -0.002069227430555531,
+   "hi": 0.0029557291666667362
+  },
+  {
+   "machine": "m4",
+   "classifier": "logreg",
+   "k": 2,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn_fast",
+   "k": 1,
+   "params": "{}",
+   "diff": -0.0008655753968254132,
+   "lo": -0.00932435619212972,
+   "hi": 0.007341064194775042
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn_fast",
+   "k": 1,
+   "params": "{\"n_normals\": 32}",
+   "diff": 0.0008680555555555802,
+   "lo": -0.005696897907021501,
+   "hi": 0.007533758577215693
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn_fast",
+   "k": 2,
+   "params": "{}",
+   "diff": -0.004861111111111094,
+   "lo": -0.0169927525972773,
+   "hi": 0.004315023733741166
+  },
+  {
+   "machine": "m4",
+   "classifier": "knn",
+   "k": 2,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "m4",
+   "classifier": "knn",
+   "k": 5,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn",
+   "k": 2,
+   "params": "{}",
+   "diff": 0.00018422067901247008,
+   "lo": -0.008404741925705506,
+   "hi": 0.008110753899360721
+  },
+  {
+   "machine": "m4",
+   "classifier": "logreg",
+   "k": 5,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "m4",
+   "classifier": "mahalanobis",
+   "k": 0,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn_fast",
+   "k": 5,
+   "params": "{}",
+   "diff": -0.0003645833333333348,
+   "lo": -0.008948218074845598,
+   "hi": 0.009322338432537472
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn_fast",
+   "k": 2,
+   "params": "{\"n_normals\": 32}",
+   "diff": -0.0008728780864197816,
+   "lo": -0.008123487103174584,
+   "hi": 0.0055099881503526795
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn",
+   "k": 5,
+   "params": "{}",
+   "diff": -0.0010416666666667185,
+   "lo": -0.009026636312381226,
+   "hi": 0.009237647306397272
+  },
+  {
+   "machine": "m4",
+   "classifier": "logreg",
+   "k": 1,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn",
+   "k": 5,
+   "params": "{\"n_normals\": 32}",
+   "diff": -0.0025868055555554603,
+   "lo": -0.010912853958455815,
+   "hi": 0.005447869114414907
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn",
+   "k": 2,
+   "params": "{\"n_normals\": 32}",
+   "diff": -0.0010464891975309198,
+   "lo": -0.009249305211089133,
+   "hi": 0.005212361696704216
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn",
+   "k": 1,
+   "params": "{}",
+   "diff": -0.0030357142857142527,
+   "lo": -0.010781684027777733,
+   "hi": 0.00332667651840823
+  },
+  {
+   "machine": "m4",
+   "classifier": "knn",
+   "k": 1,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "m4",
+   "classifier": "tabpfn_fast",
+   "k": 5,
+   "params": "{\"n_normals\": 32}",
+   "diff": -0.0024324845679013496,
+   "lo": -0.011201438945538386,
+   "hi": 0.007186403355542333
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "knn",
+   "k": 1,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn_fast",
+   "k": 5,
+   "params": "{\"n_normals\": 32}",
+   "diff": -0.00014853395061731334,
+   "lo": -0.002274813535230252,
+   "hi": 0.0019376519097222254
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn",
+   "k": 1,
+   "params": "{\"n_normals\": 32}",
+   "diff": 0.00031580687830690124,
+   "lo": -0.0007123033096341018,
+   "hi": 0.0013905629960317856
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn_outlier",
+   "k": 0,
+   "params": "{}",
+   "diff": 1.4467592592715128e-05,
+   "lo": -0.0015502025462962503,
+   "hi": 0.001244212962962843
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn_fast",
+   "k": 1,
+   "params": "{}",
+   "diff": 0.0006283068783068391,
+   "lo": -0.000838310701884895,
+   "hi": 0.0022803750551146414
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn_fast",
+   "k": 1,
+   "params": "{\"n_normals\": 32}",
+   "diff": 0.0003563161375660373,
+   "lo": -0.000896288890266711,
+   "hi": 0.001801999800209479
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn_fast",
+   "k": 2,
+   "params": "{\"n_normals\": 32}",
+   "diff": -0.00017746913580252155,
+   "lo": -0.0019487850666887268,
+   "hi": 0.0016123563574736224
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "logreg",
+   "k": 1,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn_fast",
+   "k": 2,
+   "params": "{}",
+   "diff": 0.0007238618827161147,
+   "lo": -0.0008157772541887293,
+   "hi": 0.0026479666143077517
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "knn",
+   "k": 5,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn",
+   "k": 2,
+   "params": "{}",
+   "diff": -0.0007484567901234751,
+   "lo": -0.002266722814704586,
+   "hi": 0.0005045559138007526
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "mahalanobis",
+   "k": 0,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn",
+   "k": 2,
+   "params": "{\"n_normals\": 32}",
+   "diff": -0.00034818672839498355,
+   "lo": -0.0015312014302248129,
+   "hi": 0.0007807532793210391
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn",
+   "k": 5,
+   "params": "{\"n_normals\": 32}",
+   "diff": -0.00030864197530855453,
+   "lo": -0.002186928530092605,
+   "hi": 0.0013968722442679565
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "knn",
+   "k": 2,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn_fast",
+   "k": 5,
+   "params": "{}",
+   "diff": 0.0007928240740739945,
+   "lo": -0.0006968068662948048,
+   "hi": 0.0023420331790123313
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn",
+   "k": 1,
+   "params": "{}",
+   "diff": -0.000248842592592613,
+   "lo": -0.001907438409391557,
+   "hi": 0.0012140170304232977
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "logreg",
+   "k": 2,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "tabpfn",
+   "k": 5,
+   "params": "{}",
+   "diff": -0.0006520061728395588,
+   "lo": -0.0024973814960793845,
+   "hi": 0.0008347240840853832
+  },
+  {
+   "machine": "ryzen",
+   "classifier": "logreg",
+   "k": 5,
+   "params": "{}",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  }
+ ],
+ "text": "<p>Same code, same cached features, three machines: an RTX 3090 (canonical for every reported number), an Apple M4 Pro through PyTorch's MPS backend, and the 3090 host's Ryzen 7 7700 with the GPU hidden. Track B timings come from the 20 frozen configurations on the dev split, one seed at a time; Track A timings come from Vial. Encoder throughput is measured on blank images at each scenario's native size.</p>\n<ul>\n<li><strong>TabPFN needs no training.</strong> Its \"fit\" stores the context in about 5 ms on every machine. A prediction for one scenario's images takes 0.19 s on the 3090, 0.82 s on the M4 Pro and 1.5 s on the CPU; TabPFN-3.5-Fast is 3 to 4 times faster.</li>\n<li><strong>The encoder is the real cost.</strong> DINOv3-L takes 20 ms per Fabric-sized image on the 3090, 0.23 s on the M4 Pro and 1.1 s on the CPU. For a whole scenario this dominates everything Track B does.</li>\n<li><strong>Time to a working detector is where the tracks differ most.</strong> For all 472 Vial images, the TabPFN pipeline (encode every image, fit, predict) takes about 14 s on the 3090, 2 min on the M4 Pro and 10 min on the CPU. PatchCore takes 18 s, 2.6 min and 2.5 min. EfficientAD-S needs 44 min on the 3090 and, extrapolated from short runs, about 4 h on the M4 Pro and 10 h on the CPU, almost all of it training. So TabPFN's pipeline is slightly faster than PatchCore on the 3090 and the M4 Pro, and far faster than EfficientAD-S everywhere. On the CPU, PatchCore is about 4 times faster, because DINOv3-L at a 512-pixel short side is expensive there; DINOv3-S encodes 10 times faster on the CPU (0.11 s per image) and would close that gap, at some cost in accuracy (dev split).</li>\n<li>Logistic regression is cheaper still to fit and predict, but it needs its regularisation chosen with extra labels to be calibrated (section 5).</li>\n<li>PatchCore on the M4 Pro (all 8 scenarios, dev split) matches the 3090 on pixel metrics (AU-PRO@0.05 0.207 vs 0.202), but its image AUROC is 0.03 lower (0.619 vs 0.652), mostly on Fabric. The likely cause is that its random coreset draw differs between MPS and CUDA; the M4 runs also let unsupported MPS operations fall back to the CPU. EfficientAD-S was only timed on the M4 Pro and the CPU, not evaluated.</li>\n</ul>\n"
+}

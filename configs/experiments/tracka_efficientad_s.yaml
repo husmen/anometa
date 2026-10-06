@@ -1,0 +1,4 @@
+name: tracka-efficientad-s
+track: A
+split: dev
+model: efficientad_s

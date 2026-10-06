@@ -1,0 +1,2 @@
+# Post-freeze tuned PatchCore (docs: protocol): the setting selected on the dev split, evaluated once on lock.
+- {name: lock-tracka-patchcore-512, track: A, model: patchcore, image_size: [512, 512]}

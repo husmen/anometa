@@ -1,0 +1,8 @@
+encoders: [dinov3_s, dinov3_l, siglip2]
+feature_sets: [cls+mean_patch, cls+mean_patch+novelty]
+pca_dims: [16, 32, 64, 128]
+classifiers: [tabpfn, tabpfn_fast, logreg, knn]
+ks: [1, 2, 5]
+one_class_pca_dims:
+  mahalanobis: [16, 32, 64, 128]
+  tabpfn_outlier: [16, 32]

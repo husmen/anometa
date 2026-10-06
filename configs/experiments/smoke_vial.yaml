@@ -1,0 +1,9 @@
+name: smoke_vial
+track: B
+scenarios: [vial]
+seeds: [0, 1]
+encoder: dinov3_s
+features: [cls, mean_patch, novelty]
+pca_dim: 16
+classifier: logreg
+k: 2

@@ -1,0 +1,257 @@
+<div class="page">
+<nav class="toc" aria-label="Contents"><div class="tt">Contents</div><ol>
+<li><a href="#summary">Summary</a></li>
+<li><a href="#data">Data and protocol</a></li>
+<li><a href="#models">Models</a></li>
+<li><a href="#framework">Testing framework</a></li>
+<li><a href="#results">Lock results</a></li>
+<li><a href="#tracka">Pixel-level baselines</a></li>
+<li><a href="#dev">What the dev split showed</a></li>
+<li><a href="#poststudies">Post-freeze studies</a></li>
+<li><a href="#speed">Speed and hardware</a></li>
+<li><a href="#limits">Limitations</a></li>
+<li><a href="#reproduce">Reproduce</a></li>
+<li><a href="#refs">References</a></li>
+</ol></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">TabPFN-3.5 hackathon · few-shot industrial anomaly detection</div>
+<h1>Anometa on MVTec AD 2</h1>
+<p class="lede">Can TabPFN-3.5 turn a handful of labelled defect images into a useful defect detector, using only frozen features from a vision foundation model? We tested this on the 8 scenarios of MVTec AD 2, against supervised and label-free controls and against standard unsupervised baselines, with a protocol that evaluates the final configuration once on held-out data.</p>
+<p class="meta">[AI] Written with AI assistance from the project's run artifacts on 3 October 2026. Every number comes from <code>reports/lock/results.md</code>, the dev report and the <a href="../docs/experiment-log.html">experiment log</a>. Bracketed ranges are 95% bootstrap intervals over seeds and scenes.</p>
+<div class="kpis">
+<div class="kpi"><b>{tab1}</b><span>TabPFN-3.5 lock AUROC with one labelled defect per scenario (logistic regression: {log1})</span></div>
+<div class="kpi"><b>{nll1}</b><span>TabPFN-3.5 balanced NLL at k = 1, against {lnll1} for logistic regression (lower is better)</span></div>
+<div class="kpi"><b>{dl_pro}</b><span>AU-PRO@0.05 of the training-free DINOv3-L distance map (PatchCore: {pc_pro})</span></div>
+<div class="kpi"><b>28 × 1</b><span>frozen configurations, each evaluated once on the lock split</span></div>
+</div>
+</header>
+
+<section id="summary">
+<h2><span class="n">1</span>Summary</h2>
+<ul>
+<li><strong>TabPFN-3.5 beats logistic regression with one labelled defect:</strong> lock AUROC {tab1} against {log1}, a paired difference of {d1}. At k = 2 and k = 5 it leads by about 0.04 ({tab2} vs {log2}, {tab5} vs {log5}), but those intervals include zero. With three budgets tested, the k = 1 result does not survive a Bonferroni correction on its own.</li>
+<li><strong>TabPFN is much better calibrated.</strong> Its probabilities, corrected to a 50/50 prior, have about half the negative log-likelihood of logistic regression at every k. Logistic regression only matches it after its regularisation is tuned with labels that a few-shot user does not have.</li>
+<li><strong>TabPFN ties the label-free controls.</strong> A Mahalanobis distance ({mah}) and TabPFN's own unsupervised outlier score ({tout}) on the same features need no labels and are statistically level with TabPFN at k = 1 to 5. Logistic regression and kNN fall below them. On AD2, a few labels add little over a good novelty score, and TabPFN is the only supervised model here that keeps up.</li>
+<li><strong>The foundation-model features do most of the work.</strong> The training-free DINOv3-L patch distance map ties the best of our pixel-level methods (AU-PRO@0.05 {dl_pro}; PatchCore {pc_pro} at its 256×256 default, {pc512_pro} when tuned to 512×512 on dev; EfficientAD-S {ead_pro}), and its image AUROC ({dl_auc}) is close to TabPFN's at k = 5. Both best maps are above the AD2 paper's best mean, mostly thanks to higher input resolution, and the test sets differ (section 6). This shows promise, not a ranking.</li>
+<li><strong>TabPFN-3.5-Fast matches TabPFN-3.5</strong> within 0.003 AUROC at every k, at about a third of the prediction time.</li>
+<li><strong>Post-freeze studies</strong> (section 8). TabPFN-3.5-Thinking matches local TabPFN-3.5 (AUROC +0.000 at k = 2) at about 200,000 API tokens per fit. Giving TabPFN a few good images under a new light improves its calibration there but not its ranking, because with DINOv3-L features the lighting gap is already only about 0.01 AUROC. A prototype that scores one row per patch gives TabPFN anomaly maps that beat the DINOv3 distance map by 0.06 to 0.07 AU-PRO@0.05 over all 8 scenarios (dev split), and beat logistic regression on the same rows.</li>
+<li><strong>The lock split changed the story.</strong> On the dev split TabPFN and logistic regression looked level, with one scenario (wall plugs) favouring logistic regression. On the untouched lock split that scenario reversed. Small per-scenario differences on AD2 are within scene-sampling noise.</li>
+</ul>
+</section>
+
+<section id="data">
+<h2><span class="n">2</span>Data and protocol</h2>
+<p>MVTec AD 2 <span class="cite">[<a href="#ref-3">3</a>]</span> has 8 industrial scenarios. Each has defect-free training and validation images, a labelled public test set, and private test sets that only MVTec's server scores. The public test images show every scene under regular lighting and under 3 to 6 changed lighting conditions (over- and under-exposure, extra spotlights), which the training images never show. The archives come from MVTec's official download page <span class="cite">[<a href="#ref-4">4</a>]</span> and are never redistributed.</p>
+<figure class="plot">{chart_dataset}<figcaption>Images per scenario. Train and validation hold only normal regular-lit images. The public test set is split by scene into a dev half and a lock half.</figcaption></figure>
+{table_dataset}
+<h3>Dev and lock halves</h3>
+<p>The private test sets need pixel anomaly maps for scoring, and the few-shot method needs labelled defects. So the project splits the public test set once per scenario, by scene, into two halves. All lighting variants of one scene stay in the same half, so the same defect never appears in both. The dev half is for every experiment and every model choice. The lock half is evaluated once, after the final configuration is committed.</p>
+<figure class="plot">{diag_split}<figcaption>Shots come only from regular-lit dev defect images. When a shot is taken from a scene, every image of that scene leaves the dev evaluation set. The lock set is never used for shots.</figcaption></figure>
+<figure class="plot">{diag_timeline}</figure>
+</section>
+
+<section id="models">
+<h2><span class="n">3</span>Models</h2>
+<p>The project has two tracks. Track B is the subject: frozen image features, a short table per image, and a few-shot classifier. Track A holds the standard unsupervised baselines, which train on normal images only and produce pixel anomaly maps.</p>
+<h3>Frozen vision encoders</h3>
+<p>Three vision transformers <span class="cite">[<a href="#ref-14">14</a>]</span> were tested: DINOv3 <span class="cite">[<a href="#ref-6">6</a>]</span> ViT-S/16 and ViT-L/16, and SigLIP2 <span class="cite">[<a href="#ref-7">7</a>]</span> so400m/16 (NaFlex). DINOv3 adds 4 register tokens <span class="cite">[<a href="#ref-15">15</a>]</span> next to the CLS token. None of the encoders is fine-tuned. DINOv3-L was best for every classifier on the dev split and is used in the final configuration. Encoders run in bfloat16 on CUDA, because float16 overflows in DINOv3-L.</p>
+<figure class="plot">{diag_encoder}</figure>
+<h3>From an image to one table row</h3>
+<p>Each image becomes one short row of numbers. The CLS token and the mean of all patch tokens describe the whole image. A PCA, fitted on the training normals only, compresses them to 16 to 128 values. Two novelty values describe local defects: each patch of the image gets the distance to its nearest patch among all training normals, and the largest of these distances and the mean of the top 1% are kept. Training images get leave-one-image-out novelty, so that normal training rows and normal test rows are scored the same way. The final configuration uses DINOv3-L, CLS + mean patch with PCA 16, plus the 2 novelty values: 18 columns.</p>
+<figure class="plot">{diag_trackb}</figure>
+<h3>TabPFN-3.5</h3>
+<p>TabPFN <span class="cite">[<a href="#ref-1">1</a>, <a href="#ref-8">8</a>, <a href="#ref-9">9</a>]</span> is a transformer pre-trained on millions of synthetic tables to do supervised learning in context. At use time it receives the labelled rows and the test rows together and outputs class probabilities in one forward pass, with no gradient updates. Its layers alternate attention across the features of a row and attention across rows, where test rows read the labelled context rows <span class="cite">[<a href="#ref-8">8</a>]</span>. TabPFN on frozen embeddings of images and text has been shown to be accurate and well calibrated <span class="cite">[<a href="#ref-2">2</a>]</span>; this project tests that idea on few-shot industrial anomaly detection. Here the context is about 300 normal rows (label 0) and k defect rows (label 1) per scenario.</p>
+<figure class="plot">{diag_tabpfn}<figcaption>Because normal rows outnumber defect rows by about 300 to k, raw probabilities are small. They are rescaled to a 50/50 prior <span class="cite">[<a href="#ref-18">18</a>]</span> before calibration is measured; ranking metrics are not affected.</figcaption></figure>
+<p>Variants used:</p>
+<ul>
+<li><strong>TabPFN-3.5</strong> and <strong>TabPFN-3.5-Fast</strong> <span class="cite">[<a href="#ref-1">1</a>]</span>, local weights, default settings in the final configuration. Each process loads a checkpoint once and reuses it, which cut a fit from 911 ms to 11 ms.</li>
+<li><strong>TabPFN outlier score</strong> (tabpfn-extensions, unsupervised): it estimates how likely a row is under the normal rows by the chain rule, with TabPFN regressors that predict each feature from the features before it, averaged over random feature orders. It uses no defect labels.</li>
+<li><strong>Context size</strong> (<code>n_normals: 32</code>): the same classifier with only 32 normal rows in its context. Added after a dev probe; tested once on lock.</li>
+<li>TabPFN-3.5-Thinking (API, with a disk cache) ran only as a post-freeze ablation at k = 2 (section 8); it is not part of the lock results.</li>
+</ul>
+<h3>Controls</h3>
+<ul>
+<li><strong>Logistic regression</strong> on standardised features, default C = 1. Same rows, same shots.</li>
+<li><strong>kNN</strong> on standardised features, 5 neighbours.</li>
+<li><strong>Mahalanobis distance</strong> to the normal rows <span class="cite">[<a href="#ref-13">13</a>]</span>, with a Ledoit-Wolf covariance <span class="cite">[<a href="#ref-22">22</a>]</span>. It uses no labels.</li>
+</ul>
+<h3>Track A: unsupervised baselines with anomaly maps</h3>
+<figure class="plot">{diag_tracka}</figure>
+<p>PatchCore <span class="cite">[<a href="#ref-10">10</a>]</span> and EfficientAD-S <span class="cite">[<a href="#ref-11">11</a>]</span> come from anomalib <span class="cite">[<a href="#ref-5">5</a>]</span> with the AD2 paper's stated settings <span class="cite">[<a href="#ref-3">3</a>]</span>: 256×256 input, PatchCore with a WideResNet-50 <span class="cite">[<a href="#ref-16">16</a>]</span> backbone and a 1% coreset, EfficientAD-S trained for 70,000 steps with Imagenette as its penalty set, instead of the ImageNet that the original method uses. These are the frozen settings. After the freeze, a declared dev-split sweep tuned PatchCore's input size and coreset ratio; the selected 512×512 setting was then evaluated once on lock as a separate row. EfficientAD-S was not tuned. The DINOv3 patch distance map needs no training: it reuses the patch distances already computed for the novelty features.</p>
+</section>
+
+<section id="framework">
+<h2><span class="n">4</span>Testing framework</h2>
+<p>Every experiment goes through one function, <code>run_experiment(config) → result</code>, called by the command line, the search tools and the demo. A run writes <code>artifacts/&lt;name&gt;-&lt;config hash&gt;/</code> with a manifest (git commit, dataset and split hashes, model revisions, licences, hardware, versions), the metrics and every per-image prediction. Interrupted runs resume; complete dev runs are reused; lock runs can never run twice.</p>
+<h3>Seeds and shots</h3>
+<ul>
+<li>Each Track B configuration runs 10 seeds per scenario. A seed draws the k shots from the regular-lit dev defect images. Draws are nested: the k = 1 shot is the first of the k = 5 shots for the same seed.</li>
+<li>Two classifiers at the same k and seed see exactly the same shots and are scored on exactly the same images, so their results can be compared pair by pair.</li>
+</ul>
+<h3>Metrics</h3>
+<ul>
+<li><strong>Image level:</strong> AUROC (main metric) and AUPRC. Calibration: expected calibration error (ECE) <span class="cite">[<a href="#ref-17">17</a>]</span>, negative log-likelihood (NLL) and Brier score, each also after correcting the probabilities to a 50/50 prior <span class="cite">[<a href="#ref-18">18</a>]</span> (the <em>balanced</em> versions).</li>
+<li><strong>Robustness gap:</strong> the metric on regular-lit images minus the same metric on shifted lighting.</li>
+<li><strong>Pixel level</strong> (Track A): AU-PRO up to a false-positive rate of 0.05 and 0.30 (the area under the per-region overlap curve, normalised) <span class="cite">[<a href="#ref-12">12</a>, <a href="#ref-3">3</a>]</span>, SegF1 and ClassF1 at one threshold per scenario: the mean plus 3 standard deviations of the defect-free validation maps <span class="cite">[<a href="#ref-3">3</a>]</span>.</li>
+</ul>
+<h3>Uncertainty</h3>
+<figure class="plot">{diag_stats}<figcaption>Bootstrap <span class="cite">[<a href="#ref-23">23</a>]</span> over seeds and scenes. The same draws feed both methods in a paired comparison, so the interval reflects the noise in the difference, not in each method alone.</figcaption></figure>
+<h3>Searching on dev</h3>
+<ul>
+<li><strong>Grid:</strong> 3 encoders × 2 feature sets × 4 PCA sizes × 4 classifiers × 3 values of k, plus a novelty-only ablation and the label-free controls (366 runs).</li>
+<li><strong>Optuna</strong> <span class="cite">[<a href="#ref-19">19</a>]</span> <strong>TPE</strong> <span class="cite">[<a href="#ref-20">20</a>]</span> and a <strong>TabPFN-surrogate Bayesian optimiser</strong> (TabPFN regression predicts the AUROC of untried configurations), 60 trials, 3 seeds each.</li>
+<li><strong>NSGA-II</strong> <span class="cite">[<a href="#ref-21">21</a>]</span>, 200 trials, AUROC against balanced ECE.</li>
+</ul>
+<h3>Guardrails against leakage</h3>
+<ul>
+<li>No feature, hyperparameter or split choice uses lock results. Searches never see lock labels.</li>
+<li>The order is fixed: dev experiments, then a commit that freezes the configurations, then one lock run.</li>
+<li>Every attempt, including failed ones, is appended to <code>runs.jsonl</code>.</li>
+</ul>
+<p>In total {dev_runs} dev runs were recorded before and around the freeze.</p>
+</section>
+
+<section id="results">
+<h2><span class="n">5</span>Lock results</h2>
+<p>All results in this section come from the single lock evaluation of the frozen configuration: DINOv3-L, CLS + mean patch, PCA 16, plus novelty, default settings, 10 seeds, all 8 scenarios.</p>
+<figure class="plot">{chart_budget}<figcaption>Lock AUROC against the number of shots. Bars are 95% intervals. Dashed and dotted lines are methods that use no labels at all.</figcaption></figure>
+{table_lock}
+<h3>Paired comparisons</h3>
+<figure class="plot">{chart_forest}<figcaption>TabPFN-3.5 minus each other method, scored on the same images. Orange: the interval excludes zero.</figcaption></figure>
+{table_paired}
+<div class="callout"><p><strong>Reading the k = 1 result.</strong> The interval [+0.009, +0.146] excludes zero, and 99% of the bootstrap draws favour TabPFN. With three pre-declared budgets, a Bonferroni-corrected one-sided threshold of about 0.8% is not met (about 1% of draws fall at or below zero). Report it as significant before correction.</p></div>
+<h3>Calibration</h3>
+<figure class="plot">{chart_calibration}</figure>
+<figure class="plot narrow">{chart_reliability}<figcaption>Dot size grows with the number of images in a bin. A calibrated model follows the dashed diagonal. TabPFN (orange) stays closest to it; kNN (grey) puts nearly all images in two extreme bins.</figcaption></figure>
+{table_calib}
+<p>TabPFN's probabilities are much closer to the observed defect rates than those of logistic regression and kNN at every k. This is against logistic regression at its default regularisation. On the dev split, a strongly regularised logistic regression (C ≈ 0.007) reached better calibration and AUROC than TabPFN, but that C was chosen with dev labels from all 8 scenarios.</p>
+<h3>Per scenario</h3>
+<figure class="plot"><div class="scroll">{chart_scenarios}</div><figcaption>Can stays near chance (0.46 to 0.55) for every method, and Fabric and Wall Plugs are also hard. The AD2 paper lists allowed variation in these scenarios (a randomly rotated can with glitter foil, a changing number and position of wall plugs, a fabric pattern that varies in orientation), which a whole-image embedding can mistake for a defect.</figcaption></figure>
+<h3>Ablations on lock</h3>
+<ul>
+<li><strong>32 normals in context</strong> lowered AUROC by 0.02 to 0.03 and improved calibration only at k = 1. The dev gain did not replicate.</li>
+<li><strong>Shots from every lighting</strong> (k = 10 and 20): TabPFN and logistic regression tie (about 0.78 to 0.79).</li>
+</ul>
+</section>
+
+<section id="tracka">
+<h2><span class="n">6</span>Pixel-level baselines (Track A)</h2>
+<figure class="plot">{chart_tracka}</figure>
+{table_tracka}
+<figure class="plot"><div class="scroll">{chart_tracka_scen}</div></figure>
+<h3>What the maps look like</h3>
+<p>One lock defect image per scenario, regular lighting. The DINOv3-L map is computed at 16-pixel patch resolution, the other two at 256×256.</p>
+{examples}
+<h3>Against the MVTec AD 2 paper</h3>
+<p>AU-PRO@0.05 in %. Ours: the lock half of the public test set, all lighting conditions pooled. Paper: Table VII of Heckler-Kram et al. <span class="cite">[<a href="#ref-3">3</a>]</span>, the private test set under regular lighting, scored by MVTec's server. "Best in paper" is the best of 7 methods (PatchCore, RD, RD++, EfficientAD, MSFlow, SimpleNet, DSR). Bold marks the highest of our two best maps and the paper's best.</p>
+{table_paper}
+<ul>
+<li>Our two best maps tie on the mean: the training-free DINOv3-L distance map and PatchCore at 512×512, tuned on the dev split after the freeze (38.5 each). Between them they beat the paper's best method on 6 of 8 scenarios and lose on Can and Fruit Jelly. They are complementary: the distance map wins on Rice, Sheet Metal and Vial, PatchCore on the other five.</li>
+<li>At the frozen 256×256 default, our PatchCore scores below the paper's on 6 of 8 scenarios. The dev-split sweep showed that resolution drives most of that gap: at 512×512 its lock mean rises from 22.2 to 38.5. The paper ran PatchCore at 256×256, so this shows the effect of resolution, not a better PatchCore. EfficientAD-S was not tuned and stays below the paper on 7 of 8 scenarios.</li>
+<li>The test sets differ (public vs private, pooled vs regular lighting) and the lock sets are small, so this is not a ranking. A conclusive comparison needs the private test set, scored through MVTec's server.</li>
+</ul>
+</section>
+
+<section id="dev">
+<h2><span class="n">7</span>What the dev split showed</h2>
+<h3>Searches converge on one basin</h3>
+<figure class="plot">{chart_search}<figcaption>Both optimisers reach about 0.747 at k = 2, always with logistic regression, DINOv3-L and CLS + mean patch + novelty. The search space has one dominant basin, so it cannot separate the two optimisers.</figcaption></figure>
+<h3>Dev against lock</h3>
+<div class="two">
+<figure class="plot">{chart_devlock}</figure>
+<div>
+<p>The dev half evaluates only the scenes left after the shots are drawn; the lock half evaluates all of its scenes. With 7 to 8 defect scenes per half and scenario, scenario-level AUROC moves by 0.1 to 0.2 between halves.</p>
+<p>On dev, TabPFN's scores followed a distance-to-normal score closely (Spearman 0.57 to 0.91 against Mahalanobis), and on Wall Plugs that pattern cost it. On lock, Wall Plugs favoured TabPFN (0.61 to 0.66 against 0.43 to 0.48). The lock split did its job: a dev-only story did not survive.</p>
+</div>
+</div>
+<h3>Tried and dropped</h3>
+<ul>
+<li>A rank average of TabPFN and logistic regression: no gain on dev.</li>
+<li>Larger TabPFN ensembles (<code>n_estimators</code>): scores barely changed.</li>
+<li>32 normals in context: better dev calibration, but no gain on lock.</li>
+</ul>
+</section>
+
+<section id="poststudies">
+<h2><span class="n">8</span>Post-freeze studies</h2>
+<p>Two experiments run after the single lock evaluation. They are not part of the lock benchmark, and neither changes the frozen configuration.</p>
+<h3>Can TabPFN adapt to new lighting in context?</h3>
+<p>A factory changes its lighting. Photographing a few good parts under the new light is cheap; labelling defects is not. The question: if m such images join TabPFN's context, does detection under that light improve, without any retraining? The protocol was committed before any run. Whole scenes rotate between context and evaluation over every public test scene (10 folds per scenario, dev and lock halves together), so no scene is ever both in the context and scored, under any lighting. Everything else is the frozen configuration.</p>
+<figure class="plot">{chart_lighting}<figcaption>Each point is the mean over every shifted (scenario, lighting) pair and 10 folds. Left: ranking barely moves for any model. Right: TabPFN's calibration improves with each adaptation scene; logistic regression stays far worse calibrated, and kNN (about 8) is off the scale.</figcaption></figure>
+{table_lighting}
+<ul>
+<li><strong>The primary hypothesis is not supported:</strong> two adaptation scenes change TabPFN's AUROC under shifted lighting by +0.002, within noise. There is little to recover: with DINOv3-L features the lighting gap is only about 0.01 AUROC for TabPFN (0.735 regular, 0.727 shifted) and zero for logistic regression.</li>
+<li><strong>Calibration does improve:</strong> balanced NLL under shifted lighting drops by 0.05 (k = 2) to 0.065 (k = 1), a clear and consistent gain.</li>
+<li>Under shifted light, TabPFN beats Mahalanobis by 0.045 AUROC and leads logistic regression by 0.015 to 0.025 (intervals touch zero), with far better calibration.</li>
+<li>The hardest conditions for TabPFN are <code>shift_3</code> (0.701) and <code>shift_1</code> (0.710), against 0.735 under regular light.</li>
+<li>The six <code>tabpfn_outlier</code> runs (18 features, one regressor refit per feature) took 4 to 15 hours each. They show no lighting gap either (shifted AUROC 0.709 to 0.713), and TabPFN-3.5 leads the outlier score at m = 2 by +0.016 (k = 2) and +0.012 (k = 1); both intervals include zero.</li>
+</ul>
+<h3>Does TabPFN-3.5-Thinking help?</h3>
+<p>TabPFN-3.5-Thinking, available only through the Prior Labs API, spends extra compute at prediction time to optimise a chosen metric (here AUROC, medium effort). Pre-declared comparison on the dev split, frozen configuration, k = 2, seeds 0 to 4, all 8 scenarios, against local TabPFN-3.5 on the same images:</p>
+<div class="tw"><table><thead><tr><th>Thinking minus</th><th>AUROC</th><th>balanced NLL</th></tr></thead><tbody>
+<tr><td>local TabPFN-3.5</td><td>+0.000 <span class="ci">[−0.011, +0.012]</span></td><td>+0.011 <span class="ci">[−0.011, +0.031]</span></td></tr>
+<tr><td>logistic regression</td><td>−0.034 <span class="ci">[−0.091, +0.019]</span></td><td><strong>−0.31 <span class="ci">[−0.48, −0.14]</span></strong></td></tr>
+</tbody></table></div>
+<ul>
+<li>Thinking gives the same ranking and calibration as local TabPFN-3.5 (scenario by scenario within 0.02 AUROC), at about 200,000 API tokens per fit. With only two defect rows in the context, the extra compute has little to work with; local TabPFN-3.5 is the better choice here.</li>
+<li>Seeds 5 to 9 and the k = 1 and k = 5 budgets wait for more API budget.</li>
+</ul>
+<h3>TabPFN maps from one row per patch (prototype)</h3>
+<p>Instead of one row per image, each DINOv3 patch (16×16 pixels at a 512-pixel short side, about 1,300 per image) becomes one row: PCA-32 of its patch token, its DINOv3 nearest-patch distance, the PatchCore map averaged over the patch, and the 3×3 maxima of both maps. Defect masks label the patches of the k shot images; half of the validation images give the normal rows. TabPFN scores every patch of every evaluation image, and the scores form an anomaly map. Rows are patches, not pixels: a 2448×2048 image has 5 million pixels but the features only exist per patch, so the map is upsampled like Track A's. Dev split only, all 8 scenarios, 3 seeds, k = 2 and 5. Intervals resample (scenario, seed) units.</p>
+<figure class="plot">{chart_trackc}<figcaption>All methods are scored on the same dev images with the same threshold rule. Fruit Jelly at k = 5 keeps only 3 defect scenes for evaluation.</figcaption></figure>
+<figure class="plot">{chart_trackc2}</figure>
+{table_trackc}
+<ul>
+<li><strong>TabPFN learns a better map than its inputs.</strong> Over all 8 scenarios, TabPFN-Fast's map beats the DINOv3 distance map by 0.056 (k = 2) and 0.071 (k = 5) AU-PRO@0.05, the unsupervised fusion by 0.09 to 0.12, and logistic regression on the same rows by 0.02 to 0.07; every interval excludes zero. It is the strongest TabPFN-specific result of the project.</li>
+<li><strong>With PatchCore tuned to 512×512</strong> (post-freeze rerun), TabPFN-Fast's map barely changes (0.452 and 0.470 at k = 2 and 5). It still beats the distance map (+0.059, +0.073) and the tuned PatchCore (+0.12, +0.17). The label-free fusion of the two tuned maps gets much stronger: it ties TabPFN-Fast at k = 2 (+0.018, interval includes zero), while TabPFN leads at k = 5 (+0.057).</li>
+<li><strong>Largest gains</strong> at k = 5: Wall Plugs 0.006 → 0.20, Sheet Metal 0.55 → 0.72, Walnuts 0.50 → 0.64. Vial, saturated for the DINOv3 distance (0.87), is the one clear loss (0.83).</li>
+<li><strong>Caveats:</strong> dev split only, 3 seeds; the patch labelling rule was changed once, after a crash on Can (its defects are smaller than 30% of any patch), not after looking at scores. Confirming it would need its own frozen protocol and held-out data.</li>
+<li>Cost on the 3090: 15 to 30 s per scenario with TabPFN-3.5-Fast for 100,000 to 250,000 scored patches and a context of about 18,000 rows.</li>
+<li>A threshold rule made for distances (validation mean + 3 standard deviations) suits probability maps poorly, so SegF1 often drops; a probability threshold is the next step.</li>
+</ul>
+<figure class="plot narrow-wide"><img src="{trackc_example}" alt="One defect image per scenario with three anomaly maps: DINOv3 distance, PatchCore and TabPFN-Fast" style="width:100%;height:auto;display:block"><figcaption>One example per scenario, chosen by a fixed rule: among the dev defect images under regular lighting, keep the larger half by defect area, then take the one where TabPFN-Fast's map has the highest pixel AUROC (k = 5, seed 0). These are good cases for TabPFN, not typical ones; each panel shows its own pixel AUROC. TabPFN's maps suppress the background far more than the inputs, and on Wall Plugs it finds a defect the other maps miss (pixel AUROC 1.00 vs 0.71 and 0.07). Median pixel AUROC over the same candidates (DINOv3 distance / PatchCore / TabPFN-Fast): Can 0.98 / 0.67 / 0.73 · Fabric 0.92 / 0.82 / 0.93 · Fruit Jelly 0.85 / 0.83 / 0.75 · Rice 0.99 / 0.79 / 1.00 · Sheet Metal 0.96 / 0.76 / 0.99 · Vial 0.93 / 0.87 / 0.95 · Wallplugs 0.83 / 0.52 / 0.99 · Walnuts 1.00 / 1.00 / 1.00. On Can and Fruit Jelly the plain distance map is better per image; the AU-PRO table above remains the fair summary.</figcaption></figure>
+</section>
+
+<section id="speed">
+<h2><span class="n">9</span>Speed and hardware</h2>
+{hw_text}
+<figure class="plot">{chart_hardware}</figure>
+{table_hw}
+<h3>Same results on every machine</h3>
+<p>All 20 frozen Track B configurations were rerun on the dev split on the M4 Pro (MPS) and on the Ryzen 7 7700 with the GPU hidden, from the same cached features. Logistic regression, kNN and Mahalanobis give identical scores everywhere. TabPFN's scores move by at most 0.005 AUROC on the M4 Pro and 0.001 on the CPU, and every interval includes zero.</p>
+<figure class="plot">{chart_xhw}</figure>
+</section>
+
+<section id="limits">
+<h2><span class="n">10</span>Limitations</h2>
+<ul>
+<li>Lock numbers use half of AD2's public test set, so they are not directly comparable with published AD2 results, which use the private test sets (see section 6).</li>
+<li>EfficientAD-S runs with fixed default settings. PatchCore was tuned only for input size and coreset ratio, on the dev split after the freeze; larger inputs than 512×512 were not tried.</li>
+<li>Lock sets are small: 7 defect scenes and 2 to 6 good scenes per scenario, each under 4 to 7 lighting conditions. Intervals are wide.</li>
+<li>The lock evaluation covers TabPFN image scores only. TabPFN anomaly maps exist only as a dev-split prototype (section 8) without a frozen protocol or lock evaluation.</li>
+<li>Track A runs at 256×256 (as in the AD2 paper), except the tuned PatchCore at 512×512; Track B encodes images at a 512-pixel short side. Image-level comparisons across tracks mix these settings.</li>
+<li>SegF1 is pooled over all images of a scenario, which is our reading of the metric.</li>
+</ul>
+</section>
+
+<section id="reproduce">
+<h2><span class="n">11</span>Reproduce</h2>
+<p>Python 3.14 with uv. TabPFN-3.5 weights need the licence accepted on platform.priorlabs.ai and <code>TABPFN_TOKEN</code>; DINOv3 needs gated Hugging Face access, or the ungated timm copies (equivalent within noise, measured). MVTec AD 2 is CC BY-NC-SA 4.0 and is downloaded from the official links <span class="cite">[<a href="#ref-4">4</a>]</span> with pinned SHA-256 hashes.</p>
+<div class="tw"><table><tbody>
+<tr><td>install and test</td><td><code>uv sync --extra dashboard &amp;&amp; uv run pytest</code></td></tr>
+<tr><td>data and splits</td><td><code>uv run anometa download</code> · <code>uv run anometa split</code></td></tr>
+<tr><td>features</td><td><code>uv run anometa extract --encoder dinov3_l</code></td></tr>
+<tr><td>dev grid and searches</td><td><code>uv run anometa grid configs/search/grid.yaml</code> · <code>anometa optuna tpe --trials 60</code> · <code>anometa bo --trials 60</code></td></tr>
+<tr><td>lock evaluation (once)</td><td><code>uv run anometa lock configs/frozen</code></td></tr>
+<tr><td>reports</td><td><code>uv run anometa report --split lock</code></td></tr>
+</tbody></table></div>
+</section>
+
+<section id="refs">
+<h2><span class="n">12</span>References</h2>
+{refs}
+</section>
+<footer>[AI] Generated with AI assistance from Anometa's artifacts. Code: Apache-2.0. MVTec AD 2: CC BY-NC-SA 4.0. TabPFN-3.5 weights: non-commercial licence. Built with DINOv3 under the DINOv3 License.</footer>
+</main>
+</div>

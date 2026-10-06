@@ -218,6 +218,17 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Anometa runtime data (never committed)
-data/
-cache/
-artifacts/
+/data/
+/cache/
+/artifacts/
+
+# Explainer video outputs (wav, mp4, srt)
+/docs/video/out/
+
+# Planning files: local-only, never tracked
+/docs/plans/
+/docs/wayfinder/
+/docs/HACKATHON.md
+
+# Browser automation screenshots
+/.playwright-mcp/

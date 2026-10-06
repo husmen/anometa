@@ -1,0 +1,95 @@
+/* Layout: one reading column with a sticky contents rail on wide screens; figures may run wider than the text. */
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --ink: #17202b; --muted: #586474; --rule: #dbe1e8; --accent: #b86200;
+  --c-tab: #d97706; --c-fast: #e9a93a; --c-n32: #9a5b13; --c-log: #2f68ad; --c-knn: #8b95a3;
+  --c-ref: #0d8587; --c-dl: #2c8a52; --c-ds: #74b48b; --c-pc: #7650bf; --c-ead: #be3f77;
+  --heat: #0d8587; --dev: #e3edf8; --lock: #fbeedd; --shot: #fde2c0; --node: #ffffff; --node-alt: #eef1f5;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10151c; --surface: #171e27; --ink: #e5eaf0; --muted: #9ba7b5; --rule: #2a3542; --accent: #f2a43a;
+  --c-tab: #f59e0b; --c-fast: #f7c46b; --c-n32: #c98a3c; --c-log: #6aa2e8; --c-knn: #8f9aa9;
+  --c-ref: #3cc2c4; --c-dl: #52c07f; --c-ds: #8ed3a6; --c-pc: #a98bf0; --c-ead: #ec79a9;
+  --heat: #3cc2c4; --dev: #1b2a3c; --lock: #3a2a14; --shot: #4a3214; --node: #1c2530; --node-alt: #222c38; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #171e27; --ink: #e5eaf0; --muted: #9ba7b5; --rule: #2a3542; --accent: #f2a43a;
+  --c-tab: #f59e0b; --c-fast: #f7c46b; --c-n32: #c98a3c; --c-log: #6aa2e8; --c-knn: #8f9aa9;
+  --c-ref: #3cc2c4; --c-dl: #52c07f; --c-ds: #8ed3a6; --c-pc: #a98bf0; --c-ead: #ec79a9;
+  --heat: #3cc2c4; --dev: #1b2a3c; --lock: #3a2a14; --shot: #4a3214; --node: #1c2530; --node-alt: #222c38; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); margin: 0 }
+.page { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px }
+@media (min-width: 1100px) { .page { grid-template-columns: 220px minmax(0, 1fr) } }
+nav.toc { display: none }
+@media (min-width: 1100px) { nav.toc { display: block; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; font-size: 14px; line-height: 1.5 } }
+nav.toc ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px }
+nav.toc a { color: var(--muted); text-decoration: none } nav.toc a:hover, nav.toc a:focus-visible { color: var(--accent) }
+nav.toc .tt { font: 600 13px/1 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px }
+main { min-width: 0; max-width: 900px }
+header.hero { padding-block: 8px 20px; border-bottom: 1px solid var(--rule); margin-bottom: 8px }
+.eyebrow { font: 600 14px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--accent) }
+h1 { font: 700 clamp(40px, 6vw, 64px)/1.02 var(--display); letter-spacing: -.01em; margin: 12px 0 14px; text-wrap: balance }
+h2 { font: 700 34px/1.1 var(--display); margin: 56px 0 10px; text-wrap: balance; scroll-margin-top: 16px }
+h2 .n { color: var(--accent); margin-right: 10px; font-variant-numeric: tabular-nums }
+h3 { font: 600 23px/1.2 var(--display); margin: 34px 0 6px; letter-spacing: .01em; text-wrap: balance }
+p, li { max-width: 68ch } p { margin: 10px 0 } ul, ol { padding-left: 22px }
+.lede { font-size: 19.5px; color: var(--ink); max-width: 66ch }
+.meta { color: var(--muted); font-size: 14.5px }
+a { color: var(--accent) } a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+code { font: 14px var(--mono); background: var(--node-alt); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 22px 0 6px }
+.kpi { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; min-width: 0 }
+.kpi b { display: block; font: 700 34px/1 var(--display); color: var(--accent); font-variant-numeric: tabular-nums }
+.kpi span { display: block; color: var(--muted); font-size: 14.5px; margin-top: 6px; line-height: 1.4 }
+figure { margin: 22px 0; min-width: 0 }
+figure.plot { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 14px 8px }
+figcaption { color: var(--muted); font-size: 14.5px; margin-top: 8px; max-width: 80ch }
+.scroll { overflow-x: auto } .scroll img { max-width: none; height: 230px; display: block; border-radius: 4px }
+.ex { margin: 16px 0 }
+.two { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px } @media (min-width: 820px) { .two { grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr) } }
+svg.chart, svg.diagram { width: 100%; height: auto; display: block; overflow: visible }
+svg text { font-family: var(--body) }
+.ax { fill: var(--muted); font-size: 12px } .axl { fill: var(--ink); font-size: 13px; font-weight: 600 }
+.lab { fill: var(--ink); font-size: 12.5px } .num { fill: var(--ink); font: 11.5px var(--mono); font-variant-numeric: tabular-nums }
+.hd { fill: var(--ink); font: 700 14px var(--display); letter-spacing: .04em; text-transform: uppercase }
+.grid { stroke: var(--rule); stroke-width: 1 } .zero { stroke: var(--ink); stroke-width: 1.4 }
+.diag { stroke: var(--muted); stroke-dasharray: 4 4 }
+.ln { fill: none; stroke-width: 2.2 } .ln.thin { stroke-width: 1; opacity: .35 } .ci { stroke-width: 2; opacity: .7 } .pt { stroke: var(--surface); stroke-width: 1.5 }
+.s-tab { stroke: var(--c-tab); fill: var(--c-tab) } .s-fast { stroke: var(--c-fast); fill: var(--c-fast) } .s-n32 { stroke: var(--c-n32); fill: var(--c-n32) }
+.s-log { stroke: var(--c-log); fill: var(--c-log) } .s-knn { stroke: var(--c-knn); fill: var(--c-knn) }
+.s-dl { fill: var(--c-dl); stroke: var(--c-dl) } .s-ds { fill: var(--c-ds); stroke: var(--c-ds) } .s-pc { fill: var(--c-pc); stroke: var(--c-pc) } .s-ead { fill: var(--c-ead); stroke: var(--c-ead) }
+.ln.s-tab, .ln.s-fast, .ln.s-n32, .ln.s-log, .ln.s-knn { fill: none } .s-n32.ln { stroke-dasharray: 5 4 }
+.s-tab-t { fill: var(--c-tab) } .s-log-t { fill: var(--c-log) } .s-dl-t { fill: var(--c-dl) } .s-pc-t { fill: var(--c-pc) } .s-ead-t { fill: var(--c-ead) }
+.bar { stroke: none }
+.ref-a, .ref-b { stroke: var(--c-ref); stroke-width: 1.6; stroke-dasharray: 6 4 } .ref-b { stroke-dasharray: 2 3 }
+.ref-c { stroke: var(--c-dl); stroke-width: 1.6; stroke-dasharray: 6 4 } .ref-d { stroke: var(--c-pc); stroke-width: 1.4; stroke-dasharray: 2 3 } .ref-e { stroke: var(--c-ead); stroke-width: 1.4; stroke-dasharray: 2 3 }
+.ref-a-t, .ref-b-t { fill: var(--c-ref); font-size: 11.5px } .ref-c-t { fill: var(--c-dl); font-size: 11.5px } .ref-d-t { fill: var(--c-pc); font-size: 11.5px } .ref-e-t { fill: var(--c-ead); font-size: 11.5px }
+.fp { stroke: var(--c-knn); fill: var(--c-knn) } .fp.sig { stroke: var(--c-tab); fill: var(--c-tab) } .sigt { fill: var(--accent); font-weight: 600 }
+.hc { fill: var(--heat) }
+.d-train { fill: var(--c-knn); opacity: .55 } .d-val { fill: var(--c-knn); opacity: .3 } .d-devg { fill: var(--c-log); opacity: .5 } .d-devb { fill: var(--c-log) }
+.d-lockg { fill: var(--c-tab); opacity: .5 } .d-lockb { fill: var(--c-tab) }
+.node { fill: var(--node); stroke: var(--muted); stroke-width: 1.1 } .node.alt { fill: var(--node-alt) } .node.enc { fill: var(--node-alt); stroke: var(--accent) }
+.node.dev { fill: var(--dev) } .node.lockn { fill: var(--lock); stroke: var(--accent) } .node.shot { fill: var(--shot) } .node.fit { fill: var(--node-alt) }
+.node.row { fill: var(--shot); stroke: var(--accent) } .node.inner { fill: var(--surface) }
+.nt { fill: var(--ink); font-size: 13px; font-weight: 600 } .ns { fill: var(--muted); font-size: 11.5px }
+.edge { stroke: var(--muted); stroke-width: 1.4 } .edge.faint { stroke-dasharray: 4 3; opacity: .7 } .ahead { fill: var(--muted) }
+.cell { stroke: var(--rule); stroke-width: 1 } .cell.ctx { fill: var(--node-alt) } .cell.shot { fill: var(--shot) } .cell.test { fill: var(--dev) }
+.tw { overflow-x: auto; margin: 16px 0 }
+table { border-collapse: collapse; font-size: 15px; min-width: 100%; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px }
+th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top }
+th { font: 600 13px var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap }
+td { font-variant-numeric: tabular-nums } td strong { color: var(--accent) } .ci { color: var(--muted); font-size: 13px; white-space: nowrap }
+tbody tr:last-child td { border-bottom: 0 }
+.callout { border-left: 3px solid var(--accent); background: var(--surface); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 18px 0 }
+.callout p { margin: 4px 0 }
+.note { color: var(--muted); font-size: 14.5px }
+.refs { font-size: 15px } .refs li { margin: 6px 0 } .refs .src { color: var(--muted) }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 14px }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important } }
+figure.plot.narrow { max-width: 460px }
+.ex img { display: block; width: 100%; height: auto; border-radius: 6px }
+.s-ref { stroke: var(--c-ref); fill: var(--c-ref) } .ln.s-ref { fill: none }
+figure.plot.narrow-wide { max-width: 700px; margin-inline: auto }
+.cite { white-space: nowrap; font-size: .92em } .cite a { text-decoration: none } ol.refs li:target { background: var(--shot); border-radius: 4px }

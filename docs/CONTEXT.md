@@ -66,6 +66,10 @@ _Avoid_: TabPFN track, supervised AD
 Mask-supervised few-shot patch classification: a classifier trained on frozen foundation-model patch features, labelled from the ground-truth masks of the k few-shot anomalies, outputting an anomaly map.
 _Avoid_: patch-level Track B, supervised segmentation
 
+**Track D**:
+Unsupervised patch classification: a classifier trained on frozen foundation-model patch features of defect-free images only, with artificial anomalies (perturbed features or synthetic defects) as the positive class, outputting an anomaly map. It follows the benchmark's unsupervised protocol, unlike Track C.
+_Avoid_: unsupervised Track C, self-supervised TabPFN
+
 **Patch label**:
 The normal/anomalous label of one patch, derived from how much of it a ground-truth mask covers.
 _Avoid_: pixel label, patch target
