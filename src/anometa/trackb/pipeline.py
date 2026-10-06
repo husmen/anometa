@@ -149,7 +149,7 @@ def context_normals(
     """Pick the train normals a few-shot scorer fits on.
 
     TabPFN's predictions are better calibrated with fewer normals in its
-    context (PLAN_1 § Track B), so `n_normals` draws a subsample, seeded by
+    context (docs: tracks, Track B), so `n_normals` draws a subsample, seeded by
     `(seed, scenario)` on a stream separate from shot sampling.
 
     Args:

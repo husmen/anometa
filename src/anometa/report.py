@@ -6,7 +6,7 @@ the same evaluation rows, and `fixed_set_budget` compares label budgets on the
 same rows; `build_report` turns that frame (plus each run's
 `predictions.parquet`, the search trial frames and the NSGA-II study) into
 `reports/<split>/results.md`
-and `reports/<split>/figures/*.png`, one section per PLAN_1 question. Figures
+and `reports/<split>/figures/*.png`, one section per research question. Figures
 use matplotlib's object-oriented `Figure` API, so no interactive backend is
 ever loaded.
 """
@@ -362,7 +362,7 @@ def matched_cells(fewshot: pd.DataFrame, metric: str = "auroc") -> pd.DataFrame:
 
 
 def lighting_paired(lighting: pd.DataFrame, n_boot: int = 1000) -> pd.DataFrame:
-    """Run the lighting study's pre-declared paired comparisons (PLAN_1 § Post-freeze study).
+    """Run the lighting study's pre-declared paired comparisons (docs: protocol).
 
     Compares, on shifted-lighting images, TabPFN-3.5 with m adaptation
     scenes against m = 0, and TabPFN-3.5 against each control at the
@@ -707,7 +707,7 @@ def build_report(
 ) -> Path:
     """Write the results page and figures for one split.
 
-    Sections follow PLAN_1's questions: label-budget curves (with the
+    Sections follow the research questions: label-budget curves (with the
     one-class controls scored on the same rows), classifiers per PCA
     dimension, calibration, robustness gap, Track A against Track B, and the
     search comparison. A section whose inputs are missing says so in one line.
@@ -864,7 +864,7 @@ def build_report(
         lines += _section(
             "Lighting adaptation (post-freeze study)",
             [
-                "Separate study (PLAN_1 § Post-freeze study), not part of the lock benchmark. "
+                "Separate, pre-declared study, not part of the lock benchmark. "
                 "Scene-level folds over every public test scene; m = good scenes whose "
                 "target-lit images join the context. `shifted` averages every shifted "
                 "(scenario, lighting) pair; `gap_auroc` is regular minus shifted.",

@@ -1,6 +1,6 @@
 """anomalib PatchCore and EfficientAD-S: model settings, fit and raw anomaly maps.
 
-`build_model` holds the PLAN_1 Track A settings (256x256 input without
+`build_model` holds the Track A settings (256x256 input without
 center crop, no post-processing, so maps stay raw). `fit_predict_anomalib`
 fits one model on a scenario's `train` images and returns its raw maps for
 the `validation` and `test_public` images, at model resolution.
@@ -19,7 +19,7 @@ from anometa.config import Paths, Scenario, TrackAConfig, resolve_device
 
 
 def build_model(cfg: TrackAConfig) -> AnomalibModule:
-    """Build the anomalib model a Track A config names, with PLAN_1 § Track A settings.
+    """Build the anomalib model a Track A config names, with the Track A settings (docs: tracks).
 
     Post-processing, evaluation and visualisation are disabled: the
     post-processor would min-max normalise maps with all-normal validation

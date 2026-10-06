@@ -1,7 +1,7 @@
 """Post-freeze lighting-adaptation study: TabPFN and controls with target-lit images in context.
 
 `run_lighting` is the `run_experiment` runner for `LightingConfig` (track
-`"L"`, PLAN_1 § Post-freeze study). Per scenario, fold seed and target
+`"L"`; docs: protocol, post-freeze studies). Per scenario, fold seed and target
 lighting it fits one scorer on the train normals, the fold's regular-lit
 defect shots and the target-lit images of the first `adapt_normals`
 adaptation scenes, then scores the target-lit images of every held-out

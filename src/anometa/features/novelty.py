@@ -3,7 +3,7 @@
 `build_bank` flattens a scenario's `train`-normal patch grids into one
 `PatchBank`. `nn_distances` scores query patches against it (optionally
 leaving one bank image out, for leave-one-image-out train novelty; see
-PLAN_1 § Review focus). `novelty_stats` reduces a distance vector to the two
+docs: tracks). `novelty_stats` reduces a distance vector to the two
 scalars used as features, and `patch_distances` reshapes an image's own
 distances back into its patch grid, for the Track A patch-distance map.
 """

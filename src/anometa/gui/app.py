@@ -9,7 +9,7 @@ with the live regular-vs-shifted AUROC gap. The run tab launches one
 
 `thumbnail_data_url`, `gallery_frame` and `fit_and_score` are pure and unit
 tested (`tests/test_app.py`); `main` is the Streamlit page itself, exercised
-by hand (PLAN_1_IMPLEMENTATION Task 23) and by a headless health check.
+by hand and by a headless health check.
 """
 
 import base64

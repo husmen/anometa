@@ -224,3 +224,8 @@ __marimo__/
 
 # Explainer video outputs (wav, mp4, srt)
 /docs/video/out/
+
+# Planning files: local-only, never tracked
+/docs/plans/
+/docs/wayfinder/
+/docs/HACKATHON.md

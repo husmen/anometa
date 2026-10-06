@@ -8,7 +8,7 @@ whole scenes that were used as shots so a defect never appears in both roles.
 `write_split`/`load_split` persist a split to `splits/<scenario>.csv`, and
 `split_hash` fingerprints a set of scenario splits for a run's manifest.
 `lighting_fold` draws one fold of the post-freeze lighting-adaptation study
-(PLAN_1 § Post-freeze study), which rotates whole scenes between context and
+(docs: protocol, post-freeze studies), which rotates whole scenes between context and
 evaluation.
 """
 
