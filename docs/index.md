@@ -2,7 +2,7 @@
 
 **Few-shot industrial anomaly detection with TabPFN-3.5 on frozen vision foundation model features.**
 
-[Project page](https://husmen.github.io/anometa/) · [Full report](https://husmen.github.io/anometa/report/) · [Code](https://github.com/husmen/anometa) · [Explainer video](https://husmen.github.io/anometa/#video)
+[Project page](https://husmen.github.io/anometa/) · [Full report](https://husmen.github.io/anometa/report/) · [Code](https://github.com/husmen/anometa) · [Explainer video](https://youtu.be/tLWyUFXzQJw)
 
 Anometa investigates whether TabPFN-3.5 can leverage frozen vision-foundation-model representations for few-shot industrial anomaly detection. A frozen DINOv3 encoder turns each image into one short table row; TabPFN-3.5 reads the rows of normal parts plus a handful of labelled defects as its context and scores every new image in one forward pass, with no model training. Using MVTec AD 2 as the primary benchmark, the project explores how visual representations, compact feature projections and TabPFN interact under limited labelled data, with particular attention to label efficiency, calibration and robustness to lighting and domain shifts. TabPFN-3.5 also serves as an unsupervised outlier scorer and, in a prototype, scores one row per image patch to draw defect maps.
 

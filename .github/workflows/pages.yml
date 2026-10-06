@@ -1,6 +1,5 @@
 # Landing page at /, Sphinx docs at /docs/, HTML report at /report/.
-# The explainer video is not in git (too large): attach anometa_explainer.mp4 to a GitHub
-# release and this workflow serves it from /media/.
+# The explainer video is embedded from YouTube.
 name: Pages
 
 on:
@@ -31,13 +30,9 @@ jobs:
         run: |
           cp docs/site/index.html _site/
           cp -R docs/site/assets _site/
-          mkdir -p _site/report _site/media
+          mkdir -p _site/report
           cp docs/report/index.html _site/report/
           touch _site/.nojekyll
-      - name: Fetch the explainer video from the latest release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release download --repo "$GITHUB_REPOSITORY" --pattern anometa_explainer.mp4 --dir _site/media || echo "No release video; the page shows the poster only."
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

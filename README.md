@@ -11,7 +11,7 @@
   <a href="https://husmen.github.io/anometa/">Project page</a> ·
   <a href="https://husmen.github.io/anometa/docs/">Docs</a> ·
   <a href="https://husmen.github.io/anometa/report/">Full report</a> ·
-  <a href="https://husmen.github.io/anometa/#video">Video</a>
+  <a href="https://youtu.be/tLWyUFXzQJw">Video</a>
 </p>
 
 ## What is Anometa?

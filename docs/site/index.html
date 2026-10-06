@@ -119,7 +119,8 @@ figure.plot.narrow-wide { max-width: 700px; margin-inline: auto }
 .btn { display: inline-block; padding: 8px 18px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 15px/1.2 var(--body); text-decoration: none }
 .btn:hover, .btn:focus-visible { background: var(--accent); color: #fff }
 .lp-video { margin: 28px 0 8px; scroll-margin-top: 16px }
-.lp-video video { width: 100%; aspect-ratio: 16 / 9; display: block; border-radius: 10px; background: #0b0f14; border: 1px solid var(--rule) }
+.lp-embed { aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #0b0f14; border: 1px solid var(--rule) }
+.lp-embed iframe { width: 100%; height: 100%; border: 0; display: block }
 .lp-caption { text-align: center; color: var(--muted); font-size: 14.5px; margin: 8px auto 0 }
 .lp-sec { scroll-margin-top: 16px } .lp-sec h2 { margin-top: 44px }
 .lp-sec p, .lp-sec li { max-width: none }
@@ -152,12 +153,8 @@ figure.plot.narrow-wide { max-width: 700px; margin-inline: auto }
 </header>
 
 <section id="video" class="lp-video">
-<video controls preload="metadata" poster="assets/poster.webp" playsinline>
-<source src="media/anometa_explainer.mp4" type="video/mp4">
-<track kind="captions" src="assets/anometa_explainer.vtt" srclang="en" label="English">
-<p>Your browser cannot play this video. <a href="https://github.com/husmen/anometa/releases">Download it from the releases page</a>.</p>
-</video>
-<p class="lp-caption">A 3-minute explainer (Manim, narrated, captions available). Sources: <code>docs/video/</code>.</p>
+<div class="lp-embed"><iframe src="https://www.youtube-nocookie.com/embed/tLWyUFXzQJw" title="Anometa explainer video" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+<p class="lp-caption">A 3-minute explainer, made with Manim and narrated (<a href="https://youtu.be/tLWyUFXzQJw">watch on YouTube</a>). Sources: <code>docs/video/</code>.</p>
 </section>
 
 <section class="lp-sec">

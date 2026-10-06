@@ -10,7 +10,8 @@
 .btn { display: inline-block; padding: 8px 18px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 15px/1.2 var(--body); text-decoration: none }
 .btn:hover, .btn:focus-visible { background: var(--accent); color: #fff }
 .lp-video { margin: 28px 0 8px; scroll-margin-top: 16px }
-.lp-video video { width: 100%; aspect-ratio: 16 / 9; display: block; border-radius: 10px; background: #0b0f14; border: 1px solid var(--rule) }
+.lp-embed { aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #0b0f14; border: 1px solid var(--rule) }
+.lp-embed iframe { width: 100%; height: 100%; border: 0; display: block }
 .lp-caption { text-align: center; color: var(--muted); font-size: 14.5px; margin: 8px auto 0 }
 .lp-sec { scroll-margin-top: 16px } .lp-sec h2 { margin-top: 44px }
 .lp-sec p, .lp-sec li { max-width: none }
