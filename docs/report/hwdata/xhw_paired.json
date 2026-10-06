@@ -1,0 +1,362 @@
+[
+ {
+  "machine": "m4",
+  "classifier": "tabpfn",
+  "k": 1,
+  "params": "{\"n_normals\": 32}",
+  "diff": 0.00043650793650795716,
+  "lo": -0.005640567818562553,
+  "hi": 0.006892244853670642
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn_outlier",
+  "k": 0,
+  "params": "{}",
+  "diff": 0.00039785879629639087,
+  "lo": -0.002069227430555531,
+  "hi": 0.0029557291666667362
+ },
+ {
+  "machine": "m4",
+  "classifier": "logreg",
+  "k": 2,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn_fast",
+  "k": 1,
+  "params": "{}",
+  "diff": -0.0008655753968254132,
+  "lo": -0.00932435619212972,
+  "hi": 0.007341064194775042
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn_fast",
+  "k": 1,
+  "params": "{\"n_normals\": 32}",
+  "diff": 0.0008680555555555802,
+  "lo": -0.005696897907021501,
+  "hi": 0.007533758577215693
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn_fast",
+  "k": 2,
+  "params": "{}",
+  "diff": -0.004861111111111094,
+  "lo": -0.0169927525972773,
+  "hi": 0.004315023733741166
+ },
+ {
+  "machine": "m4",
+  "classifier": "knn",
+  "k": 2,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "m4",
+  "classifier": "knn",
+  "k": 5,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn",
+  "k": 2,
+  "params": "{}",
+  "diff": 0.00018422067901247008,
+  "lo": -0.008404741925705506,
+  "hi": 0.008110753899360721
+ },
+ {
+  "machine": "m4",
+  "classifier": "logreg",
+  "k": 5,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "m4",
+  "classifier": "mahalanobis",
+  "k": 0,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn_fast",
+  "k": 5,
+  "params": "{}",
+  "diff": -0.0003645833333333348,
+  "lo": -0.008948218074845598,
+  "hi": 0.009322338432537472
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn_fast",
+  "k": 2,
+  "params": "{\"n_normals\": 32}",
+  "diff": -0.0008728780864197816,
+  "lo": -0.008123487103174584,
+  "hi": 0.0055099881503526795
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn",
+  "k": 5,
+  "params": "{}",
+  "diff": -0.0010416666666667185,
+  "lo": -0.009026636312381226,
+  "hi": 0.009237647306397272
+ },
+ {
+  "machine": "m4",
+  "classifier": "logreg",
+  "k": 1,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn",
+  "k": 5,
+  "params": "{\"n_normals\": 32}",
+  "diff": -0.0025868055555554603,
+  "lo": -0.010912853958455815,
+  "hi": 0.005447869114414907
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn",
+  "k": 2,
+  "params": "{\"n_normals\": 32}",
+  "diff": -0.0010464891975309198,
+  "lo": -0.009249305211089133,
+  "hi": 0.005212361696704216
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn",
+  "k": 1,
+  "params": "{}",
+  "diff": -0.0030357142857142527,
+  "lo": -0.010781684027777733,
+  "hi": 0.00332667651840823
+ },
+ {
+  "machine": "m4",
+  "classifier": "knn",
+  "k": 1,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "m4",
+  "classifier": "tabpfn_fast",
+  "k": 5,
+  "params": "{\"n_normals\": 32}",
+  "diff": -0.0024324845679013496,
+  "lo": -0.011201438945538386,
+  "hi": 0.007186403355542333
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "knn",
+  "k": 1,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn_fast",
+  "k": 5,
+  "params": "{\"n_normals\": 32}",
+  "diff": -0.00014853395061731334,
+  "lo": -0.002274813535230252,
+  "hi": 0.0019376519097222254
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn",
+  "k": 1,
+  "params": "{\"n_normals\": 32}",
+  "diff": 0.00031580687830690124,
+  "lo": -0.0007123033096341018,
+  "hi": 0.0013905629960317856
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn_outlier",
+  "k": 0,
+  "params": "{}",
+  "diff": 1.4467592592715128e-05,
+  "lo": -0.0015502025462962503,
+  "hi": 0.001244212962962843
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn_fast",
+  "k": 1,
+  "params": "{}",
+  "diff": 0.0006283068783068391,
+  "lo": -0.000838310701884895,
+  "hi": 0.0022803750551146414
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn_fast",
+  "k": 1,
+  "params": "{\"n_normals\": 32}",
+  "diff": 0.0003563161375660373,
+  "lo": -0.000896288890266711,
+  "hi": 0.001801999800209479
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn_fast",
+  "k": 2,
+  "params": "{\"n_normals\": 32}",
+  "diff": -0.00017746913580252155,
+  "lo": -0.0019487850666887268,
+  "hi": 0.0016123563574736224
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "logreg",
+  "k": 1,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn_fast",
+  "k": 2,
+  "params": "{}",
+  "diff": 0.0007238618827161147,
+  "lo": -0.0008157772541887293,
+  "hi": 0.0026479666143077517
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "knn",
+  "k": 5,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn",
+  "k": 2,
+  "params": "{}",
+  "diff": -0.0007484567901234751,
+  "lo": -0.002266722814704586,
+  "hi": 0.0005045559138007526
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "mahalanobis",
+  "k": 0,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn",
+  "k": 2,
+  "params": "{\"n_normals\": 32}",
+  "diff": -0.00034818672839498355,
+  "lo": -0.0015312014302248129,
+  "hi": 0.0007807532793210391
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn",
+  "k": 5,
+  "params": "{\"n_normals\": 32}",
+  "diff": -0.00030864197530855453,
+  "lo": -0.002186928530092605,
+  "hi": 0.0013968722442679565
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "knn",
+  "k": 2,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn_fast",
+  "k": 5,
+  "params": "{}",
+  "diff": 0.0007928240740739945,
+  "lo": -0.0006968068662948048,
+  "hi": 0.0023420331790123313
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn",
+  "k": 1,
+  "params": "{}",
+  "diff": -0.000248842592592613,
+  "lo": -0.001907438409391557,
+  "hi": 0.0012140170304232977
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "logreg",
+  "k": 2,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "tabpfn",
+  "k": 5,
+  "params": "{}",
+  "diff": -0.0006520061728395588,
+  "lo": -0.0024973814960793845,
+  "hi": 0.0008347240840853832
+ },
+ {
+  "machine": "ryzen",
+  "classifier": "logreg",
+  "k": 5,
+  "params": "{}",
+  "diff": 0.0,
+  "lo": 0.0,
+  "hi": 0.0
+ }
+]

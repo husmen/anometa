@@ -1,0 +1,222 @@
+[
+ {
+  "run_id": "ryzen-frozen-d847044c0cfb",
+  "classifier": "tabpfn",
+  "k": 1,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.7073586309523809,
+  "fit_ms": 4.839751985855401,
+  "predict_ms": 1622.6934110018192,
+  "wall_s": 133.859657752997
+ },
+ {
+  "run_id": "ryzen-frozen-b5ade6f6bd49",
+  "classifier": "tabpfn",
+  "k": 2,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.7068692129629629,
+  "fit_ms": 4.844687005970627,
+  "predict_ms": 1535.9981135115959,
+  "wall_s": 130.028117482987
+ },
+ {
+  "run_id": "ryzen-frozen-e5d6a9ceca0e",
+  "classifier": "tabpfn",
+  "k": 5,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.7297588734567901,
+  "fit_ms": 4.839881992666051,
+  "predict_ms": 1527.8147460048785,
+  "wall_s": 126.32248233800055
+ },
+ {
+  "run_id": "ryzen-frozen-62e30277ec4b",
+  "classifier": "tabpfn_fast",
+  "k": 1,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.7062946428571428,
+  "fit_ms": 4.004089001682587,
+  "predict_ms": 482.76309900393244,
+  "wall_s": 43.81394117700984
+ },
+ {
+  "run_id": "ryzen-frozen-a36f21701b05",
+  "classifier": "tabpfn_fast",
+  "k": 2,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.7125178433641975,
+  "fit_ms": 3.9815144991734996,
+  "predict_ms": 470.196065492928,
+  "wall_s": 41.071196511999005
+ },
+ {
+  "run_id": "ryzen-frozen-d82f4a4b2b90",
+  "classifier": "tabpfn_fast",
+  "k": 5,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.7330902777777777,
+  "fit_ms": 4.019389001769014,
+  "predict_ms": 446.4876194833778,
+  "wall_s": 38.929251677007414
+ },
+ {
+  "run_id": "ryzen-frozen-9d2d496e50e9",
+  "classifier": "logreg",
+  "k": 1,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.707385085978836,
+  "fit_ms": 15.964118487318046,
+  "predict_ms": 0.19677801174111664,
+  "wall_s": 3.033935785002541
+ },
+ {
+  "run_id": "ryzen-frozen-e2bd3b5ebb4d",
+  "classifier": "logreg",
+  "k": 2,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.7362143132716049,
+  "fit_ms": 14.902352500939742,
+  "predict_ms": 0.20367300021462142,
+  "wall_s": 3.385370731994044
+ },
+ {
+  "run_id": "ryzen-frozen-f8b756ca395a",
+  "classifier": "logreg",
+  "k": 5,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.775187114197531,
+  "fit_ms": 19.522786999004893,
+  "predict_ms": 0.19786351185757667,
+  "wall_s": 3.4748352589958813
+ },
+ {
+  "run_id": "ryzen-frozen-03c2d39339db",
+  "classifier": "knn",
+  "k": 1,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.5805764597505669,
+  "fit_ms": 0.7863030186854303,
+  "predict_ms": 28.820394989452325,
+  "wall_s": 3.7271475240122527
+ },
+ {
+  "run_id": "ryzen-frozen-c35bd943d258",
+  "classifier": "knn",
+  "k": 2,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.6129885912698413,
+  "fit_ms": 0.7794530101818964,
+  "predict_ms": 26.370046500233002,
+  "wall_s": 3.5456845220178366
+ },
+ {
+  "run_id": "ryzen-frozen-ab1030a5b80d",
+  "classifier": "knn",
+  "k": 5,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.6685088734567901,
+  "fit_ms": 0.768642988987267,
+  "predict_ms": 24.41606851061806,
+  "wall_s": 3.2873013700009324
+ },
+ {
+  "run_id": "ryzen-frozen-35083f52b8db",
+  "classifier": "tabpfn",
+  "k": 1,
+  "n_normals": 32,
+  "status": "ok",
+  "auroc": 0.6933986441798942,
+  "fit_ms": 3.657392502645962,
+  "predict_ms": 571.0313220042735,
+  "wall_s": 46.5049923589977
+ },
+ {
+  "run_id": "ryzen-frozen-b8ecfb59d7ee",
+  "classifier": "tabpfn",
+  "k": 2,
+  "n_normals": 32,
+  "status": "ok",
+  "auroc": 0.7004504243827161,
+  "fit_ms": 3.7102520000189543,
+  "predict_ms": 563.0962619907223,
+  "wall_s": 45.76396226300858
+ },
+ {
+  "run_id": "ryzen-frozen-bcd1a3f8594e",
+  "classifier": "tabpfn",
+  "k": 5,
+  "n_normals": 32,
+  "status": "ok",
+  "auroc": 0.7321412037037037,
+  "fit_ms": 3.844816004857421,
+  "predict_ms": 538.0809084890643,
+  "wall_s": 44.45147480000742
+ },
+ {
+  "run_id": "ryzen-frozen-7504aec298e7",
+  "classifier": "tabpfn_fast",
+  "k": 1,
+  "n_normals": 32,
+  "status": "ok",
+  "auroc": 0.6929646164021163,
+  "fit_ms": 3.033462999155745,
+  "predict_ms": 148.21137199760415,
+  "wall_s": 13.301518132007914
+ },
+ {
+  "run_id": "ryzen-frozen-835b2a8ae22e",
+  "classifier": "tabpfn_fast",
+  "k": 2,
+  "n_normals": 32,
+  "status": "ok",
+  "auroc": 0.700318287037037,
+  "fit_ms": 3.1468670058529824,
+  "predict_ms": 152.1896260092035,
+  "wall_s": 13.341121961013414
+ },
+ {
+  "run_id": "ryzen-frozen-2a4a2c6e71f5",
+  "classifier": "tabpfn_fast",
+  "k": 5,
+  "n_normals": 32,
+  "status": "ok",
+  "auroc": 0.7343788580246914,
+  "fit_ms": 3.0702924850629643,
+  "predict_ms": 141.34009851841256,
+  "wall_s": 12.730523950012866
+ },
+ {
+  "run_id": "ryzen-frozen-b606b67a10b5",
+  "classifier": "mahalanobis",
+  "k": 0,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.7231336805555555,
+  "fit_ms": 0.6132800044724718,
+  "predict_ms": 0.26323250494897366,
+  "wall_s": 0.1607163659937214
+ },
+ {
+  "run_id": "ryzen-frozen-5103605153c3",
+  "classifier": "tabpfn_outlier",
+  "k": 0,
+  "n_normals": null,
+  "status": "ok",
+  "auroc": 0.7168402777777778,
+  "fit_ms": 0.15355901268776506,
+  "predict_ms": 4808.869966494967,
+  "wall_s": 40.64708331899601
+ }
+]

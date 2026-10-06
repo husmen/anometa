@@ -229,3 +229,6 @@ __marimo__/
 /docs/plans/
 /docs/wayfinder/
 /docs/HACKATHON.md
+
+# Browser automation screenshots
+/.playwright-mcp/

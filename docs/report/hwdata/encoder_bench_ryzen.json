@@ -1,0 +1,98 @@
+{
+ "dinov3_s/can": {
+  "images_per_s": 4.114641702794962,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_s/fabric": {
+  "images_per_s": 9.12709703474555,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_s/fruit_jelly": {
+  "images_per_s": 7.6450583497173445,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_s/rice": {
+  "images_per_s": 9.18904525415885,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_s/sheet_metal": {
+  "images_per_s": 1.37470064930012,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_s/vial": {
+  "images_per_s": 7.564155393498268,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_s/wallplugs": {
+  "images_per_s": 8.487467944116664,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_s/walnuts": {
+  "images_per_s": 8.843302215421303,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_l/can": {
+  "images_per_s": 0.4186478501972421,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_l/fabric": {
+  "images_per_s": 0.8962738640648313,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_l/fruit_jelly": {
+  "images_per_s": 0.7610504321974806,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_l/rice": {
+  "images_per_s": 0.9090296508176574,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_l/sheet_metal": {
+  "images_per_s": 0.18484446374740002,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_l/vial": {
+  "images_per_s": 0.8089476607088657,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_l/wallplugs": {
+  "images_per_s": 0.9522545102128196,
+  "peak_vram_mb": NaN
+ },
+ "dinov3_l/walnuts": {
+  "images_per_s": 0.9467802180992241,
+  "peak_vram_mb": NaN
+ },
+ "siglip2/can": {
+  "images_per_s": 0.8853373318262729,
+  "peak_vram_mb": NaN
+ },
+ "siglip2/fabric": {
+  "images_per_s": 0.8733825110827284,
+  "peak_vram_mb": NaN
+ },
+ "siglip2/fruit_jelly": {
+  "images_per_s": 0.8699028467325279,
+  "peak_vram_mb": NaN
+ },
+ "siglip2/rice": {
+  "images_per_s": 0.9000006857489048,
+  "peak_vram_mb": NaN
+ },
+ "siglip2/sheet_metal": {
+  "images_per_s": 0.9036652213534242,
+  "peak_vram_mb": NaN
+ },
+ "siglip2/vial": {
+  "images_per_s": 0.885953835265086,
+  "peak_vram_mb": NaN
+ },
+ "siglip2/wallplugs": {
+  "images_per_s": 0.8856211597541671,
+  "peak_vram_mb": NaN
+ },
+ "siglip2/walnuts": {
+  "images_per_s": 0.8978072427644445,
+  "peak_vram_mb": NaN
+ }
+}

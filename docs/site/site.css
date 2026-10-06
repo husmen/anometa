@@ -1,0 +1,24 @@
+/* Landing page: one centred reading column on top of the report's theme tokens (report.css). */
+.lp { max-width: 920px; margin: 0 auto; padding: 32px 16px 72px }
+.lp-hero { text-align: center; padding-bottom: 24px; border-bottom: 1px solid var(--rule) }
+.lp-logo { display: block; margin: 0 auto 6px; width: 72px; height: 72px; object-fit: contain }
+.lp-hero h1 { margin: 4px 0 8px }
+.lp-sub { font-size: 21px; max-width: 40ch; margin: 0 auto 10px; text-wrap: balance }
+.lp-authors { margin: 6px 0 0; font-size: 17px } .lp-authors a { text-decoration: none }
+.lp-venue { margin: 2px 0 18px; color: var(--muted); font-size: 15px }
+.lp-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px }
+.btn { display: inline-block; padding: 8px 18px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 15px/1.2 var(--body); text-decoration: none }
+.btn:hover, .btn:focus-visible { background: var(--accent); color: #fff }
+.lp-video { margin: 28px 0 8px; scroll-margin-top: 16px }
+.lp-video video { width: 100%; aspect-ratio: 16 / 9; display: block; border-radius: 10px; background: #0b0f14; border: 1px solid var(--rule) }
+.lp-caption { text-align: center; color: var(--muted); font-size: 14.5px; margin: 8px auto 0 }
+.lp-sec { scroll-margin-top: 16px } .lp-sec h2 { margin-top: 44px }
+.lp-sec p, .lp-sec li { max-width: none }
+.lp-name { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 4px 20px 12px; margin-top: 32px }
+.lp-name h2 { margin-top: 16px }
+.lp-fig { margin: 18px 0 }
+.lp-fig img { width: 100%; height: auto; display: block; border-radius: 8px }
+.lp-note { color: var(--muted); font-size: 15px }
+.lp-bib { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font: 13.5px/1.5 var(--mono) }
+.lp-hero p { margin-inline: auto; max-width: none }
+.lp-bib code { background: none; padding: 0; border: 0; font: inherit }
