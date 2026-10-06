@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from anometa.cli import lock_configs
 from anometa.config import (
     EncoderName,
     Paths,
@@ -155,6 +156,9 @@ def test_trackb_rejects_empty_or_out_of_range_fields(kwargs: dict[str, object]) 
         dict(image_size=(0, 256)),
         dict(image_size=(256, 0)),
         dict(encoder="dinov3_s"),  # only patch_distance takes an encoder
+        dict(coreset_ratio=0.0),
+        dict(coreset_ratio=1.5),
+        dict(model="efficientad_s", coreset_ratio=0.1),  # PatchCore only
     ],
 )
 def test_tracka_rejects_invalid_fields(kwargs: dict[str, object]) -> None:
@@ -195,3 +199,29 @@ def test_seed_parallelism_defaults_to_serial(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.delenv("ANOMETA_SEED_WORKERS", raising=False)
     monkeypatch.delenv("ANOMETA_SEED_EXECUTOR", raising=False)
     assert seed_parallelism() == (1, "thread")
+
+
+def test_frozen_tracka_hashes_are_stable() -> None:
+    """The frozen Track A configs keep the run ids of their lock runs.
+
+    New optional Track A fields must stay out of the hash while unset, or the
+    lock runs' identities (and the lock guard) would break.
+    """
+    hashes = {
+        cfg.name: config_hash(cfg)[:12]
+        for cfg in lock_configs(Path("configs/frozen"))
+        if cfg.track == "A"
+    }
+    assert hashes == {
+        "lock-tracka-patchcore": "037c2b82d71e",
+        "lock-tracka-efficientad-s": "89d57c4b16ca",
+        "lock-tracka-distance-dinov3-s": "7a3eea32f0c9",
+        "lock-tracka-distance-dinov3-l": "6359aa773921",
+    }
+
+
+def test_coreset_ratio_enters_the_hash_only_when_set() -> None:
+    """An explicit coreset_ratio makes a new run id; leaving it unset changes nothing."""
+    base = TrackAConfig(model="patchcore")
+    assert config_hash(TrackAConfig(model="patchcore", coreset_ratio=0.1)) != config_hash(base)
+    assert "coreset_ratio" not in base.model_dump(exclude_none=True)

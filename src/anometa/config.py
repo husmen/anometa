@@ -172,10 +172,14 @@ class TrackAConfig(_CommonConfig):
     encoder_backend: Literal["transformers", "timm"] = "transformers"
     image_size: tuple[PositiveInt, PositiveInt] = (256, 256)
     max_steps: PositiveInt = 70000
+    coreset_ratio: Annotated[float, Field(gt=0, le=1)] | None = None
+    """PatchCore coreset sampling ratio; `None` keeps the default of 0.01."""
 
     @model_validator(mode="after")
     def _check_consistency(self) -> Self:
         """Reject combinations that don't correspond to a runnable experiment."""
+        if self.coreset_ratio is not None and self.model != "patchcore":
+            raise ValueError(f"coreset_ratio is only used by patchcore, not {self.model}")
         if self.model == "patch_distance" and self.encoder not in _DINOV3_ENCODERS:
             raise ValueError("patch_distance requires a DINOv3 encoder")
         if self.model != "patch_distance" and self.encoder is not None:
@@ -270,12 +274,16 @@ def load_configs(path: Path) -> list[ExperimentConfig]:
     return [_experiment_config_adapter.validate_python(item) for item in items]
 
 
+_HASH_OMIT_IF_NONE: tuple[str, ...] = ("coreset_ratio",)
+
+
 def config_hash(cfg: ExperimentConfig, *, exclude: Iterable[str] = ()) -> str:
     """Compute a stable content hash of an experiment config.
 
     Excludes `name` and `paths`: renaming a run or relocating its files
     leaves the hash unchanged, while any field that affects the experiment's
-    behaviour changes it. Keys are sorted, so the order of
+    behaviour changes it. Optional fields added after the freeze
+    (`_HASH_OMIT_IF_NONE`) count only when set. Keys are sorted, so the order of
     `classifier_params` entries doesn't matter.
 
     Args:
@@ -286,8 +294,11 @@ def config_hash(cfg: ExperimentConfig, *, exclude: Iterable[str] = ()) -> str:
     Returns:
         The hex-encoded SHA-256 digest of the config's canonical JSON dump.
     """
+    # Optional fields added after the freeze stay out of the hash while unset, so
+    # existing run ids (including the lock runs) do not change.
+    unset = {f for f in _HASH_OMIT_IF_NONE if getattr(cfg, f, 0) is None}
     payload = json.dumps(
-        cfg.model_dump(mode="json", exclude={"name", "paths", *exclude}),
+        cfg.model_dump(mode="json", exclude={"name", "paths", *exclude, *unset}),
         sort_keys=True,
         separators=(",", ":"),
     )
