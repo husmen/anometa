@@ -1,6 +1,6 @@
 # Anometa explainer: narration
 
-One block per scene, read in order. `build.py` turns each block into one audio clip; the clip's length sets the scene's length in `scenes.py`. Numbers come from `reports/lock/results.md` and `docs/plans/PLAN_1_RUN_LOG.md`.
+One block per scene, read in order. `build.py` turns each block into one audio clip; the clip's length sets the scene's length in `scenes.py`. Numbers come from `reports/lock/results.md` and the experiment log (`docs/experiment-log.md`).
 
 ## question
 

@@ -2,7 +2,7 @@
 
 AU-PRO wraps the vendored MVTec AD reference implementation
 (`anometa.metrics._pro_reference`); SegF1 and ClassF1 follow the pooled and
-any-pixel definitions in PLAN_1 research 02. Every metric here is pooled over
+any-pixel definitions of the MVTec AD 2 paper (docs: metrics). Every metric here is pooled over
 a full scenario, including its good images (which have all-zero masks and
 drive the false-positive rate).
 """
@@ -62,7 +62,7 @@ def upsample(map_: _Map, size_hw: tuple[int, int]) -> NDArray[np.float16]:
     """Bilinearly upsample a 2D anomaly map to `size_hw`.
 
     Uses `torch.nn.functional.interpolate` with `align_corners=False`, the
-    resize the MVTec AD 2 server reports using (PLAN_1 research 02).
+    resize the MVTec AD 2 server reports using (docs: metrics).
 
     Args:
         map_: Anomaly map, shape `(h, w)`.
@@ -81,7 +81,7 @@ def validation_threshold(val_maps: Iterable[_Map]) -> float:
     """Compute the SegF1/ClassF1 threshold from defect-free validation maps.
 
     Threshold is mean + 3 std over every pixel of every map, accumulated in
-    float64 (PLAN_1 research 02: the MVTec AD 2 evaluation checker's rule).
+    float64 (the MVTec AD 2 evaluation checker's rule; docs: metrics).
 
     Args:
         val_maps: Anomaly maps of defect-free validation images.

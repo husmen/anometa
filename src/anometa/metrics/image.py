@@ -4,7 +4,7 @@ Every score-based metric takes 1-D arrays: `y` holds ground-truth labels in
 `{0, 1}` (1 = anomalous), and `s`/`p`/`score` hold per-image scores. Ranking
 metrics (`auroc`, `auprc`) and `image_metrics` return NaN rather than raising
 when `y` has only one class, since small MVTec AD 2 lighting subsets can be
-single-class (see PLAN_1 § Review focus).
+single-class (docs: metrics).
 """
 
 import numpy as np
@@ -109,7 +109,7 @@ def ece(y: _Labels, p: NDArray[np.float64], n_bins: int = 10) -> float:
 def prior_correct(p: NDArray[np.float64], pi: float) -> NDArray[np.float64]:
     """Rescale probabilities fit under training prior `pi` to a 50/50 prior.
 
-    Computes `(p/pi) / (p/pi + (1 - p)/(1 - pi))` (PLAN_1 § Track B), so a
+    Computes `(p/pi) / (p/pi + (1 - p)/(1 - pi))` (docs: metrics), so a
     probability equal to `pi` maps to 0.5.
 
     Args:

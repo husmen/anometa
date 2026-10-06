@@ -268,7 +268,7 @@ def bootstrap_ci(
 ) -> tuple[float, float, float]:
     """Bootstrap a confidence interval for one `group_metrics` column.
 
-    Each replicate, per scenario (PLAN_1 § Data protocol): resamples that
+    Each replicate, per scenario (docs: protocol): resamples that
     scenario's seeds with replacement, and, per label, draws one multiset of
     scenes with replacement from the union of the scenario's evaluation
     scenes across seeds. Every drawn seed is scored on that same scene

@@ -9,7 +9,7 @@ word position within the block. Render with ``build.py`` (it passes
 stays in sync).
 
 Numbers: ``reports/lock/results.md`` (lock split) and the Track C prototype in
-``docs/plans/PLAN_1_RUN_LOG.md`` (dev split). Only ``Text`` is used: no LaTeX.
+the experiment log, ``docs/experiment-log.md`` (dev split). Only ``Text`` is used: no LaTeX.
 """
 
 import json

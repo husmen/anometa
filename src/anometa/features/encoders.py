@@ -2,8 +2,8 @@
 
 `load_encoder` returns an `Encoder` that turns an HxWx3 uint8 image into
 `Encoded` features (a pooled `cls` vector and an `(h, w, dim)` patch grid),
-backed by pinned Hugging Face Hub revisions (see PLAN_1 § Licences and
-access). DINOv3 loads through `transformers` by default (`DINOv3ViTModel`,
+backed by pinned Hugging Face Hub revisions (docs: getting started,
+licences). DINOv3 loads through `transformers` by default (`DINOv3ViTModel`,
 the gated `facebook/dinov3-*` repositories) and falls back to timm's ungated
 re-upload of the same weights on a gated-repository error. SigLIP2 exists
 only in `transformers` (`Siglip2VisionModel`, ungated).
@@ -45,7 +45,7 @@ HF_REVISIONS: dict[EncoderName, str] = {
     "dinov3_l": "ea8dc2863c51be0a264bab82070e3e8836b02d51",
     "siglip2": "cc24074f717b612951c2dead130904ab9b65a81e",
 }
-"""Pinned commit per transformers repository (PLAN_1 § Licences and access)."""
+"""Pinned commit per transformers repository (docs: getting started, licences)."""
 
 TIMM_REVISIONS: dict[_Dinov3Name, str] = {
     "dinov3_s": "3bf4720a82ec2066db88137180ff1f83a675cef0",

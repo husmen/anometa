@@ -185,7 +185,7 @@ class TrackAConfig(_CommonConfig):
 
 
 class LightingConfig(_CommonConfig):
-    """Post-freeze lighting-adaptation study (PLAN_1 § Post-freeze study).
+    """Post-freeze lighting-adaptation study (docs: protocol, post-freeze studies).
 
     For every scenario, fold seed and target lighting, the context holds the
     train normals, `k` regular-lit defect shots (few-shot classifiers only)
