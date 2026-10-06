@@ -129,9 +129,10 @@ class Explainer(Scene):
     def construct(self) -> None:
         """Play every segment in narration order."""
         self.camera.background_color = BG
-        self.durations: dict[str, float] = json.loads((AUDIO / "durations.json").read_text())[
-            "durations"
-        ]
+        meta = json.loads((AUDIO / "durations.json").read_text())
+        self.durations: dict[str, float] = meta["durations"]
+        # Unpadded clip lengths of the soundtrack voice; cues follow its speech.
+        self.speech: dict[str, float] = meta["speech"][meta["voices"][0]]
         self.texts = blocks()
         self.start = 0.0
         for name in self.texts:
@@ -153,7 +154,7 @@ class Explainer(Scene):
         text = self.texts[self.seg_name]
         idx = text.index(phrase)
         words = len(text.split())
-        speech = self.durations[self.seg_name] - LEAD_S - TAIL_S
+        speech = self.speech[self.seg_name] - LEAD_S - TAIL_S
         return self.seg_start + LEAD_S + speech * len(text[:idx].split()) / words
 
     def until(self, t: float) -> None:
@@ -584,7 +585,7 @@ class Explainer(Scene):
         self.at("A good label-free", FadeIn(band), Create(edges), FadeIn(refs), run_time=1.0)
 
     def maps(self) -> None:
-        """Patch rows to defect maps, the Wall Plugs example and mean AU-PRO bars."""
+        """Patch rows to defect maps, one example per scenario and mean AU-PRO bars."""
         self.title("Pixel level: one row per patch, one defect map")
         rng = np.random.default_rng(7)
         n = 8
@@ -624,24 +625,17 @@ class Explainer(Scene):
             run_time=1.0,
         )
 
-        strip = photo(HERE / "assets" / "trackc_example.webp", 2.2, crop_top=36).move_to(1.25 * UP)
-        strip.scale_to_fit_width(min(strip.width, 13.2))
-        panels = [
-            "image, defect outlined",
-            "DINOv3 distance",
-            "PatchCore",
-            "fused, no labels",
-            "TabPFN-Fast",
-        ]
-        s_lab = VGroup(
-            *(
-                txt(p, 18, AMBER if p == "TabPFN-Fast" else MUTED).move_to(
-                    strip.get_corner(DOWN + LEFT) + strip.width * (i + 0.5) / 5 * RIGHT + 0.2 * DOWN
-                )
-                for i, p in enumerate(panels)
-            )
+        gallery = photo(HERE.parent / "report" / "data" / "trackc_gallery.webp", 5.3)
+        gallery.scale_to_fit_width(min(gallery.width, 12.6)).move_to(0.25 * DOWN)
+        g_cap = txt(
+            "best example per scenario, chosen on purpose \N{MIDDLE DOT} dev split"
+            " \N{MIDDLE DOT} PatchCore: default settings, not tuned",
+            18,
+            MUTED,
+        ).next_to(gallery, DOWN, buff=0.12)
+        self.at(
+            "shown here", FadeOut(concept), FadeIn(gallery), FadeIn(g_cap), run_time=0.8, lead=1.0
         )
-        self.at("On the dev split", FadeOut(concept), FadeIn(strip), FadeIn(s_lab), run_time=0.8)
 
         data = [
             ("TabPFN-3.5-Fast", 0.468, AMBER_2),
@@ -655,8 +649,8 @@ class Explainer(Scene):
         x0 = 2.4 * LEFT
         bars = VGroup()
         for i, (name, v, color) in enumerate(data):
-            y = -0.7 - 0.43 * i
-            bar = Rectangle(width=v * unit, height=0.32, stroke_width=0).set_fill(
+            y = 1.35 - 0.52 * i
+            bar = Rectangle(width=v * unit, height=0.36, stroke_width=0).set_fill(
                 color, 1 if color != TEAL else 0.75
             )
             bar.move_to(x0 + y * UP, aligned_edge=LEFT)
@@ -669,13 +663,15 @@ class Explainer(Scene):
                     txt(f"{v:.3f}", 22, color, bold=True).next_to(bar, RIGHT, buff=0.15),
                 )
             )
+        untuned = txt("default settings, not tuned", 20, MUTED).next_to(bars[-1], RIGHT, buff=0.3)
         cap = txt(
-            "Wall Plugs example above · bars: mean AU-PRO@0.05 (higher is better), k = 5,"
-            " dev split, 8 scenarios \N{MULTIPLICATION SIGN} 3 seeds",
+            "mean AU-PRO@0.05 (higher is better), k = 5, dev split,"
+            " 8 scenarios \N{MULTIPLICATION SIGN} 3 seeds",
             18,
             MUTED,
         )
         cap.to_edge(DOWN, buff=0.25)
+        self.at("these maps beat", FadeOut(gallery), FadeOut(g_cap), run_time=0.5, lead=0.6)
         self.play(
             LaggedStart(
                 *(
@@ -687,12 +683,13 @@ class Explainer(Scene):
             FadeIn(cap),
             run_time=1.8,
         )
-        self.at(
-            "beat both",
+        self.play(
             Indicate(bars[0], color=AMBER_2, scale_factor=1.04),
             Indicate(bars[1], color=AMBER, scale_factor=1.04),
             run_time=1.0,
         )
+        self.at("They also beat PatchCore", Indicate(bars[-1], color=TEAL, scale_factor=1.04))
+        self.at("default settings", FadeIn(untuned, shift=0.2 * LEFT), run_time=0.6)
 
     def takeaways(self) -> None:
         """Speed, cross-hardware reproduction and the open-source line."""
