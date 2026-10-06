@@ -49,29 +49,30 @@ Lock split, evaluated once after the configuration was frozen on the dev split (
 
 | pixel-level (Track A, unsupervised) | AU-PRO@0.05 | AU-PRO@0.30 | SegF1 | image AUROC |
 |---|---|---|---|---|
-| **DINOv3-L patch distance (training-free)** | **0.385** | **0.583** | **0.375** | **0.780** |
+| **DINOv3-L patch distance (training-free)** | **0.385** | 0.583 | **0.375** | **0.780** |
 | PatchCore | 0.222 | 0.460 | 0.198 | 0.720 |
+| PatchCore, 512×512, tuned on dev (post-freeze) | **0.385** | **0.602** | 0.233 | 0.739 |
 | EfficientAD-S | 0.182 | 0.371 | 0.150 | 0.653 |
 
 ### Comparison with the MVTec AD 2 paper
 
 AU-PRO@0.05 in %. Ours: lock split of the public test set, all lighting conditions pooled. Paper: Table VII of [Heckler-Kram et al.](https://arxiv.org/abs/2503.21622), private test set, regular lighting (`TESTpriv`), evaluated by MVTec's server. Best of 7 methods: PatchCore, RD, RD++, EfficientAD, MSFlow, SimpleNet, DSR.
 
-| scenario | DINOv3-L distance (ours) | PatchCore, ours / paper | EfficientAD-S, ours / paper | best in paper |
-|---|---|---|---|---|
-| Can | 6.3 | 0.1 / 4.7 | 4.1 / 9.6 | **13.9** (DSR) |
-| Fabric | 19.6 | 4.5 / 11.0 | 15.7 / 22.2 | **22.2** (EfficientAD) |
-| Fruit Jelly | 42.9 | 35.4 / 46.7 | 34.1 / 50.5 | **54.4** (RD++) |
-| Rice | **39.5** | 11.7 / 25.6 | 2.9 / 27.6 | 27.6 (EfficientAD) |
-| Sheet Metal | **47.6** | 9.4 / 15.2 | 8.7 / 11.8 | 18.0 (DSR) |
-| Vial | **84.6** | 47.0 / 62.2 | 62.2 / 55.6 | 63.0 (RD++) |
-| Wall Plugs | **26.8** | 15.4 / 12.8 | 2.4 / 20.3 | 20.3 (EfficientAD) |
-| Walnuts | 41.1 | 54.3 / 51.8 | 15.7 / 48.8 | **51.8** (PatchCore) |
-| **Mean** | **38.5** | 22.2 / 28.8 | 18.2 / 30.8 | 30.8 (EfficientAD) |
+| scenario | DINOv3-L distance (ours) | PatchCore 512 px, tuned (ours) | PatchCore 256 px, ours / paper | EfficientAD-S, ours / paper | best in paper |
+|---|---|---|---|---|---|
+| Can | 6.3 | 12.9 | 0.1 / 4.7 | 4.1 / 9.6 | **13.9** (DSR) |
+| Fabric | 19.6 | **37.7** | 4.5 / 11.0 | 15.7 / 22.2 | 22.2 (EfficientAD) |
+| Fruit Jelly | 42.9 | 48.0 | 35.4 / 46.7 | 34.1 / 50.5 | **54.4** (RD++) |
+| Rice | **39.5** | 15.7 | 11.7 / 25.6 | 2.9 / 27.6 | 27.6 (EfficientAD) |
+| Sheet Metal | **47.6** | 15.9 | 9.4 / 15.2 | 8.7 / 11.8 | 18.0 (DSR) |
+| Vial | **84.6** | 73.4 | 47.0 / 62.2 | 62.2 / 55.6 | 63.0 (RD++) |
+| Wall Plugs | 26.8 | **32.0** | 15.4 / 12.8 | 2.4 / 20.3 | 20.3 (EfficientAD) |
+| Walnuts | 41.1 | **72.1** | 54.3 / 51.8 | 15.7 / 48.8 | 51.8 (PatchCore) |
+| **Mean** | **38.5** | **38.5** | 22.2 / 28.8 | 18.2 / 30.8 | 30.8 (EfficientAD) |
 
-- The training-free DINOv3-L distance map has the highest mean. It beats the paper's best method on 4 of 8 scenarios (Rice, Sheet Metal, Vial, Wall Plugs) and loses on the other 4 (Can, Fabric, Fruit Jelly, Walnuts). The higher mean comes mainly from Sheet Metal, Rice and Vial.
-- Our PatchCore and EfficientAD-S score below the paper's on 6 and 7 of 8 scenarios. Neither was tuned: both use the paper's stated settings with anomalib defaults (256×256 input; PatchCore wide_resnet50_2, coreset ratio 0.01; EfficientAD-S 70,000 steps), one setting for all scenarios, and Imagenette instead of ImageNet as EfficientAD's penalty set. Our pixel-level DINOv3 methods were not tuned either.
-- The test sets differ (public vs private, pooled lighting vs regular lighting) and the lock sets are small, so this is not a ranking. The results show promise for frozen DINOv3 patch features. A conclusive comparison needs tuned baselines and a tuned pipeline of our own, scored on the private test set through MVTec's server.
+- Our two best maps tie on the mean: the training-free DINOv3-L distance map and PatchCore at 512×512, tuned on the dev split after the freeze (38.5 each). Between them, they beat the paper's best method on 6 of 8 scenarios (Fabric, Rice, Sheet Metal, Vial, Wall Plugs, Walnuts) and lose on Can and Fruit Jelly. They are complementary: the distance map wins on Rice, Sheet Metal and Vial, PatchCore on the other five.
+- At the frozen 256×256 default, our PatchCore scores below the paper's on 6 of 8 scenarios. A declared dev-split sweep of input size and coreset ratio showed that resolution drives most of that gap: at 512×512 its lock mean rises from 22.2 to 38.5. The paper ran PatchCore at 256×256, so this shows the effect of resolution, not a better PatchCore. EfficientAD-S was not tuned (about 44 min per scenario) and stays below the paper on 7 of 8 scenarios; it also uses Imagenette instead of ImageNet as its penalty set.
+- The test sets differ (public vs private, pooled lighting vs regular lighting) and the lock sets are small, so this is not a ranking. A conclusive comparison needs the private test set, scored through MVTec's server.
 
 Reproduction: the best dev configurations give the same AUROC within 0.001 on a CPU-only Ryzen 7 7700 and within 0.004 on an M4 Pro, and the ungated timm DINOv3 weights match the gated ones within noise.
 
@@ -106,10 +107,10 @@ Every command (Track A, grid, Optuna, TabPFN-BO, report, lock, parity, Rerun), t
 ## Limitations
 
 - Lock-split numbers use half of AD2's public test set (split by scene), so they are not directly comparable with published AD2 numbers, which use the private test set (see [Comparison with the MVTec AD 2 paper](#comparison-with-the-mvtec-ad-2-paper)).
-- PatchCore and EfficientAD-S run with fixed default settings and no tuning, and they score below the paper's numbers for the same methods.
+- EfficientAD-S runs with fixed default settings. PatchCore was tuned only for input size and coreset ratio, on the dev split after the freeze; inputs larger than 512×512 were not tried.
 - SegF1 is pooled over all images of a scenario, which is our reading of the metric.
 - Lock sets are small (7 defect scenes and 2–6 good scenes per scenario, each under 4–7 lighting conditions), so the bootstrap intervals are wide.
-- Track A runs at 256×256 (as in the AD2 paper); Track B encodes DINOv3 at a 512-pixel short side and SigLIP2 at up to 1,024 patches.
+- Track A runs at 256×256 (as in the AD2 paper), except the tuned PatchCore at 512×512; Track B encodes DINOv3 at a 512-pixel short side and SigLIP2 at up to 1,024 patches.
 
 ## Acknowledgements
 

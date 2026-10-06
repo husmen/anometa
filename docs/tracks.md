@@ -60,7 +60,7 @@ Track A models learn from defect-free `train` images only and output an anomaly 
 
 ### PatchCore and EfficientAD-S
 
-Both come from anomalib and follow the MVTec AD 2 paper's settings where practical. They are **not tuned**: one setting serves all scenarios. Both score below the paper's numbers for the same methods (see [results](results.md)).
+Both come from anomalib and follow the MVTec AD 2 paper's settings where practical, with one setting for all scenarios. These frozen settings score below the paper's numbers for the same methods. After the freeze, PatchCore's input size and coreset ratio (`TrackAConfig.image_size`, `TrackAConfig.coreset_ratio`) were tuned on the dev split; the selected 512×512 setting was evaluated once on lock (see [protocol](protocol.md) and [results](results.md)). EfficientAD-S was not tuned.
 
 - Input: every image is resized to 256×256 without keeping the aspect ratio, as in the paper, and without a center crop.
 - PatchCore: `Patchcore(backbone="wide_resnet50_2", layers=("layer2", "layer3"), coreset_sampling_ratio=0.01, num_neighbors=9)`. It runs one epoch, which fills its memory bank. anomalib supports one backbone, not the paper's three-backbone ensemble.
@@ -200,7 +200,7 @@ The post-freeze lighting-adaptation study (see [protocol](protocol.md#lighting-a
 
 All 8 scenarios, dev split, k ∈ {2, 5}, 3 seeds:
 
-- TabPFN-3.5-Fast maps beat the DINOv3 distance map by +0.056 (k = 2) and +0.071 (k = 5) AU-PRO@0.05. Both intervals exclude zero.
+- TabPFN-3.5-Fast maps beat the DINOv3 distance map by +0.056 (k = 2) and +0.071 (k = 5) AU-PRO@0.05. Both intervals exclude zero. With PatchCore columns tuned to 512×512 the gains are +0.059 and +0.073, and the lead over PatchCore itself drops to +0.12 and +0.17 (see [results](results.md)).
 - They beat logistic regression on the same rows by +0.021 (k = 2) and +0.065 (k = 5).
 - Vial is the only scenario with a clear loss against the distance map, which is already near saturation there.
 - SegF1 is lower for every learned map than for the distance map. The mean + 3 std threshold rule suits distances better than probabilities.

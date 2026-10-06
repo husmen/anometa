@@ -31,31 +31,32 @@ Track B uses DINOv3-L CLS, mean-patch and patch-novelty features, PCA to 16 dime
 
 | pixel-level (Track A, unsupervised) | AU-PRO@0.05 | AU-PRO@0.30 | SegF1 | image AUROC |
 |---|---|---|---|---|
-| **DINOv3-L patch distance (training-free)** | **0.385** | **0.583** | **0.375** | **0.780** |
+| **DINOv3-L patch distance (training-free)** | **0.385** | 0.583 | **0.375** | **0.780** |
 | PatchCore | 0.222 | 0.460 | 0.198 | 0.720 |
+| PatchCore, 512×512, tuned on dev (post-freeze) | **0.385** | **0.602** | 0.233 | 0.739 |
 | EfficientAD-S | 0.182 | 0.371 | 0.150 | 0.653 |
 
-The training-free DINOv3-L patch distance map is the best of our three pixel methods. Its image AUROC (0.780) matches TabPFN at k=5 (0.789) without any labels. PatchCore and EfficientAD-S are untuned (see below).
+The training-free DINOv3-L patch distance map ties PatchCore tuned on dev to 512×512 on AU-PRO@0.05 and has the best SegF1 and image AUROC; its image AUROC (0.780) matches TabPFN at k=5 (0.789) without any labels. The tuned PatchCore row is a post-freeze study, evaluated once on lock (see [protocol](protocol.md)).
 
 ### Comparison with the MVTec AD 2 paper
 
 AU-PRO@0.05 in %. Ours: lock split of the public test set, all lighting conditions pooled. Paper: Table VII of [Heckler-Kram et al.](https://arxiv.org/abs/2503.21622), private test set, regular lighting (`TESTpriv`), evaluated by MVTec's server. Best of 7 methods: PatchCore, RD, RD++, EfficientAD, MSFlow, SimpleNet, DSR.
 
-| scenario | DINOv3-L distance (ours) | PatchCore, ours / paper | EfficientAD-S, ours / paper | best in paper |
-|---|---|---|---|---|
-| Can | 6.3 | 0.1 / 4.7 | 4.1 / 9.6 | **13.9** (DSR) |
-| Fabric | 19.6 | 4.5 / 11.0 | 15.7 / 22.2 | **22.2** (EfficientAD) |
-| Fruit Jelly | 42.9 | 35.4 / 46.7 | 34.1 / 50.5 | **54.4** (RD++) |
-| Rice | **39.5** | 11.7 / 25.6 | 2.9 / 27.6 | 27.6 (EfficientAD) |
-| Sheet Metal | **47.6** | 9.4 / 15.2 | 8.7 / 11.8 | 18.0 (DSR) |
-| Vial | **84.6** | 47.0 / 62.2 | 62.2 / 55.6 | 63.0 (RD++) |
-| Wall Plugs | **26.8** | 15.4 / 12.8 | 2.4 / 20.3 | 20.3 (EfficientAD) |
-| Walnuts | 41.1 | 54.3 / 51.8 | 15.7 / 48.8 | **51.8** (PatchCore) |
-| **Mean** | **38.5** | 22.2 / 28.8 | 18.2 / 30.8 | 30.8 (EfficientAD) |
+| scenario | DINOv3-L distance (ours) | PatchCore 512 px, tuned (ours) | PatchCore 256 px, ours / paper | EfficientAD-S, ours / paper | best in paper |
+|---|---|---|---|---|---|
+| Can | 6.3 | 12.9 | 0.1 / 4.7 | 4.1 / 9.6 | **13.9** (DSR) |
+| Fabric | 19.6 | **37.7** | 4.5 / 11.0 | 15.7 / 22.2 | 22.2 (EfficientAD) |
+| Fruit Jelly | 42.9 | 48.0 | 35.4 / 46.7 | 34.1 / 50.5 | **54.4** (RD++) |
+| Rice | **39.5** | 15.7 | 11.7 / 25.6 | 2.9 / 27.6 | 27.6 (EfficientAD) |
+| Sheet Metal | **47.6** | 15.9 | 9.4 / 15.2 | 8.7 / 11.8 | 18.0 (DSR) |
+| Vial | **84.6** | 73.4 | 47.0 / 62.2 | 62.2 / 55.6 | 63.0 (RD++) |
+| Wall Plugs | 26.8 | **32.0** | 15.4 / 12.8 | 2.4 / 20.3 | 20.3 (EfficientAD) |
+| Walnuts | 41.1 | **72.1** | 54.3 / 51.8 | 15.7 / 48.8 | 51.8 (PatchCore) |
+| **Mean** | **38.5** | **38.5** | 22.2 / 28.8 | 18.2 / 30.8 | 30.8 (EfficientAD) |
 
-- The training-free DINOv3-L distance map has the highest mean. It beats the paper's best method on 4 of 8 scenarios (Rice, Sheet Metal, Vial, Wall Plugs) and loses on the other 4 (Can, Fabric, Fruit Jelly, Walnuts). The higher mean comes mainly from Sheet Metal, Rice and Vial.
-- Our PatchCore and EfficientAD-S score below the paper's on 6 and 7 of 8 scenarios. Neither was tuned: both use the paper's stated settings with anomalib defaults (256×256 input; PatchCore wide_resnet50_2, coreset ratio 0.01; EfficientAD-S 70,000 steps), one setting for all scenarios, and Imagenette instead of ImageNet as EfficientAD's penalty set. Our pixel-level DINOv3 methods were not tuned either.
-- The test sets differ (public vs private, pooled lighting vs regular lighting) and the lock sets are small, so this is not a ranking. The results show promise for frozen DINOv3 patch features. A conclusive comparison needs tuned baselines and a tuned pipeline of our own, scored on the private test set through MVTec's server.
+- Our two best maps tie on the mean: the training-free DINOv3-L distance map and PatchCore at 512×512, tuned on the dev split after the freeze (38.5 each). Between them, they beat the paper's best method on 6 of 8 scenarios (Fabric, Rice, Sheet Metal, Vial, Wall Plugs, Walnuts) and lose on Can and Fruit Jelly. They are complementary: the distance map wins on Rice, Sheet Metal and Vial, PatchCore on the other five.
+- At the frozen 256×256 default, our PatchCore scores below the paper's on 6 of 8 scenarios. A declared dev-split sweep of input size and coreset ratio showed that resolution drives most of that gap: at 512×512 its lock mean rises from 22.2 to 38.5. The paper ran PatchCore at 256×256, so this shows the effect of resolution, not a better PatchCore. EfficientAD-S was not tuned (about 44 min per scenario) and stays below the paper on 7 of 8 scenarios; it also uses Imagenette instead of ImageNet as its penalty set.
+- The test sets differ (public vs private, pooled lighting vs regular lighting) and the lock sets are small, so this is not a ranking. A conclusive comparison needs the private test set, scored through MVTec's server.
 
 ### Reproduction
 
@@ -91,7 +92,7 @@ Pre-declared comparisons on shifted lighting, paired 95% intervals:
 - There is little to recover. With DINOv3-L features, the lighting gap at m = 0 is only about 0.01 AUROC for TabPFN and zero for logistic regression.
 - The adaptation images do improve calibration. Balanced NLL on shifted lighting drops by 0.05–0.065 with two adaptation scenes.
 - Under shifted light, TabPFN beats Mahalanobis by about 0.045 and leads logistic regression by 0.015–0.025 (intervals touch zero).
-- The TabPFN outlier score shows no lighting gap either. At k = 2, TabPFN-3.5 leads it by +0.016 [−0.005, +0.039] at m = 2. The k = 1 outlier runs are still running.
+- The TabPFN outlier score shows no lighting gap either. At m = 2, TabPFN-3.5 leads it by +0.016 [−0.005, +0.039] at k = 2 and by +0.012 [−0.009, +0.032] at k = 1; both intervals include zero. All 36 runs of the study are complete.
 
 The frozen DINOv3-L features already make every model nearly lighting-invariant on AD2. TabPFN's in-context adaptation buys calibration, not ranking.
 
@@ -137,6 +138,23 @@ TabPFN-Fast map minus each baseline, bootstrap over (scenario, seed) units, 95%:
 | PatchCore | **+0.261 [+0.186, +0.342]** | **+0.278 [+0.188, +0.373]** |
 
 - This is the strongest TabPFN-specific result of the project.
+
+With PatchCore tuned to 512×512 (post-freeze rerun, same images, seeds and context), the PatchCore columns of the rows and the PatchCore baseline change; everything else stays the same:
+
+| k | DINOv3 distance | PatchCore 512 | fused (no labels) | logreg rows | TabPFN-3.5 rows | TabPFN-Fast rows |
+|---|---|---|---|---|---|---|
+| 2 | 0.393 | 0.331 | 0.435 | 0.427 | 0.433 | **0.452** |
+| 5 | 0.397 | 0.296 | 0.413 | 0.413 | 0.469 | **0.470** |
+
+| TabPFN-Fast map minus | k = 2 | k = 5 |
+|---|---|---|
+| DINOv3 distance map | **+0.059 [+0.021, +0.103]** | **+0.073 [+0.039, +0.109]** |
+| fused map (no labels) | +0.018 [−0.016, +0.058] | **+0.057 [+0.006, +0.109]** |
+| logreg on the same rows | **+0.025 [+0.008, +0.043]** | **+0.056 [+0.024, +0.090]** |
+| PatchCore 512 | **+0.121 [+0.051, +0.199]** | **+0.174 [+0.086, +0.267]** |
+
+- TabPFN's maps barely change with the better PatchCore columns (+0.003 and +0.002, intervals around zero): they rely mostly on the DINOv3 columns.
+- The lead over PatchCore halves but stays clear. The label-free fusion gets much stronger and ties TabPFN-Fast at k = 2; at k = 5 TabPFN still leads.
 - The biggest gains at k = 5 are on Wall Plugs (0.006 → 0.202), Sheet Metal (0.554 → 0.723) and Walnuts (0.504 → 0.638). Vial is the only clear loss (0.867 → 0.834).
 - SegF1 is lower for every learned map (TabPFN-Fast 0.18 vs distance 0.26). The threshold rule (validation mean + 3 std) suits a distance better than a probability.
 - TabPFN-Fast takes 15–30 s per (scenario, k, seed) on an RTX 3090, for about 100,000–250,000 scored patches.

@@ -11,7 +11,7 @@ The name is **ano**maly + **meta**. Today "meta" means meta-learning: TabPFN was
 ```{figure} report/data/trackc_gallery.webp
 :alt: One defect image per MVTec AD 2 scenario with the DINOv3-L distance, PatchCore and TabPFN-Fast anomaly maps
 
-TabPFN as a defect-map generator (dev-split prototype): one row per image patch, scored by TabPFN-3.5-Fast. Rows: image, DINOv3-L distance, PatchCore, TabPFN-Fast. Best case per scenario, chosen on purpose (Fabric has no image where TabPFN's peak sits on the defect); typical results are in [results](results.md).
+TabPFN as a defect-map generator (dev-split prototype): one row per image patch, scored by TabPFN-3.5-Fast. Rows: image, DINOv3-L distance, PatchCore (tuned, 512 px), TabPFN-Fast. Best case per scenario, chosen on purpose (Fabric has no image where TabPFN's peak sits on the defect); typical results are in [results](results.md).
 ```
 
 ## At a glance
@@ -26,7 +26,7 @@ Lock split of MVTec AD 2, evaluated once after the configuration was frozen on t
 
 - **One labelled defect is enough to beat logistic regression:** +0.078 AUROC at k = 1 (paired interval [+0.009, +0.146]). At k = 2 and 5 the lead of about 0.04 is within noise.
 - **Calibrated without tuning:** TabPFN's balanced log loss is about half of logistic regression's (0.65 vs 1.25 at k = 1).
-- **The features do most of the work:** label-free novelty scores on the same DINOv3 features tie TabPFN. The training-free DINOv3-L distance map is the best of our pixel methods (AU-PRO@0.05 0.385, PatchCore 0.222, EfficientAD-S 0.182; both baselines untuned).
+- **The features do most of the work:** label-free novelty scores on the same DINOv3 features tie TabPFN. The training-free DINOv3-L distance map ties the best pixel method (AU-PRO@0.05 0.385, the same as PatchCore tuned on dev to 512×512; PatchCore 0.222 at its 256×256 default, EfficientAD-S 0.182).
 - **Fast and reproducible:** a TabPFN fit takes about 5 ms; one scenario runs end to end in about 14 s on an RTX 3090. Results match within 0.005 AUROC on an Apple M4 Pro and within 0.001 on a CPU.
 
 The [results](results.md) page has every table, the per-scenario comparison with the MVTec AD 2 paper and the post-freeze studies.

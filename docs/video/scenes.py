@@ -629,7 +629,7 @@ class Explainer(Scene):
         gallery.scale_to_fit_width(min(gallery.width, 12.6)).move_to(0.25 * DOWN)
         g_cap = txt(
             "best example per scenario, chosen on purpose \N{MIDDLE DOT} dev split"
-            " \N{MIDDLE DOT} PatchCore: default settings, not tuned",
+            " \N{MIDDLE DOT} PatchCore tuned on dev to 512 px",
             18,
             MUTED,
         ).next_to(gallery, DOWN, buff=0.12)
@@ -638,18 +638,19 @@ class Explainer(Scene):
         )
 
         data = [
-            ("TabPFN-3.5-Fast", 0.468, AMBER_2),
-            ("TabPFN-3.5", 0.460, AMBER),
-            ("logistic regression", 0.402, BLUE),
+            ("TabPFN-3.5-Fast", 0.470, AMBER_2),
+            ("TabPFN-3.5", 0.469, AMBER),
+            ("logistic regression", 0.413, BLUE),
+            ("fused, no labels", 0.413, TEAL),
             ("DINOv3 distance", 0.397, TEAL),
-            ("fused, no labels", 0.353, TEAL),
-            ("PatchCore", 0.189, TEAL),
+            ("PatchCore, tuned (512 px)", 0.296, TEAL),
+            ("PatchCore, default (256 px)", 0.189, TEAL),
         ]
         unit = 9.0  # scene units per unit of AU-PRO
         x0 = 2.4 * LEFT
         bars = VGroup()
         for i, (name, v, color) in enumerate(data):
-            y = 1.35 - 0.52 * i
+            y = 1.45 - 0.5 * i
             bar = Rectangle(width=v * unit, height=0.36, stroke_width=0).set_fill(
                 color, 1 if color != TEAL else 0.75
             )
@@ -663,7 +664,6 @@ class Explainer(Scene):
                     txt(f"{v:.3f}", 22, color, bold=True).next_to(bar, RIGHT, buff=0.15),
                 )
             )
-        untuned = txt("default settings, not tuned", 20, MUTED).next_to(bars[-1], RIGHT, buff=0.3)
         cap = txt(
             "mean AU-PRO@0.05 (higher is better), k = 5, dev split,"
             " 8 scenarios \N{MULTIPLICATION SIGN} 3 seeds",
@@ -688,8 +688,11 @@ class Explainer(Scene):
             Indicate(bars[1], color=AMBER, scale_factor=1.04),
             run_time=1.0,
         )
-        self.at("They also beat PatchCore", Indicate(bars[-1], color=TEAL, scale_factor=1.04))
-        self.at("default settings", FadeIn(untuned, shift=0.2 * LEFT), run_time=0.6)
+        self.at(
+            "even after tuning",
+            Indicate(bars[-2], color=TEAL, scale_factor=1.04),
+            Indicate(bars[-1], color=TEAL, scale_factor=1.04),
+        )
 
     def takeaways(self) -> None:
         """Speed, cross-hardware reproduction and the open-source line."""

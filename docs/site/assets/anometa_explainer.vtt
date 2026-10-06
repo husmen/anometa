@@ -147,58 +147,58 @@ strong on ranking, though, so a few
 labels add little.
 
 31
-00:02:01.672 --> 00:02:04.456
+00:02:01.672 --> 00:02:04.341
 The same idea works at patch level.
 
 32
-00:02:04.456 --> 00:02:10.025
+00:02:04.341 --> 00:02:09.678
 Each sixteen by sixteen pixel patch
 becomes a row, and TabPFN scores every
 patch
 
 33
-00:02:10.025 --> 00:02:14.797
+00:02:09.678 --> 00:02:14.253
 to draw a defect map, shown here for one
 image per scenario.
 
 34
-00:02:14.797 --> 00:02:20.366
+00:02:14.253 --> 00:02:19.590
 On the dev split, averaged over all eight
 scenarios, these maps beat the DINOv3
 
 35
-00:02:20.366 --> 00:02:21.161
+00:02:19.590 --> 00:02:20.353
 distance map.
 
 36
-00:02:21.161 --> 00:02:26.332
-They also beat PatchCore, but PatchCore
-ran with default settings and was not
+00:02:20.353 --> 00:02:25.690
+They also beat PatchCore, even after
+tuning it on the dev split, though tuning
 
 37
-00:02:26.332 --> 00:02:29.116
-tuned, so that gap is not conclusive.
+00:02:25.690 --> 00:02:26.834
+halves the gap.
 
 38
-00:02:30.316 --> 00:02:35.051
+00:02:28.034 --> 00:02:32.769
 TabPFN needs no training: fitting takes
 milliseconds, and one scenario runs end
 
 39
-00:02:35.051 --> 00:02:38.998
+00:02:32.769 --> 00:02:36.716
 to end in about fourteen seconds on an RTX
 3090.
 
 40
-00:02:38.998 --> 00:02:45.706
+00:02:36.716 --> 00:02:43.424
 Results match within a fraction of a point
 on an Apple M4 Pro and on a plain
 
 41
-00:02:45.706 --> 00:02:46.101
+00:02:43.424 --> 00:02:43.819
 CPU.
 
 42
-00:02:46.101 --> 00:02:50.047
+00:02:43.819 --> 00:02:47.765
 Anometa is open source, with every run
 recorded and reproducible.

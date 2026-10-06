@@ -1076,36 +1076,44 @@ PAPER_BEST = {
 
 
 def table_paper():
-    """Per-scenario lock AU-PRO@0.05 next to the AD2 paper's private-test numbers."""
+    """Per-scenario lock AU-PRO@0.05 next to the AD2 paper's private-test numbers.
+
+    Bold marks the highest of our two best maps (distance, tuned PatchCore) and the
+    paper's best method.
+    """
     dl, pc, ead = tracka("distance-dinov3-l"), tracka("patchcore"), tracka("efficientad-s")
+    pc512 = tracka("patchcore-512")
 
     def pro(m, sc):
         return 100 * m["au_pro_005" if sc is None else f"{sc}/au_pro_005"]
 
     rows = []
     for sc in [*SC, None]:
-        ours, (best_name, best) = pro(dl, sc), PAPER_BEST[sc]
+        (best_name, best) = PAPER_BEST[sc]
         pc_paper = PAPER_MEAN["patchcore"] if sc is None else PAPER_PRO["patchcore"][sc]
         ead_paper = PAPER_MEAN["efficientad"] if sc is None else PAPER_PRO["efficientad"][sc]
-        a, b = (
-            (f"<b>{ours:.1f}</b>", f"{best:.1f}")
-            if ours > best
-            else (f"{ours:.1f}", f"<b>{best:.1f}</b>")
-        )
+        vals = {"dl": pro(dl, sc), "pc512": pro(pc512, sc), "best": best}
+        top = max(vals.values())
+
+        def cell(key, vals=vals, top=top):
+            return f"<b>{vals[key]:.1f}</b>" if vals[key] == top else f"{vals[key]:.1f}"
+
         rows.append(
             [
                 "<b>Mean</b>" if sc is None else SC_LABEL[sc],
-                a,
+                cell("dl"),
+                cell("pc512"),
                 f"{pro(pc, sc):.1f} / {pc_paper:.1f}",
                 f"{pro(ead, sc):.1f} / {ead_paper:.1f}",
-                f"{b} ({best_name})",
+                f"{cell('best')} ({best_name})",
             ]
         )
     return table(
         [
             "scenario",
             "DINOv3-L distance (ours)",
-            "PatchCore, ours / paper",
+            "PatchCore 512 px, tuned (ours)",
+            "PatchCore 256 px, ours / paper",
             "EfficientAD-S, ours / paper",
             "best in paper",
         ],
@@ -1190,6 +1198,7 @@ def build():
         ("distance-dinov3-l", "DINOv3-L patch distance"),
         ("distance-dinov3-s", "DINOv3-S patch distance"),
         ("patchcore", "PatchCore"),
+        ("patchcore-512", "PatchCore, 512 px, tuned on dev (post-freeze)"),
         ("efficientad-s", "EfficientAD-S"),
     ):
         m = tracka(model)
@@ -1228,6 +1237,7 @@ def build():
         tout=f3(lock("lock-tabpfn-outlier")["auroc"]),
         dl_pro=f3(dl["au_pro_005"]),
         pc_pro=f3(pc["au_pro_005"]),
+        pc512_pro=f3(tracka("patchcore-512")["au_pro_005"]),
         ead_pro=f3(ead["au_pro_005"]),
         dl_auc=f3(dl["auroc"]),
         pc_auc=f3(pc["auroc"]),

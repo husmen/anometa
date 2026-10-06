@@ -33,7 +33,7 @@
 <li><strong>TabPFN-3.5 beats logistic regression with one labelled defect:</strong> lock AUROC {tab1} against {log1}, a paired difference of {d1}. At k = 2 and k = 5 it leads by about 0.04 ({tab2} vs {log2}, {tab5} vs {log5}), but those intervals include zero. With three budgets tested, the k = 1 result does not survive a Bonferroni correction on its own.</li>
 <li><strong>TabPFN is much better calibrated.</strong> Its probabilities, corrected to a 50/50 prior, have about half the negative log-likelihood of logistic regression at every k. Logistic regression only matches it after its regularisation is tuned with labels that a few-shot user does not have.</li>
 <li><strong>TabPFN ties the label-free controls.</strong> A Mahalanobis distance ({mah}) and TabPFN's own unsupervised outlier score ({tout}) on the same features need no labels and are statistically level with TabPFN at k = 1 to 5. Logistic regression and kNN fall below them. On AD2, a few labels add little over a good novelty score, and TabPFN is the only supervised model here that keeps up.</li>
-<li><strong>The foundation-model features do most of the work.</strong> The training-free DINOv3-L patch distance map is the best of our pixel-level methods (AU-PRO@0.05 {dl_pro}, PatchCore {pc_pro}, EfficientAD-S {ead_pro}), and its image AUROC ({dl_auc}) is close to TabPFN's at k = 5. Its mean AU-PRO@0.05 is also above the AD2 paper's best, but it wins on only 4 of 8 scenarios, our PatchCore and EfficientAD-S are untuned and below the paper's numbers, and the test sets differ (section 6). This shows promise; a conclusive result needs tuning on both sides.</li>
+<li><strong>The foundation-model features do most of the work.</strong> The training-free DINOv3-L patch distance map ties the best of our pixel-level methods (AU-PRO@0.05 {dl_pro}; PatchCore {pc_pro} at its 256×256 default, {pc512_pro} when tuned to 512×512 on dev; EfficientAD-S {ead_pro}), and its image AUROC ({dl_auc}) is close to TabPFN's at k = 5. Both best maps are above the AD2 paper's best mean, mostly thanks to higher input resolution, and the test sets differ (section 6). This shows promise, not a ranking.</li>
 <li><strong>TabPFN-3.5-Fast matches TabPFN-3.5</strong> within 0.003 AUROC at every k, at about a third of the prediction time.</li>
 <li><strong>Post-freeze studies</strong> (section 8). TabPFN-3.5-Thinking matches local TabPFN-3.5 (AUROC +0.000 at k = 2) at about 200,000 API tokens per fit. Giving TabPFN a few good images under a new light improves its calibration there but not its ranking, because with DINOv3-L features the lighting gap is already only about 0.01 AUROC. A prototype that scores one row per patch gives TabPFN anomaly maps that beat the DINOv3 distance map by 0.06 to 0.07 AU-PRO@0.05 over all 8 scenarios (dev split), and beat logistic regression on the same rows.</li>
 <li><strong>The lock split changed the story.</strong> On the dev split TabPFN and logistic regression looked level, with one scenario (wall plugs) favouring logistic regression. On the untouched lock split that scenario reversed. Small per-scenario differences on AD2 are within scene-sampling noise.</li>
@@ -78,7 +78,7 @@
 </ul>
 <h3>Track A: unsupervised baselines with anomaly maps</h3>
 <figure class="plot">{diag_tracka}</figure>
-<p>PatchCore <span class="cite">[<a href="#ref-10">10</a>]</span> and EfficientAD-S <span class="cite">[<a href="#ref-11">11</a>]</span> come from anomalib <span class="cite">[<a href="#ref-5">5</a>]</span> with the AD2 paper's stated settings <span class="cite">[<a href="#ref-3">3</a>]</span> and are not tuned: 256×256 input, PatchCore with a WideResNet-50 <span class="cite">[<a href="#ref-16">16</a>]</span> backbone and a 1% coreset, EfficientAD-S trained for 70,000 steps with Imagenette as its penalty set, instead of the ImageNet that the original method uses. The DINOv3 patch distance map needs no training: it reuses the patch distances already computed for the novelty features.</p>
+<p>PatchCore <span class="cite">[<a href="#ref-10">10</a>]</span> and EfficientAD-S <span class="cite">[<a href="#ref-11">11</a>]</span> come from anomalib <span class="cite">[<a href="#ref-5">5</a>]</span> with the AD2 paper's stated settings <span class="cite">[<a href="#ref-3">3</a>]</span>: 256×256 input, PatchCore with a WideResNet-50 <span class="cite">[<a href="#ref-16">16</a>]</span> backbone and a 1% coreset, EfficientAD-S trained for 70,000 steps with Imagenette as its penalty set, instead of the ImageNet that the original method uses. These are the frozen settings. After the freeze, a declared dev-split sweep tuned PatchCore's input size and coreset ratio; the selected 512×512 setting was then evaluated once on lock as a separate row. EfficientAD-S was not tuned. The DINOv3 patch distance map needs no training: it reuses the patch distances already computed for the novelty features.</p>
 </section>
 
 <section id="framework">
@@ -144,12 +144,12 @@
 <p>One lock defect image per scenario, regular lighting. The DINOv3-L map is computed at 16-pixel patch resolution, the other two at 256×256.</p>
 {examples}
 <h3>Against the MVTec AD 2 paper</h3>
-<p>AU-PRO@0.05 in %. Ours: the lock half of the public test set, all lighting conditions pooled. Paper: Table VII of Heckler-Kram et al. <span class="cite">[<a href="#ref-3">3</a>]</span>, the private test set under regular lighting, scored by MVTec's server. "Best in paper" is the best of 7 methods (PatchCore, RD, RD++, EfficientAD, MSFlow, SimpleNet, DSR). Bold marks the higher of our distance map and the paper's best.</p>
+<p>AU-PRO@0.05 in %. Ours: the lock half of the public test set, all lighting conditions pooled. Paper: Table VII of Heckler-Kram et al. <span class="cite">[<a href="#ref-3">3</a>]</span>, the private test set under regular lighting, scored by MVTec's server. "Best in paper" is the best of 7 methods (PatchCore, RD, RD++, EfficientAD, MSFlow, SimpleNet, DSR). Bold marks the highest of our two best maps and the paper's best.</p>
 {table_paper}
 <ul>
-<li>The training-free DINOv3-L distance map has the highest mean. It beats the paper's best method on 4 of 8 scenarios (Rice, Sheet Metal, Vial, Wall Plugs) and loses on the other 4 (Can, Fabric, Fruit Jelly, Walnuts). Most of the higher mean comes from Sheet Metal, Vial and Rice.</li>
-<li>Our PatchCore and EfficientAD-S score below the paper's on 6 and 7 of 8 scenarios. Neither was tuned: both use the paper's stated settings with anomalib defaults and one setting for all scenarios, and EfficientAD-S uses Imagenette instead of ImageNet as its penalty set. Our DINOv3 distance map was not tuned either.</li>
-<li>The test sets differ (public vs private, pooled vs regular lighting) and the lock sets are small, so this is not a ranking. The result shows promise for frozen DINOv3 patch features. A conclusive comparison needs tuned baselines and a tuned pipeline of our own, scored on the private test set through MVTec's server.</li>
+<li>Our two best maps tie on the mean: the training-free DINOv3-L distance map and PatchCore at 512×512, tuned on the dev split after the freeze (38.5 each). Between them they beat the paper's best method on 6 of 8 scenarios and lose on Can and Fruit Jelly. They are complementary: the distance map wins on Rice, Sheet Metal and Vial, PatchCore on the other five.</li>
+<li>At the frozen 256×256 default, our PatchCore scores below the paper's on 6 of 8 scenarios. The dev-split sweep showed that resolution drives most of that gap: at 512×512 its lock mean rises from 22.2 to 38.5. The paper ran PatchCore at 256×256, so this shows the effect of resolution, not a better PatchCore. EfficientAD-S was not tuned and stays below the paper on 7 of 8 scenarios.</li>
+<li>The test sets differ (public vs private, pooled vs regular lighting) and the lock sets are small, so this is not a ranking. A conclusive comparison needs the private test set, scored through MVTec's server.</li>
 </ul>
 </section>
 
@@ -185,7 +185,7 @@
 <li><strong>Calibration does improve:</strong> balanced NLL under shifted lighting drops by 0.05 (k = 2) to 0.065 (k = 1), a clear and consistent gain.</li>
 <li>Under shifted light, TabPFN beats Mahalanobis by 0.045 AUROC and leads logistic regression by 0.015 to 0.025 (intervals touch zero), with far better calibration.</li>
 <li>The hardest conditions for TabPFN are <code>shift_3</code> (0.701) and <code>shift_1</code> (0.710), against 0.735 under regular light.</li>
-<li>The six <code>tabpfn_outlier</code> runs (18 features, one regressor refit per feature) take over two hours each and were still running when this report was built.</li>
+<li>The six <code>tabpfn_outlier</code> runs (18 features, one regressor refit per feature) took 4 to 15 hours each. They show no lighting gap either (shifted AUROC 0.709 to 0.713), and TabPFN-3.5 leads the outlier score at m = 2 by +0.016 (k = 2) and +0.012 (k = 1); both intervals include zero.</li>
 </ul>
 <h3>Does TabPFN-3.5-Thinking help?</h3>
 <p>TabPFN-3.5-Thinking, available only through the Prior Labs API, spends extra compute at prediction time to optimise a chosen metric (here AUROC, medium effort). Pre-declared comparison on the dev split, frozen configuration, k = 2, seeds 0 to 4, all 8 scenarios, against local TabPFN-3.5 on the same images:</p>
@@ -204,6 +204,7 @@
 {table_trackc}
 <ul>
 <li><strong>TabPFN learns a better map than its inputs.</strong> Over all 8 scenarios, TabPFN-Fast's map beats the DINOv3 distance map by 0.056 (k = 2) and 0.071 (k = 5) AU-PRO@0.05, the unsupervised fusion by 0.09 to 0.12, and logistic regression on the same rows by 0.02 to 0.07; every interval excludes zero. It is the strongest TabPFN-specific result of the project.</li>
+<li><strong>With PatchCore tuned to 512×512</strong> (post-freeze rerun), TabPFN-Fast's map barely changes (0.452 and 0.470 at k = 2 and 5). It still beats the distance map (+0.059, +0.073) and the tuned PatchCore (+0.12, +0.17). The label-free fusion of the two tuned maps gets much stronger: it ties TabPFN-Fast at k = 2 (+0.018, interval includes zero), while TabPFN leads at k = 5 (+0.057).</li>
 <li><strong>Largest gains</strong> at k = 5: Wall Plugs 0.006 → 0.20, Sheet Metal 0.55 → 0.72, Walnuts 0.50 → 0.64. Vial, saturated for the DINOv3 distance (0.87), is the one clear loss (0.83).</li>
 <li><strong>Caveats:</strong> dev split only, 3 seeds; the patch labelling rule was changed once, after a crash on Can (its defects are smaller than 30% of any patch), not after looking at scores. Confirming it would need its own frozen protocol and held-out data.</li>
 <li>Cost on the 3090: 15 to 30 s per scenario with TabPFN-3.5-Fast for 100,000 to 250,000 scored patches and a context of about 18,000 rows.</li>
@@ -226,10 +227,10 @@
 <h2><span class="n">10</span>Limitations</h2>
 <ul>
 <li>Lock numbers use half of AD2's public test set, so they are not directly comparable with published AD2 results, which use the private test sets (see section 6).</li>
-<li>PatchCore and EfficientAD-S run with fixed default settings and no tuning, and they score below the paper's numbers for the same methods.</li>
+<li>EfficientAD-S runs with fixed default settings. PatchCore was tuned only for input size and coreset ratio, on the dev split after the freeze; larger inputs than 512×512 were not tried.</li>
 <li>Lock sets are small: 7 defect scenes and 2 to 6 good scenes per scenario, each under 4 to 7 lighting conditions. Intervals are wide.</li>
 <li>The lock evaluation covers TabPFN image scores only. TabPFN anomaly maps exist only as a dev-split prototype (section 8) without a frozen protocol or lock evaluation.</li>
-<li>Track A runs at 256×256 (as in the AD2 paper); Track B encodes images at a 512-pixel short side. Image-level comparisons across tracks mix these settings.</li>
+<li>Track A runs at 256×256 (as in the AD2 paper), except the tuned PatchCore at 512×512; Track B encodes images at a 512-pixel short side. Image-level comparisons across tracks mix these settings.</li>
 <li>SegF1 is pooled over all images of a scenario, which is our reading of the metric.</li>
 </ul>
 </section>

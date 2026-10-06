@@ -598,7 +598,7 @@ Mean dev AUROC / balanced NLL: Thinking 0.708 / 0.688, TabPFN-3.5 0.707 / 0.677,
 
 - The three k = 2 `tabpfn_outlier` runs finished (4.6–5.8 h each). Shifted AUROC 0.710 / 0.710 / 0.713 at m = 0 / 1 / 2 (regular 0.702): no lighting gap and no adaptation effect.
 - Secondary comparison, TabPFN-3.5 minus `tabpfn_outlier` at m = 2, k = 2, shifted lighting: +0.016 [−0.005, +0.039]. TabPFN leads, but the interval includes zero.
-- The three k = 1 outlier runs are still running (about 15 h). They only add the k = 1 version of this comparison.
+- The three k = 1 outlier runs finished later the same day: shifted AUROC 0.709 / 0.709 / 0.712 at m = 0 / 1 / 2 (regular 0.699 / 0.697 / 0.698), again no gap and no adaptation effect. TabPFN-3.5 minus `tabpfn_outlier` at m = 2, k = 1: +0.012 [−0.009, +0.032], the same picture as at k = 2. All 36 pre-declared runs of the lighting study are complete.
 
 ### Track C example images, chosen by a fixed rule
 
@@ -615,3 +615,30 @@ This correction compares our lock numbers with Table VII of the AD2 paper (priva
 - Our PatchCore (22.2 vs 28.8) and EfficientAD-S (18.2 vs 30.8) score below the paper on 6 and 7 of 8 scenarios. Both run untuned with anomalib defaults, and EfficientAD-S uses Imagenette instead of ImageNet as its penalty set.
 - The test sets differ (public lock half, pooled lighting), so this shows promise, not a ranking. A conclusive result needs tuned baselines, a tuned pipeline and a server submission.
 - Earlier wording in this log ("best pixel method", "not comparable with published numbers") is qualified accordingly.
+
+## 2026-10-06: tuned PatchCore (post-freeze)
+
+Protocol declared before the runs ([protocol](protocol.md#tuned-patchcore-dev-split)): dev-split sweep of PatchCore's input size and coreset ratio, selection by mean dev AU-PRO@0.05, then one declared lock run of the selected setting.
+
+Dev split, 8 scenarios (fit time on a shared RTX 3090, not canonical):
+
+| setting | AU-PRO@0.05 | AU-PRO@0.30 | SegF1 | image AUROC | fit |
+|---|---|---|---|---|---|
+| 256×256, coreset 0.01 (frozen default) | 0.202 | 0.453 | 0.162 | 0.652 | 37 s |
+| 256×256, coreset 0.1 | 0.194 | 0.445 | 0.141 | 0.663 | 110 s |
+| 384×384, coreset 0.01 | 0.269 | 0.503 | 0.171 | 0.669 | 74 s |
+| 384×384, coreset 0.1 | 0.283 | 0.521 | 0.168 | 0.688 | 416 s |
+| **512×512, coreset 0.01 (selected)** | **0.363** | **0.572** | 0.165 | **0.742** | 158 s |
+| DINOv3-L distance map (reference) | 0.391 | 0.611 | 0.267 | 0.717 | – |
+
+- Input resolution drives the gain; the coreset ratio barely matters (+0.014 at 384, −0.008 at 256).
+- 512×512 is the edge of the grid, so larger inputs may gain more. 512×512 at coreset 0.1 was not run.
+
+Lock split, one run (`lock-tracka-patchcore-512`, `configs/postfreeze/`): AU-PRO@0.05 0.385, AU-PRO@0.30 0.602, SegF1 0.233, ClassF1 0.801, image AUROC 0.739. The frozen 256×256 PatchCore scored 0.222 / 0.460 / 0.198 / 0.702 / 0.720, the DINOv3-L distance map 0.385 / 0.583 / 0.375 / 0.800 / 0.780.
+
+- On AU-PRO@0.05 the tuned PatchCore ties the distance map; per scenario they are complementary (PatchCore: Can, Fabric, Fruit Jelly, Wall Plugs, Walnuts; distance map: Rice, Sheet Metal, Vial).
+- Against the AD2 paper, the gap of our 256×256 PatchCore was mostly resolution: the paper's PatchCore ran at 256×256 (mean 28.8 on its private test set), ours at 512×512 reaches 38.5 on the lock half of the public test set.
+
+### Track C prototype with PatchCore at 512×512
+
+Rerun of the dev-only prototype with the tuned PatchCore maps in the rows and as the PatchCore baseline; everything else unchanged (same images, seeds, context and labelling rule). TabPFN-Fast map, mean AU-PRO@0.05: 0.452 (k = 2) and 0.470 (k = 5), +0.003 and +0.002 over the 256×256 version (intervals include zero). TabPFN-Fast minus PatchCore 512: +0.121 [+0.051, +0.199] (k = 2) and +0.174 [+0.086, +0.267] (k = 5). Minus the DINOv3 distance map: +0.059 and +0.073. Minus the label-free fusion (now with PatchCore 512): +0.018 [−0.016, +0.058] and +0.057 [+0.006, +0.109]. Results file: `docs/report/data/results_pc512.jsonl`.

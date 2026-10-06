@@ -6,11 +6,10 @@ This page lists what is not built yet. The hackathon results are on the [results
 
 - **Hugging Face feature upload.** Publish the cached features, the Thinking prediction cache and the lock artifacts as a Hugging Face dataset, with a dataset card that states CC BY-NC-SA 4.0 and cites AD2. Anyone can then reproduce Track B on a laptop without extracting features. The upload needs the author's explicit approval.
 - **Thinking ablation, remaining runs.** Finish seeds 5–9 at k = 2 (10 of 40 predictions are cached, about 32 fits remain). Then run k = 1 and k = 5, as the protocol requires. A fit costs about 200k tokens, so the 5M daily API token limit allows about 25 fits a day. A limit increase (about 35M tokens) is requested. It would also cover a one-fit feasibility test of Track C on the API.
-- **Lighting study, last runs.** The three `tabpfn_outlier` runs at k = 1 are still running (about 15 h). They add the k = 1 version of one secondary comparison (TabPFN-3.5 minus the outlier score). The primary result does not depend on them.
 
 ## Track C: TabPFN anomaly maps
 
-Track C gives TabPFN-3.5 one row per image patch and learns a defect map from a few labelled shot images. The dev-only prototype beats the DINOv3 distance map by +0.056 (k = 2) and +0.071 (k = 5) AU-PRO@0.05 (see [results](results.md#track-c-prototype-tabpfn-anomaly-maps)). Track C learns from labelled defects of the public test set. It breaks the benchmark's unsupervised protocol, so it will not go to MVTec's evaluation server. Its success criterion is pixel metrics (AU-PRO@0.05, SegF1, ClassF1) on the lock split, next to Track A.
+Track C gives TabPFN-3.5 one row per image patch and learns a defect map from a few labelled shot images. The dev-only prototype beats the DINOv3 distance map by +0.056 (k = 2) and +0.071 (k = 5) AU-PRO@0.05 (+0.059 and +0.073 with PatchCore columns tuned to 512×512) (see [results](results.md#track-c-prototype-tabpfn-anomaly-maps)). Track C learns from labelled defects of the public test set. It breaks the benchmark's unsupervised protocol, so it will not go to MVTec's evaluation server. Its success criterion is pixel metrics (AU-PRO@0.05, SegF1, ClassF1) on the lock split, next to Track A.
 
 ### Promote the prototype into the package
 
@@ -155,10 +154,10 @@ The training-free DINOv3 patch distance map follows the protocol: it uses only `
 
 ### Tuned baselines
 
-Our PatchCore and EfficientAD-S run untuned, with anomalib defaults and one setting for all scenarios. They score below the AD2 paper's numbers for the same methods on 6 and 7 of 8 scenarios. A conclusive comparison with the paper needs:
+PatchCore's input size and coreset ratio were tuned on dev after the freeze (512×512 ties the distance map on lock). EfficientAD-S still runs with its defaults. A conclusive comparison with the paper needs:
 
-- Tuned PatchCore and EfficientAD-S, including EfficientAD's ImageNet penalty set instead of Imagenette.
-- A tuned pipeline of our own (the DINOv3 pixel methods were not tuned either).
+- Larger PatchCore inputs than 512×512 (the best grid point sat at the edge of the grid) and a tuned EfficientAD-S, including its ImageNet penalty set instead of Imagenette.
+- A tuned pipeline of our own (the DINOv3 pixel methods were not tuned).
 - Scores on the private test set through MVTec's server, not on the public lock half.
 
 ## Broader scope: a meta-framework

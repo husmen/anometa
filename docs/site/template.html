@@ -57,11 +57,11 @@ $chart_budget
 <h3>Pixel level, against the MVTec AD 2 paper</h3>
 <p>AU-PRO@0.05 in %. Ours: lock half of the public test set, all lightings pooled. Paper: Table VII of Heckler-Kram et al., private test set, regular lighting.</p>
 $table_paper
-<p class="lp-note">The training-free DINOv3-L distance map has the highest mean but wins on only 4 of 8 scenarios. Our PatchCore and EfficientAD-S run untuned with anomalib defaults and score below the paper's numbers for the same methods, and the test sets differ. This shows promise, not a ranking: a conclusive comparison needs tuned baselines, a tuned pipeline of our own, and a submission to MVTec's evaluation server.</p>
+<p class="lp-note">Our two best maps tie on the mean: the training-free DINOv3-L distance map and PatchCore tuned on dev to 512×512 input. Between them they beat the paper's best method on 6 of 8 scenarios. The paper ran PatchCore at 256×256, so most of PatchCore's gain is resolution, and the test sets differ. This shows promise, not a ranking: a conclusive comparison needs MVTec's evaluation server.</p>
 
 <h3>TabPFN as a defect-map generator (prototype)</h3>
 <p>Each 16×16-pixel patch becomes a row (patch token, DINOv3 distance, PatchCore value and their 3×3 maxima), and TabPFN-3.5-Fast scores every patch. On the dev split of all 8 scenarios its maps beat the DINOv3 distance map by $tc2 (k = 2) and $tc5 (k = 5) AU-PRO@0.05. Dev only, 3 seeds, no frozen protocol yet.</p>
-<figure class="lp-fig lp-wide"><div class="lp-scroll"><img src="$trackc_gallery" alt="One defect image per scenario, with the DINOv3-L distance, PatchCore and TabPFN-Fast maps below it"></div><figcaption class="lp-caption">Best case per scenario, chosen on purpose: among the dev defect images under every lighting (k = 5, seeds 0 to 2), the image whose TabPFN map peaks on the defect with the highest pixel average precision. Fabric has no such image, so its row shows the closest one. Rows: image with the defect outlined, DINOv3-L distance, PatchCore, TabPFN-Fast. Typical results are the medians in the <a href="report/">report</a>, where the distance map sometimes wins.</figcaption></figure>
+<figure class="lp-fig lp-wide"><div class="lp-scroll"><img src="$trackc_gallery" alt="One defect image per scenario, with the DINOv3-L distance, PatchCore and TabPFN-Fast maps below it"></div><figcaption class="lp-caption">Best case per scenario, chosen on purpose: among the dev defect images under every lighting (k = 5, seeds 0 to 2), the image whose TabPFN map peaks on the defect with the highest pixel average precision. Fabric has no such image, so its row shows the closest one. Rows: image with the defect outlined, DINOv3-L distance, PatchCore (tuned, 512 px), TabPFN-Fast with PatchCore 512 columns. Typical results are the medians in the <a href="report/">report</a>, where the distance map sometimes wins.</figcaption></figure>
 </section>
 
 <section class="lp-sec">
@@ -77,7 +77,7 @@ $table_paper
 <h2>Limitations</h2>
 <ul>
 <li>Lock numbers use half of the public test set (7 defect scenes per scenario), so intervals are wide and the numbers are not directly comparable with the private test set.</li>
-<li>The baselines and our pipeline were not tuned for pixel metrics.</li>
+<li>Only PatchCore was tuned for pixel metrics (input size and coreset ratio, on dev); EfficientAD-S and our DINOv3 pipeline were not.</li>
 <li>TabPFN maps exist only as a dev-split prototype.</li>
 </ul>
 </section>
