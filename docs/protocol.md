@@ -163,3 +163,5 @@ Declared on 2026-10-06, before any run.
 - **Data:** all 8 scenarios, dev split only. Maps, thresholds and metrics exactly as in Track A.
 - **Selection:** the highest mean dev AU-PRO@0.05 over the 8 scenarios. On a tie within 0.005, the cheaper setting wins.
 - **Reporting:** every grid point is reported, next to the default PatchCore and the DINOv3 distance map on the same dev images. The lock split is not part of this study. A lock evaluation of the selected setting would be a separate decision, declared before it runs.
+- **Lock evaluation** (declared 2026-10-06 after the dev sweep, before any lock run of it): the selected setting, 512×512 at coreset 0.01, is evaluated once on the lock split as `lock-tracka-patchcore-512` (`configs/postfreeze/`, run with `anometa lock configs/postfreeze`). It is reported next to the frozen lock PatchCore row, not instead of it.
+- **TabPFN patch maps:** the dev-only patch-map prototype, whose rows include PatchCore columns, is rerun with the 512×512 PatchCore maps and reported next to its 256×256 results. Image-level Track B does not use PatchCore and is unchanged.
