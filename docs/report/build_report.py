@@ -1331,7 +1331,7 @@ def build_site():
         chart_budget=f'<figure class="plot">{chart_budget()}</figure>',
         table_lock=table(["method", "k = 1", "k = 2", "k = 5"], rows),
         table_paper=table_paper(),
-        trackc_example=img_uri(HERE.parent / "video" / "assets" / "trackc_example.webp"),
+        trackc_gallery=img_uri(HERE / "data" / "trackc_gallery.webp"),
     )
     desc = "Few-shot industrial anomaly detection with TabPFN-3.5 on frozen DINOv3 features, tested on MVTec AD 2."
     head = (

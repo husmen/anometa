@@ -67,8 +67,8 @@ def thumbnail_data_url(path: Path, size: int = 160) -> str:
         size: Maximum thumbnail side length in pixels.
 
     Returns:
-        A `"data:image/png;base64,..."` URL for a PNG thumbnail of `path`,
-        at most `size` px on its longest side.
+        A PNG thumbnail of `path`, at most `size` px on its longest side, as
+        an inline data URL (`"data:image/png;base64,..."`).
     """
     with Image.open(path) as image:
         rgb = image.convert("RGB")

@@ -22,3 +22,6 @@
 .lp-bib { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font: 13.5px/1.5 var(--mono) }
 .lp-hero p { margin-inline: auto; max-width: none }
 .lp-bib code { background: none; padding: 0; border: 0; font: inherit }
+/* The 8-scenario gallery runs wider than the text column; it scrolls sideways on phones. */
+.lp-wide { width: min(1240px, calc(100vw - 32px)); margin-left: 50%; transform: translateX(-50%) }
+.lp-scroll { overflow-x: auto } .lp-scroll img { min-width: 860px }

@@ -1,0 +1,71 @@
+/* Mermaid diagrams styled after Zed's markdown preview: system UI font, slate neutrals and one accent
+   colour per node (tinted fill, saturated border). Follows Furo's light/dark switch. */
+body {
+  --mz-bg: var(--color-background-primary, #ffffff); --mz-text: #0f172a; --mz-muted: #94a3b8; --mz-line: #64748b; --mz-cluster: #f8fafc;
+  --mz-a1: #5c78e2; --mz-a2: #a449ab; --mz-a3: #669f59; --mz-a4: #c4842b; --mz-a5: #3882b7; --mz-a6: #d36151;
+}
+body[data-theme="dark"] {
+  --mz-bg: var(--color-background-primary, #282c33); --mz-text: #dce0e5; --mz-muted: #5d636f; --mz-line: #a9afbc; --mz-cluster: #2f343e;
+  --mz-a1: #74ade8; --mz-a2: #b477cf; --mz-a3: #a1c181; --mz-a4: #dec184; --mz-a5: #6eb4bf; --mz-a6: #d07277;
+}
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) {
+    --mz-bg: var(--color-background-primary, #282c33); --mz-text: #dce0e5; --mz-muted: #5d636f; --mz-line: #a9afbc; --mz-cluster: #2f343e;
+    --mz-a1: #74ade8; --mz-a2: #b477cf; --mz-a3: #a1c181; --mz-a4: #dec184; --mz-a5: #6eb4bf; --mz-a6: #d07277;
+  }
+}
+.mermaid svg { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif !important }
+
+/* Nodes: cycle six accents. */
+.mermaid .node { --acc: var(--mz-a1) }
+.mermaid .node:nth-child(6n + 2) { --acc: var(--mz-a2) }
+.mermaid .node:nth-child(6n + 3) { --acc: var(--mz-a3) }
+.mermaid .node:nth-child(6n + 4) { --acc: var(--mz-a4) }
+.mermaid .node:nth-child(6n + 5) { --acc: var(--mz-a5) }
+.mermaid .node:nth-child(6n + 6) { --acc: var(--mz-a6) }
+.mermaid .node :is(rect, polygon, circle, ellipse, path) {
+  fill: color-mix(in srgb, var(--acc) 14%, var(--mz-bg)) !important;
+  stroke: var(--acc) !important; stroke-width: 1.5px !important;
+}
+.mermaid .node rect { rx: 6px; ry: 6px }
+.mermaid .node .divider, .mermaid .node line { stroke: var(--acc) !important; opacity: .6 }
+
+/* Text. */
+.mermaid :is(text, tspan, .nodeLabel, .edgeLabel, .label, .cluster-label, span, p) {
+  fill: var(--mz-text) !important; color: var(--mz-text) !important;
+}
+.mermaid .edgeLabel, .mermaid .edgeLabel :is(rect, p, span), .mermaid .labelBkg {
+  background-color: var(--mz-bg) !important; fill: var(--mz-bg) !important;
+}
+
+/* Subgraphs. */
+.mermaid .cluster rect {
+  fill: var(--mz-cluster) !important; stroke: var(--mz-muted) !important;
+  stroke-dasharray: 4 3; rx: 8px; ry: 8px;
+}
+
+/* Edges and arrowheads. */
+.mermaid :is(.flowchart-link, .edgePath path, .relation, .messageLine0, .messageLine1, .loopLine) {
+  stroke: var(--mz-line) !important; stroke-width: 1.4px !important;
+}
+.mermaid :is(marker path, .arrowheadPath, .arrowMarkerPath, #arrowhead path) {
+  fill: var(--mz-line) !important; stroke: var(--mz-line) !important;
+}
+
+/* Sequence diagrams. */
+.mermaid rect.actor { fill: color-mix(in srgb, var(--mz-a1) 14%, var(--mz-bg)) !important; stroke: var(--mz-a1) !important; rx: 6px }
+.mermaid .actor-line { stroke: var(--mz-muted) !important }
+.mermaid .note { fill: color-mix(in srgb, var(--mz-a4) 16%, var(--mz-bg)) !important; stroke: var(--mz-a4) !important }
+.mermaid .activation0, .mermaid .activation1 { fill: color-mix(in srgb, var(--mz-a5) 20%, var(--mz-bg)) !important; stroke: var(--mz-a5) !important }
+
+/* Gantt charts. */
+.mermaid :is(.task, .task0, .task1, .task2, .task3) { fill: color-mix(in srgb, var(--mz-a1) 22%, var(--mz-bg)) !important; stroke: var(--mz-a1) !important; rx: 4px }
+.mermaid :is(.done0, .done1, .done2, .done3) { fill: color-mix(in srgb, var(--mz-a3) 22%, var(--mz-bg)) !important; stroke: var(--mz-a3) !important }
+.mermaid :is(.section0, .section2) { fill: color-mix(in srgb, var(--mz-a1) 5%, transparent) !important }
+.mermaid :is(.section1, .section3) { fill: transparent !important }
+.mermaid .grid .tick line { stroke: var(--mz-muted) !important; opacity: .4 }
+.mermaid :is(.taskText, .taskTextOutsideRight, .taskTextOutsideLeft, .sectionTitle, .titleText) { fill: var(--mz-text) !important }
+
+/* Natural size (14px text); wide graphs scroll sideways instead of shrinking. */
+.mermaid { overflow-x: auto; text-align: center }
+.mermaid svg { max-width: none !important; height: auto }

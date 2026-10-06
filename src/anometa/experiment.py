@@ -34,7 +34,7 @@ RUNNERS: dict[str, str | Callable[[ExperimentConfig, Path], TrackOutput]] = {
     "B": "anometa.trackb.pipeline:run_track_b",
     "L": "anometa.trackb.lighting:run_lighting",
 }
-"""Each track's runner, as an `"module:attr"` import string or a callable."""
+"""Each track's runner: an import string (module, colon, attribute) or a callable."""
 
 
 class ExperimentResult(BaseModel):
