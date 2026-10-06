@@ -41,7 +41,7 @@ def build_model(cfg: TrackAConfig) -> AnomalibModule:
         return Patchcore(
             backbone="wide_resnet50_2",
             layers=("layer2", "layer3"),
-            coreset_sampling_ratio=0.01,
+            coreset_sampling_ratio=0.01 if cfg.coreset_ratio is None else cfg.coreset_ratio,
             num_neighbors=9,
             pre_processor=Patchcore.configure_pre_processor(image_size=cfg.image_size),
             post_processor=False,
