@@ -1,0 +1,194 @@
+WEBVTT
+
+1
+00:00:00.350 --> 00:00:04.202
+Factories need to catch defects, but
+defects are rare.
+
+2
+00:00:04.202 --> 00:00:08.909
+Often you have a handful of labelled
+examples, sometimes just one.
+
+3
+00:00:08.909 --> 00:00:13.617
+Can a model learn to spot new defects from
+that little?
+
+4
+00:00:13.617 --> 00:00:18.324
+Anometa puts TabPFN-3.5, a foundation
+model for tables, to this test.
+
+5
+00:00:19.524 --> 00:00:25.231
+The test bed is MVTec AD 2: eight
+industrial scenarios, from vials and
+walnuts
+
+6
+00:00:25.231 --> 00:00:27.269
+to sheet metal and fabric.
+
+7
+00:00:27.269 --> 00:00:31.345
+The training images show only good parts
+under regular light.
+
+8
+00:00:31.345 --> 00:00:36.236
+The test images add defects, and lighting
+the model has never seen.
+
+9
+00:00:37.436 --> 00:00:42.661
+To keep the results honest, every
+scenario's labelled test images are split
+by
+
+10
+00:00:42.661 --> 00:00:44.268
+scene into two halves.
+
+11
+00:00:44.268 --> 00:00:47.885
+All experiments and model choices use the
+dev half.
+
+12
+00:00:47.885 --> 00:00:53.110
+The configuration is then frozen, and the
+lock half is evaluated exactly once.
+
+13
+00:00:54.310 --> 00:00:58.053
+Each image goes through a frozen DINOv3
+vision transformer.
+
+14
+00:00:58.053 --> 00:01:03.460
+Its global token and its average patch
+become a compact summary, compressed to
+
+15
+00:01:03.460 --> 00:01:04.292
+sixteen numbers.
+
+16
+00:01:04.292 --> 00:01:10.115
+Two more numbers measure how far the
+image's most unusual patches sit from
+their
+
+17
+00:01:10.115 --> 00:01:11.363
+nearest normal patch.
+
+18
+00:01:11.363 --> 00:01:15.106
+That gives one row of eighteen numbers per
+image.
+
+19
+00:01:16.306 --> 00:01:19.355
+TabPFN reads a table instead of being
+trained.
+
+20
+00:01:19.355 --> 00:01:24.309
+The context holds about three hundred
+normal rows and a few defect rows.
+
+21
+00:01:24.309 --> 00:01:29.263
+In one forward pass, it predicts the
+probability that each new image is
+
+22
+00:01:29.263 --> 00:01:29.644
+defective.
+
+23
+00:01:29.644 --> 00:01:32.693
+There are no gradient updates and no
+tuning.
+
+24
+00:01:33.893 --> 00:01:40.154
+On the lock half, with a single labelled
+defect, TabPFN reaches an AUROC of zero
+
+25
+00:01:40.154 --> 00:01:44.745
+point seven six, against zero point six
+eight for logistic regression.
+
+26
+00:01:44.745 --> 00:01:48.501
+With five defects it reaches zero point
+seven nine.
+
+27
+00:01:48.501 --> 00:01:53.927
+Its probabilities are also far better
+calibrated: half the log loss of logistic
+
+28
+00:01:53.927 --> 00:01:54.344
+regression.
+
+29
+00:01:54.344 --> 00:02:00.605
+A good label-free novelty score is just as
+strong on ranking, though, so a few
+
+30
+00:02:00.605 --> 00:02:01.857
+labels add little.
+
+31
+00:02:03.057 --> 00:02:05.886
+The same idea works at patch level.
+
+32
+00:02:05.886 --> 00:02:11.545
+Each sixteen by sixteen pixel patch
+becomes a row, and TabPFN scores every
+patch
+
+33
+00:02:11.545 --> 00:02:13.566
+to draw a defect map.
+
+34
+00:02:13.566 --> 00:02:19.224
+On the dev split, averaged over all eight
+scenarios, these maps beat both the
+
+35
+00:02:19.224 --> 00:02:21.245
+DINOv3 distance map and PatchCore.
+
+36
+00:02:22.445 --> 00:02:28.007
+TabPFN needs no training: fitting takes
+milliseconds, and one scenario runs end
+
+37
+00:02:28.007 --> 00:02:32.642
+to end in about fourteen seconds on an RTX
+3090.
+
+38
+00:02:32.642 --> 00:02:40.522
+Results match within a fraction of a point
+on an Apple M4 Pro and on a plain
+
+39
+00:02:40.522 --> 00:02:40.986
+CPU.
+
+40
+00:02:40.986 --> 00:02:45.621
+Anometa is open source, with every run
+recorded and reproducible.

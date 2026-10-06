@@ -78,6 +78,8 @@ extend-immutable-calls = ["anometa.config.Paths"]
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ANN", "D100", "D104"]
 "src/anometa/metrics/_pro_reference.py" = ["ANN", "D", "B", "SIM", "UP", "NPY"]
+# One-off generator scripts for the static HTML report (not part of the package).
+"docs/report/**" = ["ANN", "D", "E501", "E702", "RUF001"]
 
 [tool.pyrefly]
 preset = "strict"

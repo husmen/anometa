@@ -1,0 +1,96 @@
+<div class="lp">
+<header class="lp-hero">
+<img class="lp-logo" src="assets/logo.webp" alt="" width="72" height="72">
+<h1>Anometa</h1>
+<p class="lp-sub">Few-shot industrial anomaly detection with TabPFN-3.5 on frozen vision foundation model features</p>
+<p class="lp-authors"><a href="https://github.com/husmen">Houssem Menhour</a></p>
+<p class="lp-venue">Prior Labs TabPFN-3.5 hackathon · MVTec AD 2 · 2026</p>
+<nav class="lp-buttons" aria-label="Project links">
+<a class="btn" href="https://github.com/husmen/anometa">Code</a>
+<a class="btn" href="docs/">Docs</a>
+<a class="btn" href="report/">Full report</a>
+<a class="btn" href="#video">Video</a>
+<a class="btn" href="#cite">Cite</a>
+</nav>
+</header>
+
+<section id="video" class="lp-video">
+<video controls preload="metadata" poster="assets/poster.webp" playsinline>
+<source src="media/anometa_explainer.mp4" type="video/mp4">
+<track kind="captions" src="assets/anometa_explainer.vtt" srclang="en" label="English">
+<p>Your browser cannot play this video. <a href="https://github.com/husmen/anometa/releases">Download it from the releases page</a>.</p>
+</video>
+<p class="lp-caption">A 2:46 explainer (Manim, narrated, captions available). Sources: <code>docs/video/</code>.</p>
+</section>
+
+<section class="lp-sec">
+<h2>Abstract</h2>
+<p>Factories need to catch defects, but defects are rare: often there is a handful of labelled examples, sometimes one. <strong>Can TabPFN-3.5, a foundation model for tables, turn a few labelled defect images into a useful detector, using only frozen features from a vision foundation model?</strong> Anometa encodes each image with a frozen DINOv3 vision transformer, compresses it to one table row, and lets TabPFN-3.5 classify new rows in context, with no gradient updates. On the 8 scenarios of MVTec AD 2, under a protocol that freezes the configuration on a dev split and evaluates it once on a held-out lock split, TabPFN reaches a lock AUROC of $tab1 with one labelled defect per scenario (logistic regression: $log1), and its probabilities have about half the balanced log loss. A good label-free novelty score ranks images just as well, so on this benchmark the frozen DINOv3 features do most of the work. A prototype that scores one row per image patch turns TabPFN into a defect-map generator that beats its own input maps on the dev split.</p>
+</section>
+
+<section class="lp-sec lp-name">
+<h2>Why "Anometa"?</h2>
+<p><strong>Ano</strong>maly + <strong>meta</strong>. Today, "meta" means meta-learning: TabPFN was pre-trained on millions of synthetic tasks and learns a new one in context. Tomorrow, it means a meta-framework: the experiment API, artifacts and protocol are not tied to one model or dataset, so other foundation models, detectors and benchmarks can plug in. TabPFN-3.5 and MVTec AD 2 are the starting point.</p>
+</section>
+
+<section class="lp-sec">
+<h2>Method</h2>
+<p>One image becomes one table row: the DINOv3 global token and mean patch (compressed by PCA) plus two novelty numbers, the distances of the image's most unusual patches to their nearest normal patch.</p>
+<figure class="lp-fig">$diag_trackb</figure>
+<p>TabPFN reads the rows of a few hundred normal images and k labelled defects as its context and predicts, in one forward pass, the probability that each new image is defective. There is no training and no tuning: fitting takes milliseconds.</p>
+<figure class="lp-fig">$diag_tabpfn</figure>
+</section>
+
+<section class="lp-sec">
+<h2>Results</h2>
+<div class="kpis">
+<div class="kpi"><b>$tab1</b><span>lock AUROC with one labelled defect per scenario; logistic regression $log1 (paired difference $d1_plain)</span></div>
+<div class="kpi"><b>$nll1</b><span>balanced NLL at k = 1, against $lnll1 for logistic regression: far better calibrated</span></div>
+<div class="kpi"><b>$tc5</b><span>AU-PRO@0.05 gain of TabPFN patch maps over the DINOv3 distance map (k = 5, dev split prototype)</span></div>
+</div>
+<h3>Image level, lock split</h3>
+<p>Mean AUROC over 8 scenarios and 10 seeds; brackets are 95% bootstrap intervals over seeds and scenes.</p>
+$table_lock
+<p>TabPFN beats logistic regression clearly at k = 1 and is level with the label-free controls at every budget. Full paired comparisons, calibration and per-scenario results are in the <a href="report/">report</a>.</p>
+$chart_budget
+
+<h3>Pixel level, against the MVTec AD 2 paper</h3>
+<p>AU-PRO@0.05 in %. Ours: lock half of the public test set, all lightings pooled. Paper: Table VII of Heckler-Kram et al., private test set, regular lighting.</p>
+$table_paper
+<p class="lp-note">The training-free DINOv3-L distance map has the highest mean but wins on only 4 of 8 scenarios. Our PatchCore and EfficientAD-S run untuned with anomalib defaults and score below the paper's numbers for the same methods, and the test sets differ. This shows promise, not a ranking: a conclusive comparison needs tuned baselines, a tuned pipeline of our own, and a submission to MVTec's evaluation server.</p>
+
+<h3>TabPFN as a defect-map generator (prototype)</h3>
+<p>Each 16×16-pixel patch becomes a row (patch token, DINOv3 distance, PatchCore value and their 3×3 maxima), and TabPFN-3.5-Fast scores every patch. On the dev split of all 8 scenarios its maps beat the DINOv3 distance map by $tc2 (k = 2) and $tc5 (k = 5) AU-PRO@0.05. Dev only, 3 seeds, no frozen protocol yet.</p>
+<figure class="lp-fig"><img src="$trackc_example" alt="Wall Plugs: image with the defect outlined, and the DINOv3 distance, PatchCore and TabPFN maps"><figcaption class="lp-caption">Wall Plugs, one dev image picked by a fixed rule. The report shows one example per scenario, including cases where the distance map wins.</figcaption></figure>
+</section>
+
+<section class="lp-sec">
+<h2>Speed and reproducibility</h2>
+<ul>
+<li>TabPFN fits in about 5 ms; one scenario runs end to end in about 14 s on an RTX 3090 (2.1 min on an Apple M4 Pro, 9.8 min on a CPU).</li>
+<li>Results match within 0.005 AUROC on the M4 Pro and within 0.001 on a CPU-only Ryzen.</li>
+<li>Every run writes a manifest (git commit, dataset, split and config hashes, model revisions, licences, seeds, hardware), metrics and per-image predictions.</li>
+</ul>
+</section>
+
+<section class="lp-sec">
+<h2>Limitations</h2>
+<ul>
+<li>Lock numbers use half of the public test set (7 defect scenes per scenario), so intervals are wide and the numbers are not directly comparable with the private test set.</li>
+<li>The baselines and our pipeline were not tuned for pixel metrics.</li>
+<li>TabPFN maps exist only as a dev-split prototype.</li>
+</ul>
+</section>
+
+<section id="cite" class="lp-sec">
+<h2>Citation</h2>
+<pre class="lp-bib"><code>@misc{anometa2026,
+  title  = {Anometa: Few-Shot Industrial Anomaly Detection with TabPFN-3.5
+            on Frozen Vision Foundation Model Features},
+  author = {Menhour, Houssem},
+  year   = {2026},
+  url    = {https://github.com/husmen/anometa}
+}</code></pre>
+<p class="lp-note">Built on TabPFN-3.5 (Prior Labs), DINOv3 (Meta AI, DINOv3 License), MVTec AD 2 (MVTec Software GmbH, CC BY-NC-SA 4.0) and anomalib. Code: Apache-2.0. Page drafted with Claude (AI).</p>
+</section>
+</div>

@@ -1,0 +1,98 @@
+{
+ "dinov3_s/can": {
+  "images_per_s": 117.1297545791495,
+  "peak_vram_mb": 76.03125
+ },
+ "dinov3_s/fabric": {
+  "images_per_s": 84.0679357545193,
+  "peak_vram_mb": 68.59619140625
+ },
+ "dinov3_s/fruit_jelly": {
+  "images_per_s": 121.72424535431745,
+  "peak_vram_mb": 66.89892578125
+ },
+ "dinov3_s/rice": {
+  "images_per_s": 83.73683183359603,
+  "peak_vram_mb": 68.60693359375
+ },
+ "dinov3_s/sheet_metal": {
+  "images_per_s": 68.76068059744635,
+  "peak_vram_mb": 97.32861328125
+ },
+ "dinov3_s/vial": {
+  "images_per_s": 135.52958663382208,
+  "peak_vram_mb": 66.65185546875
+ },
+ "dinov3_s/wallplugs": {
+  "images_per_s": 83.31386774533917,
+  "peak_vram_mb": 68.64892578125
+ },
+ "dinov3_s/walnuts": {
+  "images_per_s": 83.83205441615806,
+  "peak_vram_mb": 68.64892578125
+ },
+ "dinov3_l/can": {
+  "images_per_s": 25.176630996939767,
+  "peak_vram_mb": 647.58349609375
+ },
+ "dinov3_l/fabric": {
+  "images_per_s": 48.93686854833697,
+  "peak_vram_mb": 620.90380859375
+ },
+ "dinov3_l/fruit_jelly": {
+  "images_per_s": 32.548077440552525,
+  "peak_vram_mb": 625.12255859375
+ },
+ "dinov3_l/rice": {
+  "images_per_s": 48.34750687498762,
+  "peak_vram_mb": 620.90380859375
+ },
+ "dinov3_l/sheet_metal": {
+  "images_per_s": 11.701940391096185,
+  "peak_vram_mb": 697.88037109375
+ },
+ "dinov3_l/vial": {
+  "images_per_s": 33.538083556576424,
+  "peak_vram_mb": 624.66162109375
+ },
+ "dinov3_l/wallplugs": {
+  "images_per_s": 48.559432238987284,
+  "peak_vram_mb": 620.90380859375
+ },
+ "dinov3_l/walnuts": {
+  "images_per_s": 48.70869333172335,
+  "peak_vram_mb": 620.90380859375
+ },
+ "siglip2/can": {
+  "images_per_s": 35.55057683295123,
+  "peak_vram_mb": 867.39501953125
+ },
+ "siglip2/fabric": {
+  "images_per_s": 31.78339054947756,
+  "peak_vram_mb": 867.39501953125
+ },
+ "siglip2/fruit_jelly": {
+  "images_per_s": 34.43906874218418,
+  "peak_vram_mb": 867.39501953125
+ },
+ "siglip2/rice": {
+  "images_per_s": 31.722079259891252,
+  "peak_vram_mb": 867.39501953125
+ },
+ "siglip2/sheet_metal": {
+  "images_per_s": 38.5469732326199,
+  "peak_vram_mb": 866.39501953125
+ },
+ "siglip2/vial": {
+  "images_per_s": 35.265497247667454,
+  "peak_vram_mb": 867.39501953125
+ },
+ "siglip2/wallplugs": {
+  "images_per_s": 32.044333358673605,
+  "peak_vram_mb": 867.39501953125
+ },
+ "siglip2/walnuts": {
+  "images_per_s": 32.144324932777295,
+  "peak_vram_mb": 867.39501953125
+ }
+}

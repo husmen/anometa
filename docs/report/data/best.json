@@ -1,0 +1,250 @@
+{
+ "can": {
+  "chosen": {
+   "image_id": "test_public/bad/011_regular",
+   "area": 0.00011200716845878136,
+   "distance": 0.9797191805757813,
+   "patchcore": 0.35834341219054555,
+   "tabpfn_fast": 0.9961453840875995
+  },
+  "median": {
+   "distance": 0.9817765308322588,
+   "patchcore": 0.6652717042949812,
+   "tabpfn_fast": 0.7257223212837366
+  },
+  "n_candidates": 2,
+  "all": [
+   {
+    "image_id": "test_public/bad/011_regular",
+    "area": 0.00011200716845878136,
+    "distance": 0.9797191805757813,
+    "patchcore": 0.35834341219054555,
+    "tabpfn_fast": 0.9961453840875995
+   },
+   {
+    "image_id": "test_public/bad/001_regular",
+    "area": 9.80062724014337e-05,
+    "distance": 0.9838338810887364,
+    "patchcore": 0.9721999963994167,
+    "tabpfn_fast": 0.45529925847987374
+   }
+  ]
+ },
+ "fabric": {
+  "chosen": {
+   "image_id": "test_public/bad/004_regular",
+   "area": 0.0015701593137254903,
+   "distance": 0.9966542532020388,
+   "patchcore": 0.9387874636221143,
+   "tabpfn_fast": 0.9849381851404528
+  },
+  "median": {
+   "distance": 0.9184011918646915,
+   "patchcore": 0.8164865812698964,
+   "tabpfn_fast": 0.9298360312585425
+  },
+  "n_candidates": 2,
+  "all": [
+   {
+    "image_id": "test_public/bad/004_regular",
+    "area": 0.0015701593137254903,
+    "distance": 0.9966542532020388,
+    "patchcore": 0.9387874636221143,
+    "tabpfn_fast": 0.9849381851404528
+   },
+   {
+    "image_id": "test_public/bad/009_regular",
+    "area": 0.0003095639297385621,
+    "distance": 0.8401481305273442,
+    "patchcore": 0.6941856989176785,
+    "tabpfn_fast": 0.8747338773766322
+   }
+  ]
+ },
+ "fruit_jelly": {
+  "chosen": {
+   "image_id": "test_public/bad/002_regular",
+   "area": 0.0040300751879699245,
+   "distance": 0.9988539174672596,
+   "patchcore": 0.9497513464404834,
+   "tabpfn_fast": 0.9917431241245158
+  },
+  "median": {
+   "distance": 0.8545846418746232,
+   "patchcore": 0.8287271220411148,
+   "tabpfn_fast": 0.7468954707426393
+  },
+  "n_candidates": 2,
+  "all": [
+   {
+    "image_id": "test_public/bad/002_regular",
+    "area": 0.0040300751879699245,
+    "distance": 0.9988539174672596,
+    "patchcore": 0.9497513464404834,
+    "tabpfn_fast": 0.9917431241245158
+   },
+   {
+    "image_id": "test_public/bad/007_regular",
+    "area": 0.0010025062656641604,
+    "distance": 0.7103153662819869,
+    "patchcore": 0.7077028976417462,
+    "tabpfn_fast": 0.5020478173607628
+   }
+  ]
+ },
+ "rice": {
+  "chosen": {
+   "image_id": "test_public/bad/006_regular",
+   "area": 0.013442095588235295,
+   "distance": 0.998546509600714,
+   "patchcore": 0.8240352526331762,
+   "tabpfn_fast": 0.9985029353211876
+  },
+  "median": {
+   "distance": 0.9885892263385705,
+   "patchcore": 0.7850999486707847,
+   "tabpfn_fast": 0.9983091812624195
+  },
+  "n_candidates": 2,
+  "all": [
+   {
+    "image_id": "test_public/bad/006_regular",
+    "area": 0.013442095588235295,
+    "distance": 0.998546509600714,
+    "patchcore": 0.8240352526331762,
+    "tabpfn_fast": 0.9985029353211876
+   },
+   {
+    "image_id": "test_public/bad/014_regular",
+    "area": 0.0016914317810457517,
+    "distance": 0.978631943076427,
+    "patchcore": 0.7461646447083932,
+    "tabpfn_fast": 0.9981154272036514
+   }
+  ]
+ },
+ "sheet_metal": {
+  "chosen": {
+   "image_id": "test_public/bad/004_regular",
+   "area": 0.01672979797979798,
+   "distance": 0.9902265129280687,
+   "patchcore": 0.8984833077417986,
+   "tabpfn_fast": 0.9978713838907927
+  },
+  "median": {
+   "distance": 0.9619295479327493,
+   "patchcore": 0.7585242715466205,
+   "tabpfn_fast": 0.9928412305738754
+  },
+  "n_candidates": 2,
+  "all": [
+   {
+    "image_id": "test_public/bad/004_regular",
+    "area": 0.01672979797979798,
+    "distance": 0.9902265129280687,
+    "patchcore": 0.8984833077417986,
+    "tabpfn_fast": 0.9978713838907927
+   },
+   {
+    "image_id": "test_public/bad/005_regular",
+    "area": 0.0033502640036730947,
+    "distance": 0.9336325829374299,
+    "patchcore": 0.6185652353514424,
+    "tabpfn_fast": 0.9878110772569582
+   }
+  ]
+ },
+ "vial": {
+  "chosen": {
+   "image_id": "test_public/bad/003_regular",
+   "area": 0.012457142857142858,
+   "distance": 0.9959022052190101,
+   "patchcore": 0.9335859481890827,
+   "tabpfn_fast": 0.9907008993543276
+  },
+  "median": {
+   "distance": 0.9336787219498405,
+   "patchcore": 0.8652217802286297,
+   "tabpfn_fast": 0.9466439044214717
+  },
+  "n_candidates": 2,
+  "all": [
+   {
+    "image_id": "test_public/bad/003_regular",
+    "area": 0.012457142857142858,
+    "distance": 0.9959022052190101,
+    "patchcore": 0.9335859481890827,
+    "tabpfn_fast": 0.9907008993543276
+   },
+   {
+    "image_id": "test_public/bad/014_regular",
+    "area": 0.02710375939849624,
+    "distance": 0.8714552386806709,
+    "patchcore": 0.7968576122681766,
+    "tabpfn_fast": 0.9025869094886159
+   }
+  ]
+ },
+ "wallplugs": {
+  "chosen": {
+   "image_id": "test_public/bad/013_regular",
+   "area": 0.0005042381535947713,
+   "distance": 0.706124881748194,
+   "patchcore": 0.07050704571804986,
+   "tabpfn_fast": 0.9996631394762218
+  },
+  "median": {
+   "distance": 0.8325406094534871,
+   "patchcore": 0.5203119628933591,
+   "tabpfn_fast": 0.987378322961058
+  },
+  "n_candidates": 2,
+  "all": [
+   {
+    "image_id": "test_public/bad/013_regular",
+    "area": 0.0005042381535947713,
+    "distance": 0.706124881748194,
+    "patchcore": 0.07050704571804986,
+    "tabpfn_fast": 0.9996631394762218
+   },
+   {
+    "image_id": "test_public/bad/006_regular",
+    "area": 0.0030764910130718953,
+    "distance": 0.9589563371587801,
+    "patchcore": 0.9701168800686684,
+    "tabpfn_fast": 0.9750935064458943
+   }
+  ]
+ },
+ "walnuts": {
+  "chosen": {
+   "image_id": "test_public/bad/013_regular",
+   "area": 0.023788551879084966,
+   "distance": 0.9997954345557369,
+   "patchcore": 0.9943687337673527,
+   "tabpfn_fast": 0.999297505965583
+  },
+  "median": {
+   "distance": 0.9991100263726764,
+   "patchcore": 0.9961110105039941,
+   "tabpfn_fast": 0.9992962467398288
+  },
+  "n_candidates": 2,
+  "all": [
+   {
+    "image_id": "test_public/bad/013_regular",
+    "area": 0.023788551879084966,
+    "distance": 0.9997954345557369,
+    "patchcore": 0.9943687337673527,
+    "tabpfn_fast": 0.999297505965583
+   },
+   {
+    "image_id": "test_public/bad/006_regular",
+    "area": 0.011393229166666666,
+    "distance": 0.9984246181896158,
+    "patchcore": 0.9978532872406356,
+    "tabpfn_fast": 0.9992949875140744
+   }
+  ]
+ }
+}
